@@ -87,7 +87,9 @@ npm run preview      # serve the production build (search works here)
 - **Hosting:** Cloudflare Workers static assets, configured in `wrangler.jsonc`. Deploying creates the DNS record and HTTPS certificate automatically.
 - **www:** `workers/www-redirect/` sends every `www.danielkhan.org` and `http://` address to `https://danielkhan.org`.
 - **Deploy credentials:** the GitHub repository secrets `CLOUDFLARE_API_TOKEN` (template "Edit Cloudflare Workers", limited to this account and zone) and `CLOUDFLARE_ACCOUNT_ID`. If a deploy fails with an authentication error, create a new token and run `gh secret set CLOUDFLARE_API_TOKEN`.
-- **Cloudflare settings that must stay this way:** Always Use HTTPS on, minimum TLS 1.2, Email Address Obfuscation off, Bot Fight Mode off. The last two inject scripts that the site's security policy blocks.
+- **Cloudflare settings that must stay this way:** Always Use HTTPS on, minimum TLS 1.2, TLS 1.3 and HTTP/3 on, DNSSEC on, Email Address Obfuscation off, Bot Fight Mode off. The last two inject scripts that the site's security policy blocks.
+- **Web Analytics:** Cloudflare's cookieless Web Analytics is on; its script is allowed in the security policy (`astro.config.mjs`). If you add any other third-party script, add it to the policy too, or browsers will block it.
+- **Old address:** the separate repo `DANIELKHAN26/danielkhan26.github.io` forwards old links to the same page here.
 
 ## Project structure
 
