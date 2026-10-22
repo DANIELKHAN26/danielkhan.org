@@ -20,8 +20,8 @@ export const SITE = {
   },
 
   contact: {
-    /** A public email address, e.g. 'hello@danielkhan.org'. Empty = hidden. */
-    email: '',
+    /** Public email (Cloudflare Email Routing forwards it to a private inbox). Empty = hidden. */
+    email: 'hello@danielkhan.org',
     /** Free private contact form: paste a Web3Forms access key (https://web3forms.com). Empty = hidden. */
     web3formsAccessKey: '',
   },

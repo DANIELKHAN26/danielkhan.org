@@ -10,6 +10,7 @@ const year = new Date().getFullYear();
     <div class="footer-brand">
       <Lockup class="footer-logo" role="img" aria-label="Daniel Khan" />
       <p>{SITE.role}, {SITE.affiliation}.</p>
+      {SITE.contact.email && <a class="footer-email" href={`mailto:${SITE.contact.email}`}>{SITE.contact.email}</a>}
       <SocialLinks />
     </div>
     <nav aria-label="Explore">
@@ -43,6 +44,8 @@ const year = new Date().getFullYear();
   .footer-brand { display: grid; gap: 1rem; justify-items: start; }
   .footer-brand :global(.footer-logo) { width: 9.5rem; height: auto; color: var(--ink); }
   .footer-brand p { color: var(--ink-soft); }
+  .footer-email { color: var(--sea); font-weight: 600; }
+  .footer-email:hover { color: var(--sea-strong); }
   .footer-label { font-size: var(--text-sm); font-weight: 700; margin-bottom: 0.75rem; }
   .site-footer ul:not(.social) { list-style: none; padding: 0; display: grid; gap: 0.45rem; }
   .site-footer nav a { color: var(--ink-soft); text-decoration: none; }

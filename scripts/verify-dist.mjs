@@ -40,7 +40,15 @@ for (const file of pages) {
 
   for (const [, url] of html.matchAll(/\s(?:href|src)="(\/[^"]*)"/g)) {
     if (url.startsWith('//')) continue;
-    if (!exists(url)) fail(file, `broken internal link ${url}`);
+    if (!exists(url)) { fail(file, `broken internal link ${url}`); continue; }
+    const [path, fragment] = url.split('#');
+    if (fragment) {
+      const target = join(DIST, decodeURIComponent(path.split('?')[0]), path.endsWith('.html') ? '' : 'index.html');
+      if (existsSync(target) && !readFileSync(target, 'utf8').includes(`id="${fragment}"`)) fail(file, `link to missing section ${url}`);
+    }
+  }
+  for (const [, fragment] of html.matchAll(/\shref="#([^"]+)"/g)) {
+    if (!html.includes(`id="${fragment}"`)) fail(file, `link to missing section #${fragment}`);
   }
   for (const [, set] of html.matchAll(/\ssrcset="([^"]+)"/g)) {
     for (const part of set.split(',')) {
