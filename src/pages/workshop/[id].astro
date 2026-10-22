@@ -1,0 +1,82 @@
+---
+import { render } from 'astro:content';
+import EntryLayout from '../../layouts/EntryLayout.astro';
+import { getWorkshop, isExternal } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const items = await getWorkshop();
+  return items.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content, headings } = await render(entry);
+const actions = [
+  data.demo && { label: data.kind === 'Tool' ? 'Open the tool' : 'View demo', url: data.demo, primary: true },
+  data.download && { label: 'Download', url: data.download, primary: !data.demo },
+  data.source && { label: 'Source code', url: data.source, primary: false },
+].filter((a): a is { label: string; url: string; primary: boolean } => Boolean(a));
+---
+
+<EntryLayout
+  title={data.title}
+  summary={data.summary}
+  section={{ label: 'Open workshop', href: '/workshop/' }}
+  kicker={`Free ${data.kind.toLowerCase()}`}
+  date={data.date}
+  updated={data.updated}
+  status={data.status}
+  tags={data.tags}
+  headings={headings}
+  draft={data.draft}
+  ogType="website"
+>
+  <div class="use-bar not-prose">
+    {actions.map((a) => (
+      <a
+        class={`btn ${a.primary ? 'btn-primary' : 'btn-ghost'}`}
+        href={a.url}
+        download={a.label === 'Download' && !isExternal(a.url) ? '' : undefined}
+        rel={isExternal(a.url) ? 'noopener' : undefined}
+      >{a.label} <span aria-hidden="true">{a.label === 'Download' ? '↓' : '↗'}</span></a>
+    ))}
+  </div>
+
+  <Content />
+
+  <h2 id="licence-and-credits">Licence and credits</h2>
+  <p>
+    Version {data.version}, released under <strong>{data.licence}</strong>.
+    {data.requirements && <> Requirements: {data.requirements}.</>}
+  </p>
+  {data.basedOn.length > 0 ? (
+    <>
+      <p>This resource adapts other people's work. Their licences still apply:</p>
+      <ul>
+        {data.basedOn.map((b) => (
+          <li><a href={b.url} rel="noopener">{b.name}</a>{b.author && <> by {b.author}</>} — {b.licence}</li>
+        ))}
+      </ul>
+    </>
+  ) : (
+    <p>Original work by Daniel Khan.</p>
+  )}
+
+  <Fragment slot="aside">
+    <div class="aside-block">
+      <p class="aside-label">At a glance</p>
+      <dl class="facts">
+        <dt>Type</dt><dd>{data.kind}</dd>
+        <dt>Version</dt><dd>{data.version}</dd>
+        <dt>Licence</dt><dd>{data.licence}</dd>
+      </dl>
+    </div>
+  </Fragment>
+</EntryLayout>
+
+<style>
+  .use-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 1.25rem; border-radius: var(--radius); background: var(--sea-wash); font-family: var(--font-display); }
+  .facts { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; margin: 0; font-size: 0.95rem; }
+  .facts dt { color: var(--ink-faint); }
+  .facts dd { margin: 0; font-weight: 600; }
+</style>

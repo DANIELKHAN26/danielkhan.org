@@ -1,0 +1,125 @@
+---
+const nav = [
+  { label: 'Work', href: '/work/' },
+  { label: 'Workshop', href: '/workshop/' },
+  { label: 'Log', href: '/log/' },
+  { label: 'About', href: '/about/' },
+];
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="wordmark" href="/" aria-label="Daniel Khan, home">
+      <span class="wordmark-mark" aria-hidden="true">DK</span>
+      <span class="wordmark-name">Daniel Khan</span>
+    </a>
+
+    <nav class="site-nav" id="site-nav" aria-label="Main">
+      <ul>
+        {nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+          </li>
+        ))}
+        <li class="nav-cta">
+          <a href="/collaborate/" class="btn btn-primary" aria-current={isCurrent('/collaborate/') ? 'page' : undefined}>Collaborate</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="header-tools">
+      <a class="icon-btn" href="/search/" aria-label="Search the site">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </a>
+      <button class="icon-btn" type="button" id="theme-toggle" aria-label="Use dark theme">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" type="button" id="menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-inner { display: flex; align-items: center; gap: 1rem; min-height: 4.25rem; }
+  .wordmark { display: inline-flex; align-items: center; gap: 0.7rem; text-decoration: none; margin-right: auto; }
+  .wordmark-mark {
+    display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    background: var(--ink); color: var(--paper); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.02em;
+  }
+  .wordmark-name { font-weight: 700; font-size: 1.12rem; font-stretch: 85%; letter-spacing: -0.01em; }
+
+  .site-nav ul { display: flex; align-items: center; gap: 0.25rem; list-style: none; margin: 0; padding: 0; }
+  .site-nav a:not(.btn) {
+    display: block; padding: 0.5rem 0.8rem; border-radius: 999px; text-decoration: none; font-weight: 550; font-size: 0.97rem; color: var(--ink-soft);
+  }
+  .site-nav a:not(.btn):hover { color: var(--ink); background: var(--sunk); }
+  .site-nav a[aria-current='page']:not(.btn) { color: var(--ink); box-shadow: inset 0 -2px 0 var(--sea); border-radius: 0; }
+  .nav-cta { margin-left: 0.5rem; }
+  .nav-cta .btn { min-height: 2.5rem; padding: 0.5rem 1.1rem; }
+
+  .header-tools { display: flex; align-items: center; gap: 0.25rem; }
+  .icon-btn {
+    display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%;
+    border: 0; background: transparent; color: var(--ink); cursor: pointer;
+  }
+  .icon-btn:hover { background: var(--sunk); }
+  .menu-btn { display: none; position: relative; }
+  .menu-btn span { position: absolute; left: 0.75rem; right: 0.75rem; height: 2px; background: currentColor; border-radius: 2px; transition: transform .25s, top .25s; }
+  .menu-btn span:first-child { top: 1rem; }
+  .menu-btn span:last-child { top: 1.5rem; }
+  .menu-btn[aria-expanded='true'] span:first-child { top: 1.25rem; transform: rotate(45deg); }
+  .menu-btn[aria-expanded='true'] span:last-child { top: 1.25rem; transform: rotate(-45deg); }
+
+  @media (max-width: 52rem) {
+    .menu-btn { display: grid; }
+    .site-nav {
+      position: absolute; inset: 100% 0 auto 0; background: var(--paper); border-bottom: 1px solid var(--line);
+      padding: 0.75rem var(--gutter) 1.5rem; display: none;
+    }
+    .site-nav.open { display: block; }
+    .site-nav ul { flex-direction: column; align-items: stretch; gap: 0.1rem; }
+    .site-nav a:not(.btn) { padding: 0.85rem 0.5rem; font-size: 1.15rem; border-radius: var(--radius-sm); }
+    .site-nav a[aria-current='page']:not(.btn) { box-shadow: inset 3px 0 0 var(--sea); border-radius: 0; padding-left: 0.9rem; }
+    .nav-cta { margin: 0.75rem 0 0; }
+    .nav-cta .btn { width: 100%; min-height: 3rem; }
+    .header-tools { order: 3; }
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  const current = () => root.dataset.theme ?? (media.matches ? 'dark' : 'light');
+  const label = () => toggle?.setAttribute('aria-label', current() === 'dark' ? 'Use light theme' : 'Use dark theme');
+  label();
+  media.addEventListener('change', label);
+  toggle?.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch {}
+    label();
+  });
+
+  const menuBtn = document.getElementById('menu-toggle');
+  const nav = document.getElementById('site-nav');
+  const setMenu = (open: boolean) => {
+    nav?.classList.toggle('open', open);
+    menuBtn?.setAttribute('aria-expanded', String(open));
+    menuBtn?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  };
+  menuBtn?.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuBtn?.getAttribute('aria-expanded') === 'true') { setMenu(false); menuBtn.focus(); }
+  });
+</script>

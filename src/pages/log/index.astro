@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Annal from '../../components/Annal.astro';
+import { getLog } from '../../lib/content';
+
+const log = await getLog();
+---
+
+<BaseLayout title="Log" description="Daniel Khan's running record: releases, progress on projects, and lessons from building things.">
+  <header class="page-head wrap">
+    <p class="eyebrow">Log</p>
+    <h1 class="display">The running record.</h1>
+    <p class="lede">Releases, progress and lessons, in date order — a public notebook of what I'm building. Follow it with the <a href="/rss.xml">RSS feed</a>.</p>
+  </header>
+  <section class="section wrap" aria-label="Log entries">
+    {log.length > 0 ? <Annal entries={log} /> : <p class="lede">The first entry is on its way.</p>}
+  </section>
+</BaseLayout>
+
+<style>
+  .lede a { color: var(--sea); }
+</style>

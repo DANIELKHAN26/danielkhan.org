@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout searchable title="Script timer" description="A free tool that estimates how long a script takes to read aloud. Runs entirely in your browser.">
+  <header class="page-head wrap">
+    <p class="eyebrow">Free tool</p>
+    <h1 class="display">How long will this take to say?</h1>
+    <p class="lede">Paste a script to estimate its spoken length at the pace you choose. Everything happens in your browser — your text is never uploaded or stored.</p>
+  </header>
+
+  <section class="section wrap timer">
+    <div class="timer-input">
+      <label for="script" class="timer-label">Script</label>
+      <textarea id="script" rows="14" placeholder="Paste or type your narration here…"></textarea>
+      <div class="timer-actions">
+        <button type="button" class="btn btn-ghost" id="clear">Clear</button>
+        <button type="button" class="btn btn-ghost" id="save">Save as .txt <span aria-hidden="true">↓</span></button>
+      </div>
+    </div>
+
+    <aside class="timer-panel" aria-label="Estimate">
+      <div class="pace">
+        <label for="wpm" class="timer-label">Speaking pace</label>
+        <input id="wpm" type="range" min="100" max="190" step="5" value="140" aria-describedby="wpm-help" />
+        <p class="pace-value"><output id="wpm-out" for="wpm">140</output> words per minute</p>
+        <p id="wpm-help" class="hint">About 130–150 suits documentary narration; 160+ is brisk.</p>
+      </div>
+      <dl class="figures" aria-live="polite">
+        <div class="big"><dt>Estimated time</dt><dd id="time">0:00</dd></div>
+        <div><dt>Words</dt><dd id="words">0</dd></div>
+        <div><dt>With pauses</dt><dd id="paused">0:00</dd></div>
+        <div><dt>Paragraphs</dt><dd id="paras">0</dd></div>
+      </dl>
+      <p class="hint">“With pauses” adds about one second per paragraph break and half a second per sentence. Always rehearse aloud — numbers, names and quotations slow you down.</p>
+    </aside>
+  </section>
+</BaseLayout>
+
+<style>
+  .timer { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+  .timer-label { display: block; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.6rem; }
+  .timer textarea { min-height: 22rem; font-family: var(--font-serif); font-size: 1.15rem; line-height: 1.6; }
+  .timer-actions { display: flex; gap: 0.75rem; margin-top: 0.9rem; }
+  .timer-panel { position: sticky; top: 6rem; display: grid; gap: 1.5rem; padding: 1.75rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .pace input { width: 100%; accent-color: var(--sea); }
+  .pace-value { font-weight: 600; margin-top: 0.4rem; }
+  .hint { font-size: 0.88rem; color: var(--ink-faint); }
+  .figures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0; }
+  .figures div { border-top: 1px solid var(--line); padding-top: 0.6rem; }
+  .figures .big { grid-column: 1 / -1; border-top: 2px solid var(--ink); }
+  .figures dt { font-size: 0.85rem; color: var(--ink-faint); }
+  .figures dd { margin: 0; font-family: var(--font-mono); font-size: 1.4rem; }
+  .figures .big dd { font-size: clamp(2.5rem, 6vw, 3.6rem); color: var(--sea); letter-spacing: -0.03em; }
+  @media (max-width: 52rem) { .timer { grid-template-columns: 1fr; } .timer-panel { position: static; } }
+</style>
+
+<script>
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const text = $<HTMLTextAreaElement>('script');
+  const wpm = $<HTMLInputElement>('wpm');
+
+  const clock = (seconds: number) => {
+    const s = Math.round(seconds);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    return h ? `${h}:${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}` : `${m}:${String(r).padStart(2, '0')}`;
+  };
+
+  function update() {
+    const value = text.value.trim();
+    const words = value ? value.split(/\s+/).length : 0;
+    const paragraphs = value ? value.split(/\n\s*\n/).filter((p) => p.trim()).length : 0;
+    const sentences = value ? (value.match(/[.!?…]+(\s|$)/g) ?? []).length : 0;
+    const base = (words / Number(wpm.value)) * 60;
+    $('wpm-out').textContent = wpm.value;
+    $('words').textContent = words.toLocaleString('en-GB');
+    $('paras').textContent = String(paragraphs);
+    $('time').textContent = clock(base);
+    $('paused').textContent = clock(base + Math.max(0, paragraphs - 1) + sentences * 0.5);
+  }
+
+  text.addEventListener('input', update);
+  wpm.addEventListener('input', update);
+  $('clear').addEventListener('click', () => { text.value = ''; update(); text.focus(); });
+  $('save').addEventListener('click', () => {
+    const blob = new Blob([text.value], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'script.txt';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  update();
+</script>

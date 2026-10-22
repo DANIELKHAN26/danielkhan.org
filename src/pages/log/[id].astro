@@ -1,0 +1,40 @@
+---
+import { render } from 'astro:content';
+import EntryLayout from '../../layouts/EntryLayout.astro';
+import { getLog, readingMinutes, isExternal } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const log = await getLog();
+  return log.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content, headings } = await render(entry);
+---
+
+<EntryLayout
+  title={data.title}
+  summary={data.summary}
+  section={{ label: 'Log', href: '/log/' }}
+  kicker="Log"
+  date={data.date}
+  updated={data.updated}
+  tags={data.tags}
+  minutes={readingMinutes(entry.body)}
+  headings={headings}
+  draft={data.draft}
+>
+  <Content />
+
+  <Fragment slot="aside">
+    {data.links.length > 0 && (
+      <div class="aside-block">
+        <p class="aside-label">Related</p>
+        {data.links.map((l) => (
+          <a class="btn btn-ghost" href={l.url} rel={isExternal(l.url) ? 'noopener' : undefined}>{l.label} <span aria-hidden="true">↗</span></a>
+        ))}
+      </div>
+    )}
+  </Fragment>
+</EntryLayout>

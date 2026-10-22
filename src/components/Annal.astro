@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDayMonth, isoDate } from '../lib/content';
+
+interface Props { entries: CollectionEntry<'log'>[]; yearHeading?: 'h2' | 'h3' }
+const { entries, yearHeading: YearHeading = 'h2' } = Astro.props;
+
+const years = new Map<number, CollectionEntry<'log'>[]>();
+for (const entry of entries) {
+  const y = entry.data.date.getUTCFullYear();
+  years.set(y, [...(years.get(y) ?? []), entry]);
+}
+---
+
+<div class="annal">
+  {[...years].map(([year, items]) => (
+    <section class="annal-year" aria-label={`Log entries from ${year}`}>
+      <YearHeading>{year}</YearHeading>
+      <ol class="annal-entries">
+        {items.map((entry) => (
+          <li class="annal-entry">
+            <a href={`/log/${entry.id}/`}>
+              <time datetime={isoDate(entry.data.date)}>{formatDayMonth(entry.data.date)}</time>
+              <strong>{entry.data.title}{entry.data.draft && ' (draft)'}</strong>
+              <span>{entry.data.summary}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+  ))}
+</div>

@@ -1,0 +1,58 @@
+---
+import { render } from 'astro:content';
+import EntryLayout from '../../layouts/EntryLayout.astro';
+import { getWork, WORK_TYPES, readingMinutes, isExternal, joinProjectUrl } from '../../lib/content';
+import { githubCommunityUrl } from '../../site.config';
+
+export async function getStaticPaths() {
+  const work = await getWork();
+  return work.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content, headings } = await render(entry);
+const collab = data.collaboration?.open ? data.collaboration : undefined;
+---
+
+<EntryLayout
+  title={data.title}
+  summary={data.summary}
+  section={{ label: 'All work', href: '/work/' }}
+  kicker={WORK_TYPES[data.type]}
+  date={data.date}
+  updated={data.updated}
+  status={data.status}
+  tags={data.tags}
+  minutes={data.type === 'writing' ? readingMinutes(entry.body) : undefined}
+  headings={headings}
+  cover={data.cover}
+  coverAlt={data.coverAlt}
+  draft={data.draft}
+  ogType={data.type === 'writing' ? 'article' : 'website'}
+>
+  <Content />
+
+  <Fragment slot="aside">
+    {data.links.length > 0 && (
+      <div class="aside-block">
+        <p class="aside-label">Links</p>
+        {data.links.map((l) => (
+          <a class="btn btn-ghost" href={l.url} rel={isExternal(l.url) ? 'noopener' : undefined}>{l.label} <span aria-hidden="true">↗</span></a>
+        ))}
+      </div>
+    )}
+    {collab && (
+      <div class="aside-block collab-box">
+        <p class="aside-label">Open for collaborators</p>
+        {collab.needs.length > 0 && <ul class="needs">{collab.needs.map((n) => <li>{n}</li>)}</ul>}
+        <a class="btn btn-primary" href={joinProjectUrl(githubCommunityUrl, data.title)}>Offer to help</a>
+      </div>
+    )}
+  </Fragment>
+</EntryLayout>
+
+<style>
+  .collab-box { padding: 1.1rem; border-radius: var(--radius); background: var(--sea-wash); }
+  .needs { margin: 0; padding-left: 1.1rem; font-size: 0.95rem; display: grid; gap: 0.3rem; }
+</style>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="32" fill="#0b2a3c"/>
+  <text x="32" y="40" text-anchor="middle" font-family="ui-monospace, 'IBM Plex Mono', Menlo, monospace" font-size="23" font-weight="600" fill="#f3f6f7">DK</text>
+  <rect x="19" y="46" width="26" height="2.5" rx="1.25" fill="#52c4b6"/>
+</svg>

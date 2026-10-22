@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WorkRow from '../../components/WorkRow.astro';
+import { getWork, WORK_TYPES } from '../../lib/content';
+
+const work = await getWork();
+const types = (Object.keys(WORK_TYPES) as (keyof typeof WORK_TYPES)[])
+  .map((type) => ({ type, label: WORK_TYPES[type], count: work.filter((w) => w.data.type === type).length }))
+  .filter((t) => t.count > 0);
+---
+
+<BaseLayout title="Work" description="Research, writing, documentary work and independent projects by Daniel Khan, each with an honest status label.">
+  <header class="page-head wrap">
+    <p class="eyebrow">Work</p>
+    <h1 class="display">Things worth finishing well.</h1>
+    <p class="lede">Research, writing, documentary work and larger projects. Every entry carries a status, so you can tell a concept from finished work.</p>
+  </header>
+
+  <section class="section wrap" aria-label="All work">
+    <div class="filters" id="work-filters" role="group" aria-label="Filter by type" hidden>
+      <button class="chip" type="button" data-filter="all" aria-pressed="true">All<span class="count">{work.length}</span></button>
+      {types.map((t) => (
+        <button class="chip" type="button" data-filter={t.type} aria-pressed="false">{t.label}<span class="count">{t.count}</span></button>
+      ))}
+    </div>
+    <p class="visually-hidden" id="filter-status" role="status"></p>
+    {work.length > 0
+      ? <ul class="ledger" id="work-list">{work.map((entry) => <WorkRow entry={entry} headingLevel="h2" />)}</ul>
+      : <p class="lede">New work is on its way. Meanwhile, browse the <a href="/workshop/">open workshop</a>.</p>}
+  </section>
+</BaseLayout>
+
+<script>
+  const bar = document.getElementById('work-filters');
+  const rows = [...document.querySelectorAll<HTMLElement>('#work-list .ledger-row')];
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('#work-filters .chip')];
+  const status = document.getElementById('filter-status');
+
+  function apply(filter: string, push: boolean) {
+    const valid = chips.some((c) => c.dataset.filter === filter) ? filter : 'all';
+    let shown = 0;
+    for (const row of rows) {
+      const match = valid === 'all' || row.dataset.type === valid;
+      row.hidden = !match;
+      if (match) shown++;
+    }
+    for (const chip of chips) chip.setAttribute('aria-pressed', String(chip.dataset.filter === valid));
+    if (status) status.textContent = `Showing ${shown} ${shown === 1 ? 'entry' : 'entries'}`;
+    if (push) {
+      const url = new URL(location.href);
+      if (valid === 'all') url.searchParams.delete('type'); else url.searchParams.set('type', valid);
+      history.replaceState(null, '', url);
+    }
+  }
+
+  if (bar && rows.length) {
+    bar.hidden = false;
+    chips.forEach((chip) => chip.addEventListener('click', () => apply(chip.dataset.filter ?? 'all', true)));
+    apply(new URLSearchParams(location.search).get('type') ?? 'all', false);
+  }
+</script>

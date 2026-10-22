@@ -1,0 +1,13 @@
+# Keeps dependencies and GitHub Actions up to date with monthly, grouped pull requests.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: monthly }
+    groups:
+      all-npm: { patterns: ['*'] }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }
+    groups:
+      all-actions: { patterns: ['*'] }

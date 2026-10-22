@@ -1,0 +1,31 @@
+name: Monthly link check
+
+# Checks every external link on the live site once a month.
+# GitHub emails you if it fails, so broken links never go unnoticed for long.
+on:
+  schedule:
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci && npm run build
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --max-retries 3 --timeout 30
+            --root-dir "${{ github.workspace }}/dist"
+            --exclude '^https://danielkhan26\.github\.io'
+            --exclude '^https://github\.com/.*/(issues/new|discussions)'
+            'dist/**/*.html'
+          fail: true

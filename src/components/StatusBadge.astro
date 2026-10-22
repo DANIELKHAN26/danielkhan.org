@@ -1,0 +1,6 @@
+---
+interface Props { status: string }
+const { status } = Astro.props;
+---
+
+<span class="status" data-status={status}>{status}</span>

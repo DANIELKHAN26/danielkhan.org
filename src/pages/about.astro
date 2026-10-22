@@ -1,0 +1,83 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, socialLinks, githubCommunityUrl } from '../site.config';
+import portrait from '../assets/daniel-khan-portrait.jpg';
+---
+
+<BaseLayout searchable title="About" description="About Daniel Khan — research, evidence-led writing, documentary work and open tools.">
+  <section class="about wrap">
+    <div class="about-photo">
+      <Picture
+        src={portrait}
+        formats={['avif', 'webp']}
+        widths={[400, 692]}
+        sizes="(min-width: 52rem) 26rem, 90vw"
+        alt="Portrait of Daniel Khan on a windy beach, in a light-blue shirt, with the sea behind him"
+      />
+    </div>
+    <div class="about-copy">
+      <p class="eyebrow">About</p>
+      <h1 class="display">Hello, I'm Daniel.</h1>
+      <div class="prose">
+        <p>I work across research, writing, documentary and software. The question comes first; the format follows — an essay, a script, a research brief or a small tool that makes the next piece of work easier.</p>
+        <p>Much of my research looks at public questions in Bangladesh: what a law, budget or statistic actually establishes, and what it leaves unanswered. I try to make difficult subjects clear without making them simpler than they are — publishing sources, treating disputed claims as disputed, and correcting mistakes in the open.</p>
+        <p>This site brings that work together. <a href="/work/the-annalist/">The Annalist</a> is an explanatory-news project in development, <a href="/work/rede/">REDE</a> is a community-platform concept, and the <a href="/workshop/">open workshop</a> holds tools and templates anyone can use.</p>
+      </div>
+      <div class="about-actions">
+        <a class="btn btn-primary" href="/collaborate/">Work with me</a>
+        {SITE.cvUrl && <a class="btn btn-ghost" href={SITE.cvUrl}>Download CV <span aria-hidden="true">↓</span></a>}
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap method" aria-labelledby="method-title">
+    <div>
+      <p class="eyebrow">How I work</p>
+      <h2 id="method-title" class="display">Four steps, in this order.</h2>
+    </div>
+    <ol class="method-steps">
+      <li><strong>Ask the question.</strong><span>What exactly needs explaining, and for whom?</span></li>
+      <li><strong>Examine the record.</strong><span>What can the documents, data and people on record establish?</span></li>
+      <li><strong>Test the other explanation.</strong><span>What else could account for it — and does the conclusion survive?</span></li>
+      <li><strong>Publish what holds.</strong><span>Say what is known, what isn't, and how to report an error.</span></li>
+    </ol>
+  </section>
+
+  {(socialLinks.length > 0 || githubCommunityUrl) && (
+    <section class="section wrap" aria-labelledby="elsewhere-title">
+      <p class="eyebrow">Elsewhere</p>
+      <h2 id="elsewhere-title" class="display elsewhere-title">Find me online</h2>
+      <ul class="elsewhere">
+        {socialLinks.map((s) => <li><a href={s.url} rel="me noopener">{s.label} <span aria-hidden="true">↗</span></a></li>)}
+        {githubCommunityUrl && <li><a href={`${githubCommunityUrl}/discussions`}>Community discussions <span aria-hidden="true">↗</span></a></li>}
+      </ul>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .about { display: grid; grid-template-columns: minmax(0, 26rem) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); padding-block: clamp(3rem, 7vw, 5.5rem); align-items: start; }
+  .about-photo { position: sticky; top: 6rem; }
+  .about-photo :global(img) { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius); box-shadow: var(--shadow); }
+  .about h1 { font-size: var(--step-5); margin-block: 1rem 2rem; }
+  .about-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2.25rem; }
+  @media (max-width: 52rem) {
+    .about { grid-template-columns: 1fr; }
+    .about-photo { position: static; max-width: 22rem; }
+  }
+
+  .method { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: clamp(2rem, 6vw, 5rem); }
+  .method h2 { font-size: var(--step-3); margin-top: 0.75rem; }
+  .method-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; border-top: 2px solid var(--ink); }
+  .method-steps li { counter-increment: s; display: grid; grid-template-columns: 3.5rem 1fr; gap: 0.2rem 0; padding: 1.2rem 0; border-bottom: 1px solid var(--line); }
+  .method-steps li::before { content: counter(s, decimal-leading-zero); grid-row: span 2; font-family: var(--font-mono); color: var(--shingle); padding-top: 0.25rem; }
+  .method-steps strong { font-size: var(--step-1); font-stretch: 88%; }
+  .method-steps span { color: var(--ink-soft); font-family: var(--font-serif); }
+  @media (max-width: 52rem) { .method { grid-template-columns: 1fr; } }
+
+  .elsewhere-title { font-size: var(--step-3); margin-block: 0.75rem 1.5rem; }
+  .elsewhere { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .elsewhere a { display: inline-flex; gap: 0.4rem; padding: 0.7rem 1.1rem; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-weight: 600; background: var(--surface); }
+  .elsewhere a:hover { border-color: var(--sea); color: var(--sea); }
+</style>

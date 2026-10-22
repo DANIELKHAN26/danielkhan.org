@@ -1,0 +1,87 @@
+---
+import { Font } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE, socialLinks } from '../site.config';
+import ogDefault from '../assets/og-card.png';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** 'article' for writing and log entries. */
+  ogType?: 'website' | 'article';
+  published?: Date;
+  /** Exclude a page from search engines. */
+  noindex?: boolean;
+  /** Include this page's main content in the site search (listing pages leave it off). */
+  searchable?: boolean;
+}
+
+const { title, description = SITE.description, ogType = 'website', published, noindex = false, searchable = false } = Astro.props;
+const fullTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.roles.join(' · ')}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(ogDefault.src, Astro.site);
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+  sameAs: socialLinks.map((s) => s.url),
+};
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f3f6f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#06161f" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — new work and log`} href="/rss.xml" />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${SITE.name} on a windy beach, with the sea behind`} />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-serif" />
+    <Font cssVariable="--font-mono" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
+
+    <!-- Apply the saved theme before first paint so the page never flashes. -->
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" data-pagefind-body={searchable && !noindex ? '' : undefined}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

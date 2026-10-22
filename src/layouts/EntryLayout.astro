@@ -1,0 +1,133 @@
+---
+import type { MarkdownHeading } from 'astro';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import StatusBadge from '../components/StatusBadge.astro';
+import { formatDate, isoDate, isExternal } from '../lib/content';
+import { githubCommunityUrl } from '../site.config';
+
+interface Props {
+  title: string;
+  summary: string;
+  section: { label: string; href: string };
+  kicker: string;
+  date: Date;
+  updated?: Date;
+  status?: string;
+  tags?: string[];
+  minutes?: number;
+  headings?: MarkdownHeading[];
+  cover?: ImageMetadata;
+  coverAlt?: string;
+  draft?: boolean;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title, summary, section, kicker, date, updated, status, tags = [], minutes,
+  headings = [], cover, coverAlt, draft = false, ogType = 'article',
+} = Astro.props;
+
+const toc = headings.filter((h) => h.depth === 2);
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const correctionUrl = githubCommunityUrl
+  ? `${githubCommunityUrl}/issues/new?template=correction.yml&page=${encodeURIComponent(pageUrl)}`
+  : '/collaborate/';
+---
+
+<BaseLayout title={title} description={summary} ogType={ogType} published={date} noindex={draft} searchable>
+  <article>
+    <header class="entry-head wrap">
+      <a class="crumb" href={section.href} data-pagefind-ignore><span aria-hidden="true">←</span> {section.label}</a>
+      {draft && <p class="draft-flag" role="note">Draft — only visible in local preview. Set <code>draft: false</code> to publish.</p>}
+      <div class="entry-kicker" data-pagefind-ignore>
+        <span class="eyebrow">{kicker}</span>
+        {status && <StatusBadge status={status} />}
+      </div>
+      <h1 class="display">{title}</h1>
+      <p class="lede">{summary}</p>
+      <p class="entry-meta mono" data-pagefind-ignore>
+        <time datetime={isoDate(date)}>{formatDate(date)}</time>
+        {updated && <span>Updated <time datetime={isoDate(updated)}>{formatDate(updated)}</time></span>}
+        {minutes && <span>{minutes} min read</span>}
+      </p>
+    </header>
+
+    {cover && coverAlt && (
+      <figure class="entry-cover wrap"><Image src={cover} alt={coverAlt} widths={[640, 960, 1280, 1600]} sizes="(min-width: 76rem) 76rem, 100vw" /></figure>
+    )}
+
+    <div class="entry-body wrap">
+      <div class="prose">
+        <slot />
+      </div>
+
+      <aside class="entry-aside" aria-label="About this entry" data-pagefind-ignore>
+        <div class="aside-inner">
+          <slot name="aside" />
+          {toc.length >= 2 && (
+            <nav class="aside-block" aria-label="On this page">
+              <p class="aside-label">On this page</p>
+              <ol class="toc">{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+            </nav>
+          )}
+          {tags.length > 0 && (
+            <div class="aside-block">
+              <p class="aside-label">Topics</p>
+              <ul class="tag-list">{tags.map((t) => <li>{t}</li>)}</ul>
+            </div>
+          )}
+          <div class="aside-block no-print">
+            <button type="button" class="btn btn-ghost copy-link" data-url={pageUrl}>Copy link</button>
+            <span class="copy-status mono" role="status"></span>
+            <a class="aside-small" href={correctionUrl} rel={isExternal(correctionUrl) ? 'noopener' : undefined}>Suggest a correction</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </article>
+  <slot name="after" />
+</BaseLayout>
+
+<style>
+  .entry-head { padding-block: clamp(2.5rem, 6vw, 4.5rem) 2rem; }
+  .crumb { display: inline-flex; gap: 0.4rem; text-decoration: none; color: var(--ink-soft); font-weight: 550; margin-bottom: 2rem; }
+  .crumb:hover { color: var(--sea); }
+  .draft-flag { background: #fff3d6; color: #5a3d00; border: 1px solid #e9c46a; padding: 0.6rem 0.9rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-size: 0.95rem; }
+  .entry-kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.25rem; }
+  .entry-head h1 { font-size: var(--step-5); margin-block: 1.1rem 1.25rem; max-width: 18ch; }
+  .entry-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; margin-top: 1.5rem; color: var(--ink-faint); }
+  .entry-cover { margin-block: 0 2.5rem; }
+  .entry-cover :global(img) { width: 100%; border-radius: var(--radius); }
+
+  .entry-body {
+    display: grid; grid-template-columns: minmax(0, 1fr) 17rem; gap: clamp(2rem, 6vw, 5rem);
+    padding-top: 2.5rem; border-top: 1px solid var(--line);
+  }
+  .aside-inner { position: sticky; top: 6rem; display: grid; gap: 1.75rem; }
+  .toc { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.45rem; font-size: 0.95rem; }
+  .toc a { color: var(--ink-soft); text-decoration: none; }
+  .toc a:hover { color: var(--sea); text-decoration: underline; }
+  .aside-small { font-size: 0.9rem; color: var(--ink-soft); }
+  .copy-status:empty { display: none; }
+
+  @media (max-width: 60rem) {
+    .entry-body { grid-template-columns: 1fr; }
+    .aside-inner { position: static; padding-top: 2rem; border-top: 1px solid var(--line); }
+  }
+</style>
+
+<script>
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('.copy-link')) {
+    const status = btn.parentElement?.querySelector('.copy-status');
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.url ?? location.href);
+        if (status) status.textContent = 'Link copied';
+      } catch {
+        if (status) status.textContent = 'Copy failed — use the address bar';
+      }
+    });
+  }
+</script>

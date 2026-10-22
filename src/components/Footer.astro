@@ -1,0 +1,60 @@
+---
+import { SITE, socialLinks, githubCommunityUrl } from '../site.config';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-lead">
+      <p class="footer-title">Have a question worth answering properly?</p>
+      <a class="text-link" href="/collaborate/">Work with me <span aria-hidden="true">→</span></a>
+    </div>
+
+    <nav aria-label="Site">
+      <p class="footer-label">Site</p>
+      <ul>
+        <li><a href="/work/">Work</a></li>
+        <li><a href="/workshop/">Open workshop</a></li>
+        <li><a href="/log/">Log</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/search/">Search</a></li>
+      </ul>
+    </nav>
+
+    <nav aria-label="Elsewhere">
+      <p class="footer-label">Elsewhere</p>
+      <ul>
+        {socialLinks.map((s) => <li><a href={s.url} rel="me noopener">{s.label}</a></li>)}
+        {githubCommunityUrl && <li><a href={`${githubCommunityUrl}/discussions`}>Community discussions</a></li>}
+        <li><a href="/rss.xml">RSS feed</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap footer-base">
+    <span>© {year} {SITE.name}. Writing and media all rights reserved; workshop resources carry their own licences.</span>
+    <a href="/privacy/">Privacy</a>
+  </div>
+</footer>
+
+<style>
+  .site-footer { margin-top: clamp(4rem, 10vw, 7rem); background: var(--ink); color: var(--paper); }
+  :root[data-theme='dark'] .site-footer { background: #030d13; color: var(--ink); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .site-footer { background: #030d13; color: var(--ink); } }
+
+  .footer-grid {
+    display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); gap: 2.5rem;
+    padding-block: clamp(3rem, 7vw, 5rem) 2.5rem;
+  }
+  .footer-title { font-size: var(--step-3); font-weight: 700; font-stretch: 80%; letter-spacing: -0.03em; line-height: 1.02; max-width: 16ch; margin-bottom: 1.5rem; }
+  .footer-lead .text-link { color: #7fd6ca; }
+  .footer-label { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; margin-bottom: 0.9rem; }
+  .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+  .site-footer nav a { text-decoration: none; opacity: 0.88; }
+  .site-footer nav a:hover { opacity: 1; text-decoration: underline; }
+  .footer-base {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding-block: 1.5rem 2rem;
+    border-top: 1px solid rgb(255 255 255 / 14%); font-size: 0.85rem; opacity: 0.8;
+  }
+  .footer-base a { color: inherit; }
+  @media (max-width: 44rem) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-lead { grid-column: 1 / -1; } }
+</style>

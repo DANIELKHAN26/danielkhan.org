@@ -1,0 +1,25 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import StatusBadge from './StatusBadge.astro';
+import { WORK_TYPES } from '../lib/content';
+
+interface Props { entry: CollectionEntry<'work'>; headingLevel?: 'h2' | 'h3' }
+const { entry, headingLevel: Heading = 'h3' } = Astro.props;
+const { data } = entry;
+---
+
+<li class="ledger-row" data-type={data.type}>
+  <a href={`/work/${entry.id}/`}>
+    <span class="ledger-year">{data.date.getUTCFullYear()}</span>
+    <Heading class="ledger-title">{data.title}{data.draft && ' (draft)'}</Heading>
+    <span class="ledger-meta">
+      <span class="ledger-type">{WORK_TYPES[data.type]}</span>
+      <StatusBadge status={data.status} />
+    </span>
+    <p class="ledger-summary">{data.summary}</p>
+    {data.cover && data.coverAlt && (
+      <div class="ledger-thumb"><Image src={data.cover} alt={data.coverAlt} width={480} /></div>
+    )}
+  </a>
+</li>

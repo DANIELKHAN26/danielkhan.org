@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Search" description="Search Daniel Khan's work, workshop and log." noindex>
+  <header class="page-head wrap">
+    <p class="eyebrow">Search</p>
+    <h1 class="display">Find anything on the site.</h1>
+    <form class="search-form" role="search" action="/search/" method="get">
+      <label class="visually-hidden" for="q">Search the site</label>
+      <input id="q" name="q" type="search" placeholder="Try “Bangladesh”, “template” or “documentary”" autocomplete="off" />
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+  </header>
+  <section class="section wrap" aria-live="polite">
+    <p id="search-status" class="search-status mono"></p>
+    <ol id="search-results" class="results"></ol>
+  </section>
+</BaseLayout>
+
+<style>
+  .search-form { display: flex; gap: 0.75rem; margin-top: 2rem; max-width: 42rem; }
+  .search-form input { font-size: 1.15rem; padding: 0.9rem 1.1rem; border-radius: 999px; }
+  .search-status { color: var(--ink-faint); margin-bottom: 1.5rem; }
+  .results { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .results :global(li) { border-bottom: 1px solid var(--line); }
+  .results :global(a) { display: grid; gap: 0.35rem; padding: 1.25rem 0; text-decoration: none; }
+  .results :global(.r-title) { font-size: var(--step-1); font-weight: 650; font-stretch: 88%; }
+  .results :global(.r-url) { font-family: var(--font-mono); font-size: 0.75rem; color: var(--shingle); }
+  .results :global(.r-excerpt) { font-family: var(--font-serif); color: var(--ink-soft); }
+  .results :global(mark) { background: var(--sea-wash); color: inherit; padding: 0 0.1em; border-radius: 3px; }
+  .results :global(a:hover .r-title) { color: var(--sea); }
+  @media (max-width: 30rem) { .search-form { flex-direction: column; } }
+</style>
+
+<script>
+  type Result = { url: string; excerpt: string; meta: { title?: string } };
+  type Pagefind = { init: () => Promise<void>; debouncedSearch: (q: string) => Promise<{ results: { data: () => Promise<Result> }[] } | null> };
+
+  const input = document.getElementById('q') as HTMLInputElement;
+  const list = document.getElementById('search-results')!;
+  const status = document.getElementById('search-status')!;
+  let pagefind: Pagefind | undefined;
+
+  async function load() {
+    if (pagefind) return pagefind;
+    const path = '/pagefind/pagefind.js';
+    pagefind = (await import(/* @vite-ignore */ path)) as Pagefind;
+    await pagefind.init();
+    return pagefind;
+  }
+
+  function render(results: Result[], query: string) {
+    list.replaceChildren(
+      ...results.map((r) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = r.url;
+        const title = document.createElement('span');
+        title.className = 'r-title';
+        title.textContent = r.meta.title?.replace(/ — Daniel Khan$/, '') ?? r.url;
+        const url = document.createElement('span');
+        url.className = 'r-url';
+        url.textContent = r.url;
+        const excerpt = document.createElement('span');
+        excerpt.className = 'r-excerpt';
+        excerpt.innerHTML = r.excerpt; // Pagefind escapes page text and only adds <mark> tags.
+        a.append(title, url, excerpt);
+        li.append(a);
+        return li;
+      }),
+    );
+    status.textContent = results.length
+      ? `${results.length} result${results.length === 1 ? '' : 's'} for “${query}”`
+      : `Nothing found for “${query}”. Try a shorter or different word.`;
+  }
+
+  async function run(query: string) {
+    const q = query.trim();
+    const url = new URL(location.href);
+    if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+    history.replaceState(null, '', url);
+    if (!q) { list.replaceChildren(); status.textContent = ''; return; }
+    try {
+      const pf = await load();
+      const search = await pf.debouncedSearch(q);
+      if (!search) return; // superseded by a newer keystroke
+      render(await Promise.all(search.results.slice(0, 20).map((r) => r.data())), q);
+    } catch {
+      status.textContent = 'Search is available on the published site (run “npm run build” then “npm run preview” locally).';
+    }
+  }
+
+  input.closest('form')?.addEventListener('submit', (e) => { e.preventDefault(); run(input.value); });
+  input.addEventListener('input', () => run(input.value));
+  const initial = new URLSearchParams(location.search).get('q');
+  if (initial) { input.value = initial; run(initial); }
+  input.focus();
+</script>

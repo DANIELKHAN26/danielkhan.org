@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" noindex>
+  <header class="page-head wrap">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="display">This page isn't on the record.</h1>
+    <p class="lede">It may have moved, or the link may be incomplete. Try the search, or start from one of these:</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="/">Home</a>
+      <a class="btn btn-ghost" href="/search/">Search</a>
+      <a class="btn btn-ghost" href="/work/">Work</a>
+    </div>
+  </header>
+</BaseLayout>
+
+<style>
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+</style>
