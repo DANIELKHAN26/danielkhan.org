@@ -127,7 +127,7 @@ const hrefFor = (type: string) => (work.some((w) => w.data.type === type) ? `/wo
       <div>
         <p class="eyebrow eyebrow-light">Collaborate</p>
         <h2 id="collab-title" class="display">Some questions need more than one person.</h2>
-        <p class="collab-copy">Researchers, designers, developers, translators and anyone with a well-sourced correction are welcome. Join a project below, start a public discussion, or send a private note.</p>
+        <p class="collab-copy">Researchers, designers, developers, translators and anyone with a well-sourced correction are welcome. Join a project, start a public discussion, or send a private note.</p>
         <div class="collab-actions">
           <a class="btn btn-light" href="/collaborate/">Ways to collaborate <span class="arrow" aria-hidden="true">↗</span></a>
           {githubCommunityUrl && <a class="btn btn-outline-light" href={`${githubCommunityUrl}/discussions`}>Start a discussion</a>}
@@ -197,18 +197,18 @@ const hrefFor = (type: string) => (work.some((w) => w.data.type === type) ? `/wo
   .workshop-band { background: var(--sunk); }
 
   /* ----- Collaborate band ----- */
-  .collab-band { background: var(--sea); color: var(--on-sea); padding-block: clamp(4rem, 9vw, 7rem); margin-bottom: calc(-1 * clamp(4rem, 10vw, 7rem)); }
+  .collab-band { background: var(--band); color: var(--on-band); padding-block: clamp(4rem, 9vw, 7rem); margin-bottom: calc(-1 * clamp(4rem, 10vw, 7rem)); }
   .collab-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: start; }
   .collab-band h2 { font-size: var(--step-4); margin-block: 1rem 1.25rem; max-width: 14ch; }
   .eyebrow-light { color: inherit; }
   .collab-copy { font-family: var(--font-serif); font-size: var(--step-1); max-width: 34rem; }
   .collab-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
-  .collab-band .btn-outline-light { color: var(--on-sea); border-color: color-mix(in srgb, var(--on-sea) 50%, transparent); background: transparent; }
+  .collab-band .btn-outline-light { color: var(--on-band); border-color: color-mix(in srgb, var(--on-band) 50%, transparent); background: transparent; }
   /* Darker tint (not lighter) keeps small text above 4.5:1 contrast in both themes. */
   .open-projects { background: rgb(0 0 0 / 14%); border-radius: var(--radius); padding: 1.5rem; }
   .open-label { text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
   .open-projects ul { list-style: none; margin: 0; padding: 0; }
-  .open-projects li { display: grid; gap: 0.25rem; padding-block: 1rem; border-bottom: 1px solid color-mix(in srgb, var(--on-sea) 22%, transparent); }
+  .open-projects li { display: grid; gap: 0.25rem; padding-block: 1rem; border-bottom: 1px solid color-mix(in srgb, var(--on-band) 22%, transparent); }
   .open-projects li:last-child { border-bottom: 0; }
   .open-title { font-weight: 650; font-size: var(--step-1); font-stretch: 88%; text-decoration: none; }
   .open-title:hover { text-decoration: underline; }

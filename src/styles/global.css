@@ -18,6 +18,8 @@
   --sky: #2c6cb5;        /* focus ring, small highlights */
   --shingle: #8a5a24;    /* dates and record marks */
   --on-sea: #ffffff;
+  --band: #0c6b67;
+  --on-band: #ffffff;
 
   --radius: 14px;
   --radius-sm: 8px;
@@ -50,6 +52,8 @@
   --sky: #86b8ee;
   --shingle: #ddac70;
   --on-sea: #04211f;
+  --band: #0d3d3a;
+  --on-band: #e4eef1;
   --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 60%);
 }
 
@@ -69,6 +73,8 @@
     --sky: #86b8ee;
     --shingle: #ddac70;
     --on-sea: #04211f;
+    --band: #0d3d3a;
+    --on-band: #e4eef1;
     --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 60%);
   }
 }
