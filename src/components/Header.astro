@@ -1,4 +1,6 @@
 ---
+import Mark from '../assets/brand/dk-mark.svg';
+
 const nav = [
   { label: 'Work', href: '/work/' },
   { label: 'Workshop', href: '/workshop/' },
@@ -12,7 +14,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="wordmark" href="/" aria-label="Daniel Khan, home">
-      <span class="wordmark-mark" aria-hidden="true">DK</span>
+      <Mark class="wordmark-mark" aria-hidden="true" />
       <span class="wordmark-name">Daniel Khan</span>
     </a>
 
@@ -52,10 +54,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
   }
   .header-inner { display: flex; align-items: center; gap: 1rem; min-height: 4.25rem; }
   .wordmark { display: inline-flex; align-items: center; gap: 0.7rem; text-decoration: none; margin-right: auto; }
-  .wordmark-mark {
-    display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%;
-    background: var(--ink); color: var(--paper); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.02em;
-  }
+  .wordmark :global(.wordmark-mark) { width: 2.6rem; height: auto; color: var(--ink); flex: none; }
   .wordmark-name { font-weight: 700; font-size: 1.12rem; font-stretch: 85%; letter-spacing: -0.01em; }
 
   .site-nav ul { display: flex; align-items: center; gap: 0.25rem; list-style: none; margin: 0; padding: 0; }

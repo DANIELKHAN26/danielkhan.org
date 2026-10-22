@@ -7,6 +7,7 @@ import Annal from '../components/Annal.astro';
 import { getWork, getWorkshop, getLog, joinProjectUrl } from '../lib/content';
 import { SITE, githubCommunityUrl } from '../site.config';
 import portrait from '../assets/daniel-khan-beach.jpg';
+import headshot from '../assets/daniel-khan-headshot.jpg';
 
 const work = await getWork();
 const featured = (work.some((w) => w.data.featured) ? work.filter((w) => w.data.featured) : work).slice(0, 5);
@@ -54,7 +55,10 @@ const hrefFor = (type: string) => (work.some((w) => w.data.type === type) ? `/wo
   <section class="section intro" aria-labelledby="intro-title">
     <div class="wrap intro-grid">
       <div>
-        <p class="eyebrow">What I do</p>
+        <div class="intro-byline">
+          <Picture src={headshot} formats={['avif', 'webp']} widths={[96, 192]} sizes="96px" alt="Daniel Khan" class="avatar" />
+          <p class="eyebrow">What I do</p>
+        </div>
         <h2 id="intro-title" class="intro-text">{SITE.intro}</h2>
       </div>
       <ul class="practice">
@@ -176,6 +180,8 @@ const hrefFor = (type: string) => (work.some((w) => w.data.type === type) ? `/wo
 
   /* ----- Intro ----- */
   .intro-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+  .intro-byline { display: flex; align-items: center; gap: 1rem; }
+  .intro-byline :global(.avatar) { width: 4.5rem; height: 4.5rem; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--sea); }
   .intro-text { font-family: var(--font-serif); font-weight: 400; font-size: var(--step-3); line-height: 1.2; letter-spacing: -0.015em; margin-top: 1.25rem; }
   .practice { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
   .practice li { border-bottom: 1px solid var(--line); }
