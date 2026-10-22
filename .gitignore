@@ -28,3 +28,6 @@ pnpm-debug.log*
 *.pem
 *.key
 /private/
+
+# Wrangler local dev state (never commit)
+.wrangler/
