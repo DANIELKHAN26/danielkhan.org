@@ -8,9 +8,9 @@ import { SITE } from '../site.config';
 
 const all = await getResearch();
 const groups = [
-  { title: 'Under review', items: all.filter((r) => r.data.kind === 'under-review') },
-  { title: 'Conference and seminar papers', items: all.filter((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)) },
-  { title: 'Research projects', items: all.filter((r) => ['thesis', 'project'].includes(r.data.kind)) },
+  { id: 'under-review', title: 'Papers under review', items: all.filter((r) => r.data.kind === 'under-review') },
+  { id: 'presentations', title: 'Conference and seminar papers', items: all.filter((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)) },
+  { id: 'projects', title: 'Research projects', items: all.filter((r) => ['thesis', 'project'].includes(r.data.kind)) },
 ].filter((g) => g.items.length > 0);
 ---
 
@@ -19,24 +19,32 @@ const groups = [
     <ul class="tags interests" aria-label="Research interests">{PROFILE.interests.map((i) => <li>{i}</li>)}</ul>
   </PageHeader>
 
-  {groups.map((g, i) => (
-    <section class="section" aria-labelledby={`group-${i}`}>
-      <div class="container">
-        <div class="section-title"><h2 id={`group-${i}`}>{g.title}</h2></div>
+  <div class="container research">
+    <nav class="jump" aria-label="On this page">
+      {groups.map((g) => <a href={`#${g.id}`}>{g.title} <span>{g.items.length}</span></a>)}
+    </nav>
+    {groups.map((g) => (
+      <section class="group" id={g.id} aria-labelledby={`${g.id}-title`}>
+        <h2 id={`${g.id}-title`}>{g.title}</h2>
         <ResearchList items={g.items} />
-      </div>
-    </section>
-  ))}
-
-  <section class="section">
-    <div class="container note">
-      <p>Ongoing: the <a href="/work/bangladesh-public-interest-research/">Bangladesh public-interest research programme</a>. Interested in a paper or working together? <a href="/collaborate/">Get in touch</a>.</p>
-    </div>
-  </section>
+      </section>
+    ))}
+    <p class="note">
+      Ongoing: the <a href="/work/bangladesh-public-interest-research/">Bangladesh public-interest research programme</a>{' '}
+      and <a href="/lab/">language-technology experiments in the Lab</a>. To discuss a paper, <a href="/collaborate/">get in touch</a>.
+    </p>
+  </div>
 </BaseLayout>
 
 <style>
   .interests { margin-top: 1.25rem; }
-  .note p { color: var(--ink-soft); max-width: var(--measure); }
+  .research { padding-block: 1.5rem var(--space-section); }
+  .jump { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .jump a { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.25rem; padding: 0.3rem 0.8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 0.9rem; font-weight: 600; text-decoration: none; }
+  .jump a:hover { border-color: var(--sea); color: var(--sea); }
+  .jump span { font-size: 0.8rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .group { padding-top: clamp(1.75rem, 1.25rem + 2vw, 2.75rem); }
+  .group h2 { font-size: var(--h3); margin-bottom: 0.75rem; }
+  .note { margin-top: 2.25rem; color: var(--ink-soft); max-width: var(--measure); }
   .note a { color: var(--sea); }
 </style>

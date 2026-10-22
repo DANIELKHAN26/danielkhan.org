@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import researchSource from '../content/research.yaml?raw';
+import librarySource from '../content/library.yaml?raw';
 
 type Dated = { data: { date: Date; draft: boolean } };
 
@@ -10,8 +11,17 @@ const newestFirst = (a: Dated, b: Dated) => b.data.date.getTime() - a.data.date.
 export async function getWork() {
   return (await getCollection('work', visible)).sort(newestFirst);
 }
-export async function getWorkshop() {
-  return (await getCollection('workshop', visible)).sort(newestFirst);
+export async function getLab() {
+  return (await getCollection('lab', visible)).sort(newestFirst);
+}
+/** External work credited in the Lab library, in file order. */
+export async function getLibrary() {
+  const order = [...librarySource.matchAll(/^- id: *(\S+)/gm)].map((m) => m[1]);
+  return (await getCollection('library')).sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+}
+/** Posts from YouTube, Substack, LinkedIn and Facebook, newest first. */
+export async function getUpdates() {
+  return (await getCollection('updates', visible)).sort(newestFirst);
 }
 /** Research outputs, in the order they are written in src/content/research.yaml. */
 export async function getResearch() {

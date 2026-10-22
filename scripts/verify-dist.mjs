@@ -23,7 +23,8 @@ function exists(path) {
 
 const pages = walk(DIST).filter((f) => f.endsWith('.html'));
 const drafts = ['evidence-led-writing', 'the-second-question'];
-const placeholders = /lorem ipsum|TODO|FIXME|example\.com|YOUR-USERNAME|\(draft\)/i;
+// Whole words only ("Christodoulopoulos" must not match TODO); TODO/FIXME must be upper-case markers.
+const placeholders = /\bTODO\b|\bFIXME\b|lorem ipsum|example\.com|YOUR-USERNAME|\(draft\)|TITLE — replace/i;
 
 for (const file of pages) {
   const html = readFileSync(file, 'utf8');
@@ -34,7 +35,8 @@ for (const file of pages) {
   if (!isRedirectOr404 && !/<link rel="canonical" href="https:\/\//.test(html)) fail(file, 'missing canonical URL');
   if (!/http-equiv="content-security-policy"/.test(html)) fail(file, 'missing Content-Security-Policy meta');
   if ((html.match(/<h1[\s>]/g) ?? []).length !== 1) fail(file, 'must have exactly one <h1>');
-  if (/<img(?![^>]*\balt=)[^>]*>/.test(html)) fail(file, 'image without alt attribute');
+  // A bare `alt` attribute is valid (it equals alt="", used for decorative images).
+  if (/<img(?![^>]*\salt(?:=|[\s>]))[^>]*>/.test(html)) fail(file, 'image without alt attribute');
   if (placeholders.test(html.replace(/<script[\s\S]*?<\/script>/g, ''))) fail(file, `placeholder text found: ${html.match(placeholders)[0]}`);
   for (const d of drafts) if (html.includes(`/work/${d}/`)) fail(file, `links to draft "${d}"`);
 

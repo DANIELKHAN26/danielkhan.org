@@ -17,4 +17,4 @@ A change in law is not the same as its enforcement, and a budget allocation is n
 - The institutions responsible for each decision.
 - The strongest competing explanation, tested rather than dismissed.
 
-Finished work is published with source notes and a correction history. Working files and anything that could identify participants stay private. The [evidence ledger](/workshop/evidence-ledger/) used here is free in the workshop.
+Finished work is published with source notes and a correction history. Working files and anything that could identify participants stay private. The [evidence ledger](/lab/evidence-ledger/) used here is free in the Lab.

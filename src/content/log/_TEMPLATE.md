@@ -7,7 +7,7 @@ draft: true
 tags: [Build notes]
 links:                 # optional related links
   - label: The release
-    url: /workshop/my-tool/
+    url: /lab/my-tool/
 ---
 
 What you made, changed or learned — and what you'd like help with next.

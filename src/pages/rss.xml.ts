@@ -1,14 +1,14 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
-import { getWork, getLog, getWorkshop } from '../lib/content';
+import { getWork, getLog, getLab } from '../lib/content';
 import { SITE } from '../site.config';
 
 export async function GET(context: APIContext) {
-  const [work, log, workshop] = await Promise.all([getWork(), getLog(), getWorkshop()]);
+  const [work, log, lab] = await Promise.all([getWork(), getLog(), getLab()]);
   const items = [
     ...work.map((e) => ({ title: e.data.title, description: e.data.summary, pubDate: e.data.date, link: `/work/${e.id}/`, categories: e.data.tags })),
     ...log.map((e) => ({ title: e.data.title, description: e.data.summary, pubDate: e.data.date, link: `/log/${e.id}/`, categories: e.data.tags })),
-    ...workshop.map((e) => ({ title: `${e.data.title} (free ${e.data.kind.toLowerCase()})`, description: e.data.summary, pubDate: e.data.date, link: `/workshop/${e.id}/`, categories: e.data.tags })),
+    ...lab.map((e) => ({ title: e.data.kind === 'Experiment' ? `${e.data.title} (experiment)` : `${e.data.title} (free ${e.data.kind.toLowerCase()})`, description: e.data.summary, pubDate: e.data.date, link: `/lab/${e.id}/`, categories: e.data.tags })),
   ].sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
   return rss({

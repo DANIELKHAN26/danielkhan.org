@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import SocialLinks from '../../components/SocialLinks.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
+import Icon from '../../components/Icon.astro';
 import { getWork, joinProjectUrl } from '../../lib/content';
 import { SITE, githubCommunityUrl, socialLinks } from '../../site.config';
 
@@ -14,102 +14,138 @@ const hasForm = web3formsAccessKey.length > 0;
 const linkedin = socialLinks.find((s) => s.icon === 'linkedin');
 ---
 
-<BaseLayout searchable title="Collaborate" description="Join one of Daniel Khan's projects, start a public discussion, or get in touch privately.">
-  <PageHeader title="Collaborate" lede="Join a project that's already moving, raise an idea in public, or get in touch privately. Corrections are as welcome as proposals." />
+<BaseLayout searchable title="Collaborate" description="Work with Daniel Khan: join a project, write privately, or start a public discussion.">
+  <PageHeader title="Collaborate" lede="Join a project that's already moving, write to me privately, or raise an idea in public. Corrections are as welcome as proposals." />
 
-  <section class="section" id="projects" aria-labelledby="join-title">
-    <div class="container">
-      <div class="section-title"><h2 id="join-title">Join a project</h2></div>
-      <p class="section-intro">Say what you'd bring and suggest a small first step. The button opens a short form on GitHub.</p>
-      <ul class="rows">
-        {open.map((p) => (
-          <li class="row">
-            <div class="row-static join">
-              <a class="row-title" href={`/work/${p.id}/`}>{p.data.title}</a>
-              <span class="row-meta"><StatusBadge status={p.data.status} /></span>
-              {p.data.collaboration?.needs.length ? <p class="row-text">Looking for: {p.data.collaboration.needs.join(', ')}</p> : null}
-              <a class="btn btn-ghost join-btn" href={joinProjectUrl(githubCommunityUrl, p.data.title)}>Offer to help</a>
-            </div>
-          </li>
-        ))}
-      </ul>
-      {projects.length > open.length && <p class="more">Other projects welcome good proposals too — see <a href="/work/">all projects</a>.</p>}
-    </div>
-  </section>
-
-  <section class="section" id="message" aria-labelledby="contact-title">
-    <div class="container contact">
-      <div>
-        <div class="section-title"><h2 id="contact-title">Get in touch</h2></div>
-        <ul class="routes">
-          {email && <li><strong>Email</strong><a href={`mailto:${email}`}>{email}</a></li>}
-          {linkedin && <li><strong>Private message</strong><a href={linkedin.url} rel="noopener">Message me on LinkedIn</a></li>}
-          {githubCommunityUrl && <li><strong>Public discussion</strong><a href={`${githubCommunityUrl}/discussions`}>Ideas, questions and resources on GitHub</a></li>}
-        </ul>
-        <p class="caution">Please don't send passwords, confidential documents or information about research participants. For sensitive material, ask first and we'll agree a secure route.</p>
-        <div class="elsewhere"><SocialLinks variant="list" /></div>
-      </div>
-      {hasForm && (
-        <div>
-        <form class="message-form" method="POST" action="https://api.web3forms.com/submit">
-          <input type="hidden" name="access_key" value={web3formsAccessKey} />
-          <input type="hidden" name="subject" value={`New message from ${SITE.name}'s website`} />
-          <input type="hidden" name="from_name" value={`${SITE.name} website`} />
-          <input type="hidden" name="redirect" value={new URL('/collaborate/thanks/', Astro.site).href} />
-          <input type="checkbox" name="botcheck" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <div class="field">
-            <label for="f-name">Your name</label>
-            <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" />
-          </div>
-          <div class="field">
-            <label for="f-email">Your email</label>
-            <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="254" />
-            <span class="hint">Only used to reply to you.</span>
-          </div>
-          <div class="field">
-            <label for="f-topic">What is it about?</label>
-            <select id="f-topic" name="topic">
-              <option>A collaboration idea</option>
-              {projects.map((p) => <option>Joining: {p.data.title}</option>)}
-              <option>A correction or source</option>
-              <option>Media or speaking request</option>
-              <option>Something else</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="f-message">Message</label>
-            <textarea id="f-message" name="message" required maxlength="5000" rows="7"></textarea>
-          </div>
-          <label class="consent"><input type="checkbox" name="consent" value="yes" required /> I agree that this message is delivered through Web3Forms, a third-party form service, so Daniel can reply.</label>
-          <button class="btn btn-primary" type="submit">Send message</button>
-        </form>
-        </div>
+  <div class="container collab">
+    <section class="ways" aria-label="Ways to get involved">
+      <article class="way" id="message">
+        <span class="way-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.4" d="M1.5 3.5h13v9h-13zM1.8 3.8 8 8.6l6.2-4.8" /></svg></span>
+        <h2>Write to me</h2>
+        <p>Partnerships, commissions, media requests or anything private.</p>
+        {email && <a class="btn btn-primary" href={`mailto:${email}`}>{email}</a>}
+        {linkedin && <a class="way-alt" href={linkedin.url} rel="noopener"><Icon name="linkedin" size={14} /> Or message me on LinkedIn</a>}
+      </article>
+      <article class="way">
+        <span class="way-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.4" d="M5.5 7a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM1 14c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4M11 7.5a2 2 0 1 0 0-4M12 10c1.8.3 3 1.6 3 4" /></svg></span>
+        <h2>Join a project</h2>
+        <p>Add your skills to work in progress. Each offer opens a short public form on GitHub.</p>
+        <a class="btn btn-ghost" href="#projects">See open projects ↓</a>
+      </article>
+      {githubCommunityUrl && (
+        <article class="way">
+          <span class="way-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.4" d="M2 2.5h12v8H6l-3.5 3v-3H2z" /></svg></span>
+          <h2>Discuss in public</h2>
+          <p>Ideas, questions and useful resources — anyone can read and reply.</p>
+          <a class="btn btn-ghost" href={`${githubCommunityUrl}/discussions`}>Open discussions ↗</a>
+        </article>
       )}
-    </div>
-  </section>
+    </section>
+
+    {open.length > 0 && (
+      <section class="block" id="projects" aria-labelledby="projects-title">
+        <h2 id="projects-title">Open projects</h2>
+        <div class="open">
+          {open.map((p) => (
+            <article class="open-card">
+              <div class="open-top">
+                <h3><a href={`/work/${p.id}/`}>{p.data.title}</a></h3>
+                <StatusBadge status={p.data.status} />
+              </div>
+              {p.data.collaboration?.needs.length ? (
+                <ul class="needs" aria-label="Looking for">{p.data.collaboration.needs.map((n) => <li>{n}</li>)}</ul>
+              ) : null}
+              <a class="btn btn-ghost btn-sm" href={joinProjectUrl(githubCommunityUrl, p.data.title)}>Offer to help</a>
+            </article>
+          ))}
+        </div>
+        {projects.length > open.length && <p class="more">Other projects welcome good proposals too — see <a href="/work/">all projects</a>.</p>}
+      </section>
+    )}
+
+    <section class="block guide" aria-labelledby="guide-title">
+      <h2 id="guide-title">What to include</h2>
+      <ol class="steps">
+        <li><strong>The problem.</strong> What question, gap or bug would we work on?</li>
+        <li><strong>What you'd bring.</strong> Skills, sources, code or time — and what is still uncertain.</li>
+        <li><strong>A first step.</strong> Something small we could finish and check within a few weeks.</li>
+      </ol>
+      <p class="caution">Please don't send passwords, confidential documents or information about research participants. For sensitive material, ask first and we'll agree a secure route.</p>
+    </section>
+
+    {hasForm && (
+      <section class="block" aria-label="Message form">
+          <form class="message-form" method="POST" action="https://api.web3forms.com/submit">
+            <input type="hidden" name="access_key" value={web3formsAccessKey} />
+            <input type="hidden" name="subject" value={`New message from ${SITE.name}'s website`} />
+            <input type="hidden" name="from_name" value={`${SITE.name} website`} />
+            <input type="hidden" name="redirect" value={new URL('/collaborate/thanks/', Astro.site).href} />
+            <input type="checkbox" name="botcheck" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div class="field">
+              <label for="f-name">Your name</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" />
+            </div>
+            <div class="field">
+              <label for="f-email">Your email</label>
+              <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="254" />
+              <span class="hint">Only used to reply to you.</span>
+            </div>
+            <div class="field">
+              <label for="f-topic">What is it about?</label>
+              <select id="f-topic" name="topic">
+                <option>A collaboration idea</option>
+                {projects.map((p) => <option>Joining: {p.data.title}</option>)}
+                <option>A correction or source</option>
+                <option>Media or speaking request</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f-message">Message</label>
+              <textarea id="f-message" name="message" required maxlength="5000" rows="7"></textarea>
+            </div>
+            <label class="consent"><input type="checkbox" name="consent" value="yes" required /> I agree that this message is delivered through Web3Forms, a third-party form service, so Daniel can reply.</label>
+            <button class="btn btn-primary" type="submit">Send message</button>
+          </form>
+      </section>
+    )}
+  </div>
 </BaseLayout>
 
 <style>
-  .join { grid-template-columns: minmax(0, 1fr) auto; }
-  .row-title { text-decoration: none; }
-  .row-title:hover { color: var(--sea); text-decoration: underline; }
-  .join-btn { grid-column: 1; justify-self: start; margin-top: 0.5rem; }
+  .collab { padding-block: 2rem var(--space-section); }
+  .ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
+  .way { display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; padding: 1.35rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); scroll-margin-top: 6rem; }
+  .way-icon { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sea-wash); color: var(--sea); }
+  .way h2 { font-size: var(--h3); }
+  .way p { color: var(--ink-soft); flex: 1; }
+  .way .btn { max-width: 100%; overflow-wrap: anywhere; }
+  .way-alt { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 1.5rem; font-size: 0.88rem; color: var(--ink-soft); }
+  .way-alt:hover { color: var(--sea); }
+
+  .block { padding-top: clamp(2rem, 1.5rem + 2vw, 3rem); scroll-margin-top: 5rem; }
+  .block > h2 { font-size: var(--h2); margin-bottom: 1rem; }
+  .open { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
+  .open-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 1.15rem 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .open-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; width: 100%; }
+  .open-top h3 { font-size: var(--h3); line-height: 1.35; }
+  .open-top a { display: inline-block; text-decoration: none; }
+  .open-top a:hover { color: var(--sea); text-decoration: underline; }
+  .needs { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; flex: 1; align-content: flex-start; }
+  .needs li { font-size: 0.82rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: var(--sea-wash); color: var(--ink); }
   .more { margin-top: 1.25rem; color: var(--ink-soft); }
   .more a { color: var(--sea); }
 
-  .contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
-  .contact:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
-  .routes { list-style: none; padding: 0; border-top: 1px solid var(--line); max-width: 40rem; }
-  .routes li { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: 0.25rem 1.5rem; padding-block: 0.9rem; border-bottom: 1px solid var(--line); }
-  .routes a { color: var(--sea); font-weight: 600; }
-  .caution { margin-top: 1.25rem; color: var(--ink-faint); font-size: var(--text-sm); max-width: 40rem; }
-  .elsewhere { margin-top: 1.5rem; }
-  .message-form { display: grid; gap: 1rem; padding: clamp(1.25rem, 3vw, 1.75rem); border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+  .steps { list-style: none; padding: 0; counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
+  .steps li { counter-increment: s; padding-top: 0.75rem; border-top: 2px solid var(--ink); color: var(--ink-soft); }
+  .steps li::before { content: counter(s); display: block; font-weight: 700; color: var(--sea); margin-bottom: 0.25rem; }
+  .steps strong { color: var(--ink); }
+  .caution { margin-top: 1.25rem; font-size: var(--text-sm); color: var(--ink-faint); max-width: 44rem; }
+
+  .message-form { display: grid; gap: 1rem; max-width: 40rem; padding: clamp(1.25rem, 3vw, 1.75rem); border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
   .consent { display: flex; gap: 0.6rem; align-items: start; font-size: 0.9rem; color: var(--ink-soft); }
   .consent input { margin-top: 0.3rem; accent-color: var(--sea); }
   .message-form .btn { justify-self: start; }
-  @media (max-width: 52rem) { .contact { grid-template-columns: 1fr; } }
-  @media (max-width: 34rem) { .routes li { grid-template-columns: 1fr; } }
 </style>
 
 <script>

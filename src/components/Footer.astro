@@ -3,35 +3,28 @@ import Lockup from '../assets/brand/dk-lockup.svg';
 import SocialLinks from './SocialLinks.astro';
 import { SITE } from '../site.config';
 const year = new Date().getFullYear();
+const links = [
+  { label: 'Research', href: '/research/' },
+  { label: 'Projects', href: '/work/' },
+  { label: 'Lab', href: '/lab/' },
+  { label: 'Updates', href: '/updates/' },
+  { label: 'Collaborate', href: '/collaborate/' },
+  { label: 'About', href: '/about/' },
+  { label: 'Search', href: '/search/' },
+];
 ---
 
 <footer class="site-footer">
-  <div class="container footer-grid">
+  <div class="container footer-top">
     <div class="footer-brand">
-      <Lockup class="footer-logo" role="img" aria-label="Daniel Khan" />
-      <p>{SITE.role}, {SITE.affiliation}.</p>
+      <a href="/" aria-label="Daniel Khan, home"><Lockup class="footer-logo" aria-hidden="true" /></a>
       {SITE.contact.email && <a class="footer-email" href={`mailto:${SITE.contact.email}`}>{SITE.contact.email}</a>}
-      <SocialLinks />
     </div>
-    <nav aria-label="Explore">
-      <p class="footer-label">Explore</p>
-      <ul>
-        <li><a href="/research/">Research</a></li>
-        <li><a href="/work/">Projects</a></li>
-        <li><a href="/workshop/">Workshop</a></li>
-        <li><a href="/podcast/">Podcast</a></li>
-      </ul>
-    </nav>
-    <nav aria-label="More">
-      <p class="footer-label">More</p>
-      <ul>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/log/">Updates</a></li>
-        <li><a href="/collaborate/">Collaborate</a></li>
-        <li><a href="/search/">Search</a></li>
-      </ul>
-    </nav>
+    <SocialLinks variant="icons" />
   </div>
+  <nav class="container footer-nav" aria-label="Footer">
+    <ul>{links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+  </nav>
   <div class="container footer-base">
     <span>© {year} {SITE.name}</span>
     <span><a href="/privacy/">Privacy</a> · <a href="/rss.xml">RSS</a></span>
@@ -39,21 +32,15 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
-  .site-footer { margin-top: var(--space-section); border-top: 1px solid var(--line); background: var(--surface); }
-  .footer-grid { display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); gap: 2rem; padding-block: 3rem 2.25rem; }
-  .footer-brand { display: grid; gap: 1rem; justify-items: start; }
-  .footer-brand :global(.footer-logo) { width: 9.5rem; height: auto; color: var(--ink); }
-  .footer-brand p { color: var(--ink-soft); }
+  .site-footer { margin-top: auto; border-top: 1px solid var(--line); background: var(--surface); }
+  .footer-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 2rem; padding-block: 2rem 1.25rem; }
+  .footer-brand { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+  .footer-brand :global(.footer-logo) { display: block; width: 8.5rem; height: auto; color: var(--ink); }
   .footer-email { color: var(--sea); font-weight: 600; }
   .footer-email:hover { color: var(--sea-strong); }
-  .footer-label { font-size: var(--text-sm); font-weight: 700; margin-bottom: 0.75rem; }
-  .site-footer ul:not(.social) { list-style: none; padding: 0; display: grid; gap: 0.45rem; }
-  .site-footer nav a { color: var(--ink-soft); text-decoration: none; }
-  .site-footer nav a:hover { color: var(--sea); text-decoration: underline; }
-  .footer-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; padding-block: 1.25rem 1.75rem; border-top: 1px solid var(--line); font-size: var(--text-sm); color: var(--ink-faint); }
+  .footer-nav ul { list-style: none; padding: 0 0 1.25rem; display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; }
+  .footer-nav a { display: inline-block; padding-block: 0.25rem; color: var(--ink-soft); text-decoration: none; }
+  .footer-nav a:hover { color: var(--sea); text-decoration: underline; }
+  .footer-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; padding-block: 1rem 1.5rem; border-top: 1px solid var(--line); font-size: var(--text-sm); color: var(--ink-faint); }
   .footer-base a { color: inherit; }
-  @media (max-width: 44rem) {
-    .footer-grid { grid-template-columns: 1fr 1fr; }
-    .footer-brand { grid-column: 1 / -1; }
-  }
 </style>

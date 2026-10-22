@@ -1,19 +1,27 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import WorkRow from '../../components/WorkRow.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
 import { getWork } from '../../lib/content';
 
 const work = await getWork();
+const order = ['Ongoing', 'In progress', 'In development', 'Concept', 'Published', 'Released', 'Paused', 'Archived'];
+const sorted = [...work].sort((a, b) => order.indexOf(a.data.status) - order.indexOf(b.data.status) || b.data.date.getTime() - a.data.date.getTime());
 ---
 
-<BaseLayout title="Projects" description="Independent projects by Daniel Khan in journalism, documentary and open tools, each with its current status.">
-  <PageHeader title="Projects" lede="Independent work in journalism, documentary and tools. Each project shows where it stands." />
-  <section class="section">
-    <div class="container">
-      {work.length > 0
-        ? <ul class="rows">{work.map((entry) => <WorkRow entry={entry} headingLevel="h2" />)}</ul>
-        : <p>New projects are on their way.</p>}
-    </div>
+<BaseLayout title="Projects" description="Independent projects by Daniel Khan in journalism, research, documentary and tools, each with its current status.">
+  <PageHeader title="Projects" lede="Independent work in journalism, research, documentary and tools. Each card shows where the project stands." />
+  <section class="container projects-wrap">
+    {sorted.length > 0
+      ? <div class="projects">{sorted.map((entry) => <ProjectCard entry={entry} headingLevel="h2" />)}</div>
+      : <p>New projects are on their way.</p>}
+    <p class="note">Looking for experiments and tools? See the <a href="/lab/">Lab</a>.</p>
   </section>
 </BaseLayout>
+
+<style>
+  .projects-wrap { padding-block: 2rem var(--space-section); }
+  .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 1rem; }
+  .note { margin-top: 1.75rem; color: var(--ink-soft); }
+  .note a { color: var(--sea); }
+</style>

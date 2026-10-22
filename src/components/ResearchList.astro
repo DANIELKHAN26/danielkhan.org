@@ -2,29 +2,30 @@
 import type { CollectionEntry } from 'astro:content';
 import { RESEARCH_KINDS } from '../content.config';
 
-interface Props { items: CollectionEntry<'research'>[]; headingLevel?: 'h2' | 'h3' }
-const { items, headingLevel: Heading = 'h3' } = Astro.props;
+interface Props { items: CollectionEntry<'research'>[] }
+const { items } = Astro.props;
 ---
 
-<ol class="rows research">
+<ol class="pubs">
   {items.map(({ data }) => (
-    <li class="row">
-      <div class="row-static">
-        <Heading class="row-title research-title">
-          {data.url ? <a href={data.url}>{data.title}</a> : data.title}
-        </Heading>
-        <span class="row-meta"><span class="status" data-status={data.kind === 'under-review' ? 'Ongoing' : 'Published'}>{RESEARCH_KINDS[data.kind]}</span></span>
-        {(data.venue || data.year) && (
-          <p class="row-text venue">{[data.venue, data.year].filter(Boolean).join(', ')}</p>
-        )}
+    <li class="pub">
+      <span class:list={['pub-kind', { pending: data.kind === 'under-review' }]}>{RESEARCH_KINDS[data.kind]}</span>
+      <div class="pub-main">
+        <p class="pub-title">{data.url ? <a href={data.url}>{data.title}</a> : data.title}</p>
+        {(data.venue || data.year) && <p class="pub-venue">{[data.venue, data.year].filter(Boolean).join(', ')}</p>}
       </div>
     </li>
   ))}
 </ol>
 
 <style>
-  .research-title { font-family: var(--font-read); font-weight: 600; font-size: 1.15rem; letter-spacing: 0; }
-  .research-title a { text-decoration: none; }
-  .research-title a:hover { color: var(--sea); text-decoration: underline; }
-  .venue { font-style: italic; }
+  .pubs { list-style: none; padding: 0; border-top: 1px solid var(--line); }
+  .pub { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 0.35rem 1.5rem; padding-block: 0.95rem; border-bottom: 1px solid var(--line); }
+  .pub-kind { font-size: 0.82rem; font-weight: 600; color: var(--sea); padding-top: 0.2rem; }
+  .pub-kind.pending { color: var(--shingle); }
+  .pub-title { font-family: var(--font-read); font-size: 1.08rem; line-height: 1.45; max-width: 46rem; }
+  .pub-title a { color: inherit; }
+  .pub-title a:hover { color: var(--sea); }
+  .pub-venue { margin-top: 0.2rem; font-size: 0.92rem; color: var(--ink-soft); font-style: italic; }
+  @media (max-width: 36rem) { .pub { grid-template-columns: 1fr; } .pub-kind { padding-top: 0; } }
 </style>

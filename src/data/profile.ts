@@ -5,7 +5,7 @@
 export const PROFILE = {
   bio: [
     'I am an anthropologist and PhD candidate in Arts at Macquarie University. My research connects anthropology with digital authoritarianism, affective media and digital cultures — and asks what they mean for equity, resilience and representation among marginalised communities in Bangladesh and the Global South.',
-    'Alongside research, I write The Annalist on Substack, build small open tools, and am preparing a podcast.',
+    'Alongside research, I write The Annalist on Substack, build language tools for verifying news — including work on video and Bengali NLP — and am preparing a podcast.',
   ],
   interests: [
     'Digital authoritarianism',

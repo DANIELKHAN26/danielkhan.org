@@ -1,0 +1,87 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { PLATFORMS, youtubeId } from '../content.config';
+import { formatDate, isoDate } from '../lib/content';
+
+interface Props { entry: CollectionEntry<'updates'>; headingLevel?: 'h2' | 'h3' }
+const { entry, headingLevel: Heading = 'h3' } = Astro.props;
+const { title, url, platform, date, summary, image, imageAlt, draft } = entry.data;
+const label = PLATFORMS[platform].label;
+const videoId = platform === 'youtube' ? youtubeId(url) : undefined;
+const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', linkedin: 'View on LinkedIn', facebook: 'View on Facebook' }[platform];
+---
+
+<article class="update" data-platform={platform}>
+  {videoId ? (
+    <div class="update-media video" data-video-id={videoId} data-video-title={title}>
+      <a class="video-link" href={url} rel="noopener">
+        {image && imageAlt
+          ? <Image src={image} alt="" widths={[400, 640, 960]} sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw" />
+          : <span class="media-fallback"><Icon name="youtube" size={40} /></span>}
+        <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M8 5v14l11-7z" fill="currentColor" /></svg></span>
+        <span class="visually-hidden">Play “{title}” (loads the YouTube player)</span>
+      </a>
+    </div>
+  ) : (
+    <a class="update-media" href={url} rel="noopener" tabindex="-1" aria-hidden="true">
+      {image && imageAlt
+        ? <Image src={image} alt="" widths={[400, 640, 960]} sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw" />
+        : <span class="media-fallback"><Icon name={platform} size={40} /></span>}
+    </a>
+  )}
+  <div class="update-body">
+    <p class="update-meta">
+      <Icon name={platform} size={14} />
+      <span>{label}</span>
+      <span aria-hidden="true">·</span>
+      <time datetime={isoDate(date)}>{formatDate(date)}</time>
+    </p>
+    <Heading class="update-title"><a href={url} rel="noopener">{title}{draft && ' (draft)'}</a></Heading>
+    {summary && <p class="update-summary">{summary}</p>}
+    <a class="update-action" href={url} rel="noopener" tabindex="-1" aria-hidden="true">{action} ↗</a>
+  </div>
+</article>
+
+<style>
+  .update { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+  .update-media { position: relative; display: block; aspect-ratio: 16 / 9; background: var(--sunk); overflow: hidden; }
+  .update-media :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+  .update:hover .update-media :global(img) { transform: scale(1.02); }
+  .media-fallback { display: grid; place-items: center; width: 100%; height: 100%; }
+  .video :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .video-link { display: block; width: 100%; height: 100%; }
+  .play {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center;
+    width: 3.5rem; height: 3.5rem; border-radius: 50%; background: rgb(0 0 0 / 70%); color: #fff; transition: background-color .2s;
+  }
+  .video-link:hover .play, .video-link:focus-visible .play { background: #ff0000; }
+  .update-body { display: flex; flex-direction: column; gap: 0.45rem; padding: 1rem 1.15rem 1.15rem; flex: 1; }
+  .update-meta { display: flex; align-items: center; gap: 0.4rem; font-size: var(--text-sm); color: var(--ink-faint); }
+  .update-title { font-size: var(--h3); line-height: 1.35; }
+  .update-title a { display: inline-block; text-decoration: none; }
+  .update-title a:hover { color: var(--sea); text-decoration: underline; }
+  .update-summary { color: var(--ink-soft); font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .update-action { margin-top: auto; padding-top: 0.35rem; font-size: var(--text-sm); font-weight: 600; color: var(--sea); text-decoration: none; }
+</style>
+
+<script>
+  // Swap the thumbnail for YouTube's privacy-enhanced player only when the visitor asks to play.
+  for (const box of document.querySelectorAll<HTMLElement>('.video[data-video-id]')) {
+    const link = box.querySelector('a');
+    link?.addEventListener('click', (event) => {
+      const id = box.dataset.videoId ?? '';
+      if (!/^[\w-]{11}$/.test(id)) return; // fall back to opening YouTube
+      event.preventDefault();
+      const frame = document.createElement('iframe');
+      frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      frame.title = box.dataset.videoTitle ?? 'YouTube video';
+      frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.allowFullscreen = true;
+      link.replaceWith(frame);
+      frame.focus();
+    });
+  }
+</script>

@@ -7,7 +7,6 @@ version: "1.0"
 licence: MIT
 date: 2026-10-22
 demo: /tools/script-timer/
-source: https://github.com/DANIELKHAN26/danielkhan.org/blob/main/src/pages/tools/script-timer.astro
 requirements: Any modern browser
 tags: [Presenting, Documentary, Tool]
 ---

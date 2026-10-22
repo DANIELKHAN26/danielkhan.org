@@ -3,53 +3,40 @@ import Icon from './Icon.astro';
 import Waveform from './Waveform.astro';
 import { SITE } from '../site.config';
 
-interface Props { headingLevel?: 'h1' | 'h2'; more?: boolean }
-const { headingLevel: Heading = 'h2', more = false } = Astro.props;
 const { podcast } = SITE;
-const substack = SITE.social.find((s) => s.icon === 'substack');
+const live = podcast.status === 'live';
 ---
 
-<section class="podcast" aria-labelledby="podcast-title">
-  <div class="container podcast-grid">
-    <div class="podcast-text">
-      <p class="onair"><span class="dot" aria-hidden="true"></span> {podcast.status === 'live' ? 'Now playing' : 'Coming soon'}</p>
-      <Heading id="podcast-title">The podcast</Heading>
-      <p class="podcast-lede">
-        {podcast.status === 'live'
-          ? 'Episodes are out now on YouTube.'
-          : 'A personal podcast by Daniel Khan, now in production. The first episodes will premiere on YouTube.'}
-      </p>
-      {podcast.premise && <p class="podcast-premise">{podcast.premise}</p>}
-      <div class="podcast-actions">
-        <a class="btn btn-light" href={podcast.channel} rel="noopener"><Icon name="youtube" size={18} /> Subscribe on YouTube</a>
-        {more
-          ? <a class="btn btn-outline" href="/podcast/">About the podcast</a>
-          : substack && <a class="btn btn-outline" href={substack.url} rel="noopener">Follow updates on Substack</a>}
-      </div>
-    </div>
-    <div class="podcast-art" aria-hidden="true">
-      <Waveform />
-      <p class="podcast-caption"><span>Episode 01</span><span>In production</span></p>
-    </div>
+<div class="podcast">
+  <div class="podcast-text">
+    <p class="onair"><span class="dot" aria-hidden="true"></span> {live ? 'Now playing' : 'Coming soon'}</p>
+    <h2 id="podcast-title">The podcast</h2>
+    <p class="podcast-lede">
+      {live ? 'New episodes are out on YouTube.' : 'A personal podcast by Daniel Khan, now in production. The first episodes will premiere on YouTube.'}
+    </p>
+    {podcast.premise && <p class="podcast-premise">{podcast.premise}</p>}
+    <a class="btn btn-light" href={podcast.channel} rel="noopener"><Icon name="youtube" size={18} /> Subscribe on YouTube</a>
   </div>
-</section>
+  <div class="podcast-art" aria-hidden="true">
+    <Waveform />
+    <p class="podcast-caption"><span>Episode 01</span><span>{live ? 'Out now' : 'In production'}</span></p>
+  </div>
+</div>
 
 <style>
-  .podcast { background: var(--band); color: var(--on-band); padding-block: clamp(3rem, 2rem + 4vw, 4.5rem); }
-  .podcast-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
-  .onair { display: inline-flex; align-items: center; gap: 0.55rem; font-size: var(--text-sm); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-  .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: #ff6b5e; box-shadow: 0 0 0 0 rgb(255 107 94 / 60%); }
+  .podcast {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem); border-radius: var(--radius); background: var(--band); color: var(--on-band);
+  }
+  .onair { display: inline-flex; align-items: center; gap: 0.55rem; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: #ff6b5e; }
   @media (prefers-reduced-motion: no-preference) { .dot { animation: pulse 2s ease-out infinite; } }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgb(255 107 94 / 55%); } 70%, 100% { box-shadow: 0 0 0 0.6rem rgb(255 107 94 / 0%); } }
-  .podcast h1, .podcast h2 { font-size: var(--h1); margin-top: 0.75rem; }
-  .podcast-lede { margin-top: 0.85rem; font-size: var(--text-lg); max-width: 34rem; }
-  .podcast-premise { margin-top: 0.75rem; max-width: 34rem; opacity: 0.9; font-family: var(--font-read); }
-  .podcast-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgb(255 107 94 / 55%); } 70%, 100% { box-shadow: 0 0 0 0.5rem rgb(255 107 94 / 0%); } }
+  .podcast h2 { font-size: var(--h2); margin-top: 0.5rem; }
+  .podcast-lede { margin-block: 0.6rem 1.1rem; max-width: 30rem; }
+  .podcast-premise { margin: -0.4rem 0 1.1rem; max-width: 30rem; font-family: var(--font-read); opacity: 0.92; }
   .podcast :global(.btn-light) { background: #fff; color: #0b2a3c; }
   .podcast :global(.btn-light:hover) { background: #e6f3f1; }
-  .podcast :global(.btn-outline) { border-color: color-mix(in srgb, var(--on-band) 45%, transparent); color: var(--on-band); }
-  .podcast :global(.btn-outline:hover) { border-color: var(--on-band); }
-  .podcast-art { color: var(--on-band); }
-  .podcast-caption { display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: var(--text-sm); opacity: 0.85; font-variant-numeric: tabular-nums; }
-  @media (max-width: 56rem) { .podcast-grid { grid-template-columns: 1fr; } .podcast-art { max-width: 32rem; } }
+  .podcast-caption { display: flex; justify-content: space-between; margin-top: 0.6rem; font-size: var(--text-sm); opacity: 0.85; }
+  @media (max-width: 48rem) { .podcast { grid-template-columns: 1fr; } }
 </style>

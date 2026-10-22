@@ -1,10 +1,10 @@
 ---
 import { render } from 'astro:content';
 import EntryLayout from '../../layouts/EntryLayout.astro';
-import { getWorkshop, isExternal } from '../../lib/content';
+import { getLab, isExternal } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const items = await getWorkshop();
+  const items = await getLab();
   return items.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
 }
 
@@ -21,8 +21,8 @@ const actions = [
 <EntryLayout
   title={data.title}
   summary={data.summary}
-  section={{ label: 'Workshop', href: '/workshop/' }}
-  kicker={`Free ${data.kind.toLowerCase()} · version ${data.version} · ${data.licence}`}
+  section={{ label: 'Lab', href: '/lab/' }}
+  kicker={data.kind === 'Experiment' ? 'Experiment' : `Free ${data.kind.toLowerCase()} · version ${data.version} · ${data.licence}`}
   date={data.date}
   updated={data.updated}
   status={data.status}
@@ -30,7 +30,7 @@ const actions = [
   draft={data.draft}
   ogType="website"
 >
-  <div class="use-bar">
+  {actions.length > 0 && <div class="use-bar">
     {actions.map((a) => (
       <a
         class={`btn ${a.primary ? 'btn-primary' : 'btn-ghost'}`}
@@ -39,29 +39,41 @@ const actions = [
         rel={isExternal(a.url) ? 'noopener' : undefined}
       >{a.label} <span aria-hidden="true">{a.label === 'Download' ? '↓' : '↗'}</span></a>
     ))}
-  </div>
+  </div>}
 
   <Content />
 
-  <h2 id="licence-and-credits">Licence and credits</h2>
-  <p>
-    Version {data.version}, released under <strong>{data.licence}</strong>.
-    {data.requirements && <> Requirements: {data.requirements}.</>}
-  </p>
-  {data.basedOn.length > 0 ? (
+  {data.kind !== 'Experiment' && (
     <>
-      <p>This resource adapts other people's work. Their licences still apply:</p>
-      <ul>
-        {data.basedOn.map((b) => (
-          <li><a href={b.url} rel="noopener">{b.name}</a>{b.author && <> by {b.author}</>} — {b.licence}</li>
-        ))}
-      </ul>
+      <h2 id="licence-and-credits">Licence and credits</h2>
+      <p>
+        Version {data.version}, released under <strong>{data.licence}</strong>.{data.requirements && <> Requirements: {data.requirements}.</>}
+      </p>
+      {data.basedOn.length > 0 ? (
+        <>
+          <p>This resource adapts other people's work. Their licences still apply:</p>
+          <ul>
+            {data.basedOn.map((b) => (
+              <li><a href={b.url} rel="noopener">{b.name}</a>{b.author && <> by {b.author}</>} — {b.licence}</li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p>Original work by Daniel Khan.</p>
+      )}
     </>
-  ) : (
-    <p>Original work by Daniel Khan.</p>
   )}
+
+  <Fragment slot="actions">
+    {data.links.length > 0 && (
+      <div class="links">
+        {data.links.map((l) => <a class="btn btn-ghost" href={l.url} rel={isExternal(l.url) ? 'noopener' : undefined}>{l.label} <span aria-hidden="true">↗</span></a>)}
+      </div>
+    )}
+  </Fragment>
 </EntryLayout>
 
 <style>
   .use-bar { display: flex; flex-wrap: wrap; gap: 0.6rem; font-family: var(--font-sans); }
+  .links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 </style>

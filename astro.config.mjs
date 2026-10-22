@@ -67,7 +67,8 @@ export default defineConfig({
         "form-action 'self' https://api.web3forms.com",
         "base-uri 'self'",
         "object-src 'none'",
-        "frame-src 'none'",
+        // Only YouTube's privacy-enhanced player, loaded when a visitor presses play on a video card.
+        "frame-src https://www.youtube-nocookie.com",
         'upgrade-insecure-requests',
       ],
       // 'wasm-unsafe-eval' lets the Pagefind search index (WebAssembly) run.

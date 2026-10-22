@@ -7,11 +7,14 @@ const href = z
   .string()
   .regex(/^(https:\/\/[^\s]+|\/[a-z0-9][^\s]*)$/i, 'Use a full https:// URL or a /path on this site');
 
+const httpsUrl = z.string().regex(/^https:\/\/[^\s]+$/i, 'Use a full https:// URL');
+
 const link = z.object({ label: z.string().min(1), url: href });
 
 /** Honest, fixed status labels shown on every entry. */
 export const STATUSES = [
   'Concept',
+  'In progress',
   'In development',
   'Ongoing',
   'Published',
@@ -30,6 +33,7 @@ const common = {
   draft: z.boolean().default(false),
 };
 
+/* ---------- Projects (/work/) ---------- */
 const work = defineCollection({
   loader: glob({ pattern: '**/[^_]*.md', base: './src/content/work' }),
   schema: ({ image }) =>
@@ -53,39 +57,116 @@ const work = defineCollection({
       }),
 });
 
-const workshop = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/workshop' }),
+/* ---------- Lab (/lab/): your experiments and released tools ---------- */
+export const LAB_KINDS = ['Experiment', 'Tool', 'Template'] as const;
+
+const lab = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/lab' }),
   schema: z
     .object({
       ...common,
-      kind: z.enum(['Template', 'Tool', 'Design', 'Code', 'Guide']),
+      kind: z.enum(LAB_KINDS),
       status: z.enum(STATUSES),
-      version: z.string().min(1),
-      licence: z.string().min(2),
+      /** One line on what is being tried or built — shown on the Lab index. */
+      focus: z.string().max(160).optional(),
+      version: z.string().optional(),
+      licence: z.string().optional(),
       /** A file in /public/downloads/ or an https:// release asset. */
       download: href.optional(),
-      /** Source repository, e.g. https://github.com/you/tool */
       source: href.optional(),
-      /** A live demo or in-browser tool. */
       demo: href.optional(),
       requirements: z.string().optional(),
+      links: z.array(link).default([]),
       /** Credit for anything adapted from someone else's work. */
       basedOn: z
-        .array(
-          z.object({
-            name: z.string(),
-            url: href,
-            author: z.string().optional(),
-            licence: z.string(),
-          }),
-        )
+        .array(z.object({ name: z.string(), url: href, author: z.string().optional(), licence: z.string() }))
         .default([]),
     })
-    .refine((d) => d.download || d.source || d.demo, {
-      message: 'A workshop entry needs at least one of download, source or demo, so visitors can use it.',
+    .refine((d) => d.kind === 'Experiment' || (d.version && d.licence), {
+      message: 'Tools and templates need a version and a licence.',
+      path: ['licence'],
+    })
+    .refine((d) => d.kind === 'Experiment' || d.download || d.source || d.demo, {
+      message: 'Tools and templates need at least one of download, source or demo, so visitors can use them.',
     }),
 });
 
+/* ---------- Library: credited external work, edited in src/content/library.yaml ---------- */
+const library = defineCollection({
+  loader: file('src/content/library.yaml'),
+  schema: z.object({
+    title: z.string().min(2),
+    url: httpsUrl,
+    by: z.string().min(2),
+    topic: z.enum(['Verification & news data', 'Speech & video', 'Bengali NLP']),
+    licence: z.string().min(2),
+    note: z.string().min(10).max(220),
+  }),
+});
+
+/* ---------- Updates (/updates/): your posts elsewhere, added by link ---------- */
+export const PLATFORMS = {
+  youtube: { label: 'YouTube', hosts: ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be'] },
+  substack: { label: 'Substack', hosts: ['substack.com', '*.substack.com'] },
+  linkedin: { label: 'LinkedIn', hosts: ['linkedin.com', 'www.linkedin.com'] },
+  facebook: { label: 'Facebook', hosts: ['facebook.com', 'www.facebook.com', 'm.facebook.com', 'fb.watch'] },
+} as const;
+export type Platform = keyof typeof PLATFORMS;
+
+const hostMatches = (url: string, platform: Platform) => {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return PLATFORMS[platform].hosts.some((h) => (h.startsWith('*.') ? host.endsWith(h.slice(1)) : host === h));
+  } catch {
+    return false;
+  }
+};
+
+/** YouTube video ID from watch, youtu.be, shorts, live and embed URLs. */
+export function youtubeId(url: string): string | undefined {
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'youtu.be') return u.pathname.slice(1).split('/')[0] || undefined;
+    if (u.searchParams.get('v')) return u.searchParams.get('v') ?? undefined;
+    const m = u.pathname.match(/^\/(?:shorts|live|embed)\/([\w-]{11})/);
+    return m?.[1];
+  } catch {
+    return undefined;
+  }
+}
+
+const updates = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/updates' }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string().min(3).max(160),
+        date: z.coerce.date(),
+        platform: z.enum(Object.keys(PLATFORMS) as [Platform, ...Platform[]]),
+        url: httpsUrl,
+        /** A sentence or two shown on the card — usually the post's own opening. */
+        summary: z.string().max(320).optional(),
+        image: image().optional(),
+        imageAlt: z.string().optional(),
+        /** true = an episode of the podcast (shown in the Podcast section). */
+        podcast: z.boolean().default(false),
+        draft: z.boolean().default(false),
+      })
+      .refine((d) => hostMatches(d.url, d.platform), {
+        message: 'The url does not belong to the chosen platform — check both.',
+        path: ['url'],
+      })
+      .refine((d) => d.platform !== 'youtube' || !!youtubeId(d.url), {
+        message: 'This YouTube link has no video ID. Use the video\'s own link (watch?v=…, youtu.be/…, or /shorts/…).',
+        path: ['url'],
+      })
+      .refine((d) => !d.image || !!d.imageAlt, {
+        message: 'Add imageAlt (a short description of the image) when you set an image.',
+        path: ['imageAlt'],
+      }),
+});
+
+/* ---------- Notes (/log/<id>/): longer updates written on this site ---------- */
 const log = defineCollection({
   loader: glob({ pattern: '**/[^_]*.md', base: './src/content/log' }),
   schema: z.object({
@@ -94,7 +175,7 @@ const log = defineCollection({
   }),
 });
 
-/** Research outputs, edited in src/content/research.yaml. */
+/* ---------- Research, edited in src/content/research.yaml ---------- */
 export const RESEARCH_KINDS = {
   'under-review': 'Under review',
   accepted: 'Accepted paper',
@@ -115,4 +196,4 @@ const research = defineCollection({
   }),
 });
 
-export const collections = { work, workshop, log, research };
+export const collections = { work, lab, library, updates, log, research };

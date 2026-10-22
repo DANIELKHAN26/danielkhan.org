@@ -7,9 +7,11 @@ export const SITE = {
   url: 'https://danielkhan.org',
   role: 'PhD candidate in Arts',
   affiliation: 'Macquarie University',
-  /** One sentence shown under your name on the home page and in search results. */
+  /** Motto shown under your name on the home page. */
+  motto: 'Good questions deserve a full answer.',
+  /** What you work on, in one sentence (home page and Research page). */
   focus:
-    'I research digital authoritarianism, affective media and digital cultures, with a focus on Bangladesh and the Global South.',
+    'I study digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South — and build language tools for verifying news.',
   description:
     'Daniel Khan — PhD candidate in Arts at Macquarie University researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South.',
 
@@ -31,11 +33,10 @@ export const SITE = {
    * `icon` must match a name in src/components/Icon.astro.
    */
   social: [
-    { label: 'LinkedIn', icon: 'linkedin', url: 'https://www.linkedin.com/in/danielkhan6/' },
-    { label: 'Substack', icon: 'substack', url: 'https://substack.com/@annalisthub' },
-    { label: 'YouTube', icon: 'youtube', url: 'https://www.youtube.com/@DanielKhan1M' },
-    { label: 'Facebook', icon: 'facebook', url: 'https://www.facebook.com/danielmd.khan/' },
-    { label: 'GitHub', icon: 'github', url: 'https://github.com/DANIELKHAN26' },
+    { label: 'LinkedIn', icon: 'linkedin', url: 'https://www.linkedin.com/in/danielkhan6/', name: 'Daniel Khan', about: 'Research and professional updates' },
+    { label: 'Substack', icon: 'substack', url: 'https://substack.com/@annalisthub', name: 'The Annalist', about: 'The Annalist — sourced explainers' },
+    { label: 'YouTube', icon: 'youtube', url: 'https://www.youtube.com/@DanielKhan1M', name: '@DanielKhan1M', about: 'Videos and the podcast' },
+    { label: 'Facebook', icon: 'facebook', url: 'https://www.facebook.com/danielmd.khan/', name: 'Daniel Khan', about: 'Personal updates' },
   ],
 
   podcast: {

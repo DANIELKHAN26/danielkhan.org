@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "test": "npm run check && npm run build && node scripts/verify-dist.mjs"
+    "test": "npm run check && npm run build && node scripts/verify-dist.mjs",
+    "add": "node scripts/add-update.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

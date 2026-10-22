@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import { getLab, getLibrary, isExternal } from '../../lib/content';
+
+const lab = await getLab();
+const experiments = lab.filter((e) => e.data.kind === 'Experiment');
+const tools = lab.filter((e) => e.data.kind !== 'Experiment');
+const library = await getLibrary();
+const topics = [...new Set(library.map((l) => l.data.topic))];
+---
+
+<BaseLayout searchable title="Lab" description="Daniel Khan's lab: language-technology experiments for verifying news, free research tools, and a library of credited outside work.">
+  <PageHeader title="Lab" lede="Experiments I'm running, tools anyone can use, and the outside work I build on — each labelled by its real stage and properly credited." />
+
+  <div class="container lab">
+    {experiments.length > 0 && (
+      <section class="block" aria-labelledby="experiments-title">
+        <h2 id="experiments-title">Experiments</h2>
+        <div class="experiments">
+          {experiments.map((e) => (
+            <article class="exp">
+              <div class="exp-top"><span class="exp-kind">Experiment</span><StatusBadge status={e.data.status} /></div>
+              <h3><a href={`/lab/${e.id}/`}>{e.data.title}{e.data.draft && ' (draft)'}</a></h3>
+              <p>{e.data.focus ?? e.data.summary}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {tools.length > 0 && (
+      <section class="block" aria-labelledby="tools-title">
+        <h2 id="tools-title">Tools and templates</h2>
+        <ul class="tools">
+          {tools.map((t) => (
+            <li class="tool">
+              <div>
+                <a class="tool-title" href={`/lab/${t.id}/`}>{t.data.title}{t.data.draft && ' (draft)'}</a>
+                <p class="tool-meta">{t.data.kind} · v{t.data.version} · {t.data.licence}</p>
+              </div>
+              <div class="tool-actions">
+                {t.data.demo && <a class="btn btn-ghost btn-sm" href={t.data.demo}>Open</a>}
+                {t.data.download && <a class="btn btn-ghost btn-sm" href={t.data.download} download={isExternal(t.data.download) ? undefined : ''}>Download</a>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {library.length > 0 && (
+      <section class="block" id="library" aria-labelledby="library-title">
+        <h2 id="library-title">Library</h2>
+        <p class="intro">Established, openly documented work I use or recommend. It belongs to its authors; follow each link for terms of use.</p>
+        {topics.map((topic) => (
+          <div class="shelf">
+            <h3>{topic}</h3>
+            <ul class="refs">
+              {library.filter((l) => l.data.topic === topic).map(({ data }) => (
+                <li class="ref">
+                  <a class="ref-title" href={data.url} rel="noopener">{data.title} <span aria-hidden="true">↗</span></a>
+                  <p class="ref-by">{data.by} · {data.licence}</p>
+                  <p class="ref-note">{data.note}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .lab { padding-bottom: var(--space-section); }
+  .block { padding-top: clamp(2rem, 1.5rem + 2vw, 3rem); }
+  .block > h2 { font-size: var(--h2); margin-bottom: 1rem; }
+  .intro { color: var(--ink-soft); max-width: var(--measure); margin: -0.5rem 0 1rem; }
+
+  .experiments { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem; }
+  .exp { position: relative; display: flex; flex-direction: column; gap: 0.5rem; padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); border-top: 3px solid var(--sea); transition: border-color .2s; }
+  .exp:hover { border-color: var(--sea); }
+  .exp-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+  .exp-kind { font-size: 0.82rem; font-weight: 600; color: var(--sea); }
+  .exp h3 { font-size: var(--h3); line-height: 1.35; }
+  .exp h3 a { display: inline-block; text-decoration: none; }
+  .exp h3 a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .exp p { color: var(--ink-soft); }
+
+  .tools, .refs { list-style: none; padding: 0; border-top: 1px solid var(--line); }
+  .tool { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1.5rem; padding-block: 0.85rem; border-bottom: 1px solid var(--line); }
+  .tool-title { display: inline-block; font-weight: 600; text-decoration: none; }
+  .tool-title:hover { color: var(--sea); text-decoration: underline; }
+  .tool-meta { font-size: 0.85rem; color: var(--ink-faint); }
+  .tool-actions { display: flex; gap: 0.5rem; }
+  :global(.btn-sm) { min-height: 2.25rem; padding: 0.35rem 0.9rem; font-size: 0.88rem; }
+
+  .shelf + .shelf { margin-top: 1.5rem; }
+  .shelf h3 { font-size: 0.95rem; color: var(--ink-soft); margin-bottom: 0.5rem; }
+  .ref { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 0.2rem 1.5rem; padding-block: 0.85rem; border-bottom: 1px solid var(--line); }
+  .ref-title { grid-row: span 2; font-weight: 600; text-decoration: none; display: inline-block; align-self: start; }
+  .ref-title:hover { color: var(--sea); text-decoration: underline; }
+  .ref-by { font-size: 0.85rem; color: var(--ink-faint); }
+  .ref-note { color: var(--ink-soft); font-size: 0.95rem; }
+  @media (max-width: 44rem) { .ref { grid-template-columns: 1fr; } .ref-title { grid-row: auto; } }
+</style>

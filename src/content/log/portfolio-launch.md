@@ -7,7 +7,7 @@ links:
   - label: Ways to collaborate
     url: /collaborate/
   - label: Open workshop
-    url: /workshop/
+    url: /lab/
 ---
 
 This site is now my main home online. It collects work that was previously scattered across folders, drafts and conversations, and shows each piece with an honest label: a concept, something in development, or finished work.
@@ -15,7 +15,7 @@ This site is now my main home online. It collects work that was previously scatt
 ## What's here
 
 - **[Research](/research/)** and **[Projects](/work/)** — papers, The Annalist, REDE, the documentary presenter lab and ScriptFlow.
-- **[Open workshop](/workshop/)** — free templates and tools: an evidence ledger, a production card, a collaboration brief, a script timer, and the code for this site itself.
+- **[Lab](/lab/)** — experiments, free templates and tools (an evidence ledger, a production card, a collaboration brief and a script timer), and a library of credited research.
 - **Updates** — where I record what I build, release and learn, in date order.
 
 ## How to get involved

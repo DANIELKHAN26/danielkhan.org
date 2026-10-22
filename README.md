@@ -1,4 +1,4 @@
-# Daniel Khan — portfolio, open workshop and log
+# Daniel Khan — personal research website (danielkhan.org)
 
 Live site: **https://danielkhan.org**
 
@@ -6,14 +6,13 @@ A fast, private-by-default personal site built with [Astro](https://astro.build)
 
 | Section | What goes there | Where to edit |
 |---|---|---|
-| **Home** | Photo, role, one-line focus, current research, projects, podcast teaser | `src/site.config.ts` (name, role, focus, social links) |
+| **Home** | Name, motto, one-line focus, channel links, compact Research and Projects, podcast + latest post | `src/site.config.ts` |
 | **Research** | Papers under review, conference papers, research projects | `src/content/research.yaml` |
 | **Projects** | Projects with honest status labels | `src/content/work/` |
-| **Workshop** | Free tools, templates and designs others can use, with licence and credits | `src/content/workshop/` + files in `public/downloads/` |
-| **Podcast** | "Coming soon" teaser; set `podcast.status: 'live'` when episodes are out | `src/site.config.ts` |
-| **Collaborate** | Join-a-project forms, LinkedIn message, public discussions, optional private form | driven by config + project files |
-| **About** (footer) | Short academic profile: education, experience, interests, methods | `src/data/profile.ts` |
-| **Updates** (footer) | Dated notes: what you built, released or learned | `src/content/log/` |
+| **Lab** | Your experiments, free tools and templates, and a library of credited outside work | `src/content/lab/`, `src/content/library.yaml`, files in `public/downloads/` |
+| **Updates** | Your posts on Substack, YouTube, LinkedIn and Facebook (added by link), the podcast, and site notes | `npm run add -- <link>` → `src/content/updates/`; notes in `src/content/log/` |
+| **Collaborate** | Email, open projects with "Offer to help", public discussions | driven by config + project files |
+| **About** (footer) | Short bio with expandable education, experience, expertise and interests | `src/data/profile.ts` |
 
 ---
 
@@ -29,12 +28,19 @@ A fast, private-by-default personal site built with [Astro](https://astro.build)
 
 You can do all of this on **github.com** in the browser: open the folder, click **Add file → Create new file**, paste, then **Commit**.
 
-### Share a tool or design you built from a GitHub project
+### Add a post from YouTube, Substack, LinkedIn or Facebook
 
-1. Check that the original licence lets you share your version, and keep its licence notice.
-2. Put your version in its own public repository (or a ZIP in `public/downloads/`).
-3. Add a `src/content/workshop/` entry with `source:` or `download:`, your `licence:`, and a `basedOn:` entry that credits the original. The page shows the credit automatically.
-4. Add a short entry in `src/content/log/` (Updates) announcing it.
+```bash
+npm run add -- https://annalisthub.substack.com/p/your-post
+npm run add -- https://youtu.be/VIDEO_ID --podcast     # a podcast episode
+```
+
+This reads the post's public preview (title, summary, image), saves the image inside the site, and writes a file in `src/content/updates/`. Visitors never load anything from the platform until they choose to — YouTube videos play only when pressed, through YouTube's privacy-enhanced player. LinkedIn and Facebook often block automatic reading; then a **draft** is created: open it, paste the title (and optionally a summary and a screenshot as `image`), and set `draft: false`. Links must match their platform (a "youtube" post must link to youtube.com), and duplicates are refused.
+
+### Add an experiment, tool or library item
+
+- **Experiment or tool:** copy `src/content/lab/_TEMPLATE.md`. Experiments need only a title, summary, status and a one-line `focus`; tools and templates also need a version, licence and a download, source or demo link.
+- **Library item (someone else's work):** add a block to `src/content/library.yaml` with the official link, authors, topic and the **exact licence** — some research resources are non-commercial only.
 
 ### Open a project for collaborators
 
@@ -52,7 +58,7 @@ It then appears on the home page and on `/collaborate/` with an **Offer to help*
 
 Edit **`src/content/research.yaml`**: copy a block, change the title and `kind`. The order in the file is the order on the site. Following humanities convention, don't name the journal while a paper is under review; add `venue:` once it is accepted.
 
-### Change your name, links, email or contact form
+### Change your motto, focus line, links, email or podcast
 
 Edit **`src/site.config.ts`**. Empty values are hidden, so no empty or fake links ever appear on the site.
 
@@ -108,15 +114,16 @@ npm run preview      # serve the production build (search works here)
 src/
   site.config.ts        ← your identity, links and contact options
   content.config.ts     ← the fields each content type accepts
-  content/{work,workshop,log}/   ← your Markdown entries (+ _TEMPLATE.md)
+  content/{work,lab,updates,log}/ ← Markdown entries (+ _TEMPLATE.md); research.yaml, library.yaml
   assets/               ← photos (optimised at build time)
-  pages/                ← routes: home, work, workshop, log, collaborate, about, search, tools
+  pages/                ← routes: home, research, work, lab, updates, collaborate, about, search, tools
   layouts/, components/ ← page structure and reusable parts
   styles/global.css     ← design tokens (colours, type scale) and shared styles
 public/                 ← copied as-is: favicon, downloads/, _headers (HTTP headers)
 wrangler.jsonc          ← Cloudflare hosting config
 workers/www-redirect/   ← www → apex redirect
 scripts/verify-dist.mjs ← post-build checks
+scripts/add-update.mjs  ← `npm run add -- <link>`: add a post to Updates
 ```
 
 ## Licence

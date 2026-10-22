@@ -4,8 +4,8 @@ summary: Moving from a home-made Python generator to a standard framework — an
 date: 2026-10-22
 tags: [Web design, Astro, Build notes]
 links:
-  - label: The template
-    url: /workshop/portfolio-template/
+  - label: The Lab
+    url: /lab/
 ---
 
 The first version of this site used a small, home-made Python generator. It worked, but every new feature — images in articles, tables, search — meant writing and maintaining more of my own code.
@@ -22,4 +22,4 @@ So I rebuilt it on [Astro](https://astro.build), an open-source framework design
 
 ## What stayed
 
-The principles: honest status labels, sources beside claims, and a public workshop where useful things are shared with a clear licence. The whole site is now [free to reuse](/workshop/portfolio-template/) as a template.
+The principles: honest status labels, sources beside claims, and a [Lab](/lab/) where useful things are shared with a clear licence and credit.

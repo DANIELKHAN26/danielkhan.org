@@ -1,103 +1,124 @@
 ---
 import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import photo from '../assets/daniel-khan-profile.jpg';
-import { PORTRAIT } from '../lib/portrait';
 import Portrait from '../components/Portrait.astro';
 import SocialLinks from '../components/SocialLinks.astro';
-import ResearchList from '../components/ResearchList.astro';
-import WorkRow from '../components/WorkRow.astro';
-import PodcastTeaser from '../components/PodcastTeaser.astro';
-import { getWork, getWorkshop, getResearch } from '../lib/content';
+import StatusBadge from '../components/StatusBadge.astro';
+import Icon from '../components/Icon.astro';
+import photo from '../assets/daniel-khan-profile.jpg';
+import { PORTRAIT } from '../lib/portrait';
+import { getWork, getResearch, getUpdates, formatDate, isoDate } from '../lib/content';
+import { RESEARCH_KINDS, PLATFORMS } from '../content.config';
 import { SITE } from '../site.config';
 
-const research = (await getResearch()).filter((r) => r.data.kind === 'under-review').slice(0, 3);
+const research = (await getResearch()).slice(0, 3);
 const work = await getWork();
 const projects = [...work.filter((w) => w.data.featured), ...work.filter((w) => !w.data.featured)].slice(0, 4);
-const resources = await getWorkshop();
+const latest = (await getUpdates()).find((u) => !u.data.podcast);
 // Start downloading the portrait (the largest element on screen) before the browser reaches it.
 const heroImage = await getImage({ src: photo, format: 'avif', widths: [...PORTRAIT.widths] });
 ---
 
 <BaseLayout searchable>
   <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImage.srcSet.attribute} imagesizes={PORTRAIT.sizes} fetchpriority="high" />
+
   <section class="hero container" aria-labelledby="hero-title">
     <div class="hero-text">
       <h1 id="hero-title">{SITE.name}</h1>
-      <p class="hero-role">{SITE.role}, <span class="nowrap">{SITE.affiliation}</span></p>
+      <p class="hero-motto">{SITE.motto}</p>
       <p class="hero-focus">{SITE.focus}</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="/research/">View research</a>
-        <a class="btn btn-ghost" href="/collaborate/">Get in touch</a>
-      </div>
-      <SocialLinks />
+      <SocialLinks withEmail label="Contact and channels" />
     </div>
     <div class="hero-portrait">
       <Portrait eager />
     </div>
   </section>
 
-  {research.length > 0 && (
-    <section class="section" aria-labelledby="research-title">
-      <div class="container">
-        <div class="section-title">
-          <h2 id="research-title">Current research</h2>
-          <a class="link-arrow" href="/research/">All research →</a>
-        </div>
-        <ResearchList items={research} />
-      </div>
-    </section>
-  )}
+  <section class="brief container" aria-label="Research and projects">
+    <div class="brief-col">
+      <div class="brief-head"><h2>Research</h2><a class="link-arrow" href="/research/">All research →</a></div>
+      <ol class="brief-list">
+        {research.map(({ data }) => (
+          <li>
+            <span class="brief-title serif">{data.title}</span>
+            <span class="brief-meta">{RESEARCH_KINDS[data.kind]}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <div class="brief-col">
+      <div class="brief-head"><h2>Projects</h2><a class="link-arrow" href="/work/">All projects →</a></div>
+      <ul class="brief-list">
+        {projects.map((p) => (
+          <li>
+            <a class="brief-title" href={`/work/${p.id}/`}>{p.data.title}</a>
+            <span class="brief-meta"><StatusBadge status={p.data.status} /></span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
 
-  {projects.length > 0 && (
-    <section class="section" aria-labelledby="projects-title">
-      <div class="container">
-        <div class="section-title">
-          <h2 id="projects-title">Projects</h2>
-          <a class="link-arrow" href="/work/">All projects →</a>
-        </div>
-        <ul class="rows">{projects.map((entry) => <WorkRow entry={entry} />)}</ul>
-      </div>
-    </section>
-  )}
-
-  <PodcastTeaser more />
-
-  {resources.length > 0 && (
-    <section class="section" aria-labelledby="workshop-title">
-      <div class="container workshop-strip">
-        <div>
-          <h2 id="workshop-title">Open workshop</h2>
-          <p>{resources.length} free templates and tools — research ledgers, production checklists and this site's own code — each with a licence and credits.</p>
-        </div>
-        <a class="btn btn-ghost" href="/workshop/">Browse the workshop</a>
-      </div>
-    </section>
-  )}
+  <section class="strip container" aria-label="Podcast and latest update">
+    <a class="strip-item" href="/updates/#podcast">
+      <span class="strip-icon onair" aria-hidden="true"><span class="dot"></span></span>
+      <span>
+        <span class="strip-label">Podcast · {SITE.podcast.status === 'live' ? 'Now playing' : 'Coming soon'}</span>
+        <span class="strip-title">{SITE.podcast.status === 'live' ? 'Listen to the latest episode' : 'First episodes in production on YouTube'}</span>
+      </span>
+    </a>
+    {latest && (
+      <a class="strip-item" href="/updates/">
+        <span class="strip-icon" aria-hidden="true"><Icon name={latest.data.platform} size={18} /></span>
+        <span>
+          <span class="strip-label">Latest on {PLATFORMS[latest.data.platform].label} · <time datetime={isoDate(latest.data.date)}>{formatDate(latest.data.date)}</time></span>
+          <span class="strip-title">{latest.data.title}</span>
+        </span>
+      </a>
+    )}
+  </section>
 </BaseLayout>
 
 <style>
+  /* Hero */
   .hero {
-    display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem);
-    align-items: center; padding-block: clamp(2.5rem, 1.5rem + 5vw, 5.5rem);
+    display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center; padding-block: clamp(2.25rem, 1.5rem + 4vw, 4.5rem) clamp(2rem, 1.5rem + 2vw, 3rem);
   }
   .hero h1 { font-size: var(--display); letter-spacing: -0.03em; line-height: 1.02; }
-  .hero-role { margin-top: 0.9rem; font-size: var(--text-lg); font-weight: 600; color: var(--sea); }
-  .hero-focus { margin-top: 1rem; max-width: 34rem; font-size: clamp(1.125rem, 1.05rem + 0.45vw, 1.35rem); line-height: 1.5; color: var(--ink-soft); }
-  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-block: 1.75rem 1.5rem; }
+  .hero-motto { margin-top: 0.75rem; font-family: var(--font-read); font-style: italic; font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.75rem); color: var(--sea); line-height: 1.3; }
+  .hero-focus { margin-block: 1rem 1.5rem; max-width: 36rem; font-size: var(--text-lg); line-height: 1.55; color: var(--ink-soft); }
   .hero-portrait { display: grid; justify-items: end; }
-  .nowrap { white-space: nowrap; }
+  .hero-portrait :global(.portrait-large) { width: min(100%, 20rem); }
 
-  .workshop-strip {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 2rem;
-    padding: clamp(1.5rem, 3vw, 2rem); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
-  }
-  .workshop-strip h2 { font-size: var(--h2); }
-  .workshop-strip p { margin-top: 0.5rem; color: var(--ink-soft); max-width: 40rem; }
+  /* Research | Projects */
+  .brief { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 3.5rem); padding-block: clamp(1.75rem, 1.25rem + 2vw, 2.75rem); border-top: 1px solid var(--line); }
+  .brief-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--ink); }
+  .brief-head h2 { font-size: var(--h3); }
+  .brief-head .link-arrow { font-size: var(--text-sm); }
+  .brief-list { list-style: none; padding: 0; }
+  .brief-list li { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-block: 0.7rem; border-bottom: 1px solid var(--line); }
+  .brief-title { font-weight: 600; line-height: 1.35; text-decoration: none; }
+  .brief-title.serif { font-family: var(--font-read); font-weight: 500; font-size: 1.02rem; }
+  a.brief-title:hover { color: var(--sea); text-decoration: underline; }
+  .brief-meta { flex: none; font-size: 0.8rem; color: var(--ink-faint); white-space: nowrap; }
+
+  /* Podcast + latest strip */
+  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 0.75rem; padding-bottom: clamp(1rem, 2vw, 1.5rem); }
+  .strip-item { display: flex; align-items: center; gap: 0.9rem; padding: 0.9rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); text-decoration: none; transition: border-color .2s; }
+  .strip-item:hover { border-color: var(--sea); }
+  .strip-icon { display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sunk); }
+  .onair { background: var(--band); }
+  .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: #ff6b5e; }
+  @media (prefers-reduced-motion: no-preference) { .dot { animation: pulse 2s ease-out infinite; } }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgb(255 107 94 / 55%); } 70%, 100% { box-shadow: 0 0 0 0.5rem rgb(255 107 94 / 0%); } }
+  .strip-label { display: block; font-size: 0.8rem; color: var(--ink-faint); }
+  .strip-title { display: block; font-weight: 600; line-height: 1.35; }
 
   @media (max-width: 52rem) {
-    .hero { grid-template-columns: 1fr; padding-top: 2rem; }
+    .hero { grid-template-columns: 1fr; padding-top: 1.75rem; }
     .hero-portrait { order: -1; justify-items: start; }
-    .hero-portrait :global(.portrait-large) { width: min(62vw, 15rem); }
+    .hero-portrait :global(.portrait-large) { width: min(52vw, 12.5rem); }
+    .brief { grid-template-columns: 1fr; }
   }
 </style>

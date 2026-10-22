@@ -4,9 +4,12 @@ import Portrait from '../components/Portrait.astro';
 import SocialLinks from '../components/SocialLinks.astro';
 import { PROFILE } from '../data/profile';
 import { SITE } from '../site.config';
+
+const latestRole = PROFILE.experience[0];
+const highestDegree = PROFILE.education[0];
 ---
 
-<BaseLayout searchable title="About" description={`About ${SITE.name}, ${SITE.role} at ${SITE.affiliation}: education, experience and research interests.`}>
+<BaseLayout searchable title="About" description={`About ${SITE.name}: research focus, education, experience and expertise.`}>
   <header class="page-head">
     <div class="container about-head">
       <Portrait size="small" eager />
@@ -17,68 +20,73 @@ import { SITE } from '../site.config';
     </div>
   </header>
 
-  <section class="section">
-    <div class="container about-grid">
-      <div class="prose about-bio">
-        {PROFILE.bio.map((p) => <p>{p}</p>)}
-      </div>
-
-      <dl class="facts">
-        <div class="fact">
-          <dt>Education</dt>
-          <dd>
-            <ul>
-              {PROFILE.education.map((e) => (
-                <li><strong>{e.award}</strong>{' '}<span>{e.institution}{e.years && <>, <span class="nowrap">{e.years}</span></>}</span></li>
-              ))}
-            </ul>
-          </dd>
-        </div>
-        <div class="fact">
-          <dt>Selected experience</dt>
-          <dd>
-            <ul>
-              {PROFILE.experience.map((x) => (
-                <li><strong>{x.role}</strong>{' '}<span>{x.organisation}, <span class="nowrap">{x.years}</span></span></li>
-              ))}
-            </ul>
-          </dd>
-        </div>
-        <div class="fact">
-          <dt>Research interests</dt>
-          <dd><ul class="tags">{PROFILE.interests.map((i) => <li>{i}</li>)}</ul></dd>
-        </div>
-        <div class="fact">
-          <dt>Methods and tools</dt>
-          <dd><ul class="tags">{PROFILE.methods.map((m) => <li>{m}</li>)}</ul></dd>
-        </div>
-        <div class="fact">
-          <dt>Elsewhere</dt>
-          <dd><SocialLinks variant="list" /></dd>
-        </div>
-        <div class="fact">
-          <dt>CV</dt>
-          <dd>{PROFILE.cv
-            ? <p><a href={PROFILE.cv}>Download CV (PDF)</a></p>
-            : <p>A full CV is available on request — <a href="/collaborate/">get in touch</a>.</p>}</dd>
-        </div>
-      </dl>
+  <div class="container about">
+    <div class="about-bio">
+      {PROFILE.bio.map((p) => <p>{p}</p>)}
+      <SocialLinks withEmail label="Contact and channels" />
     </div>
-  </section>
+
+    <div class="facts">
+      <details name="about" open>
+        <summary><span class="f-title">Education</span><span class="f-peek">{highestDegree.award}</span></summary>
+        <ul class="timeline">
+          {PROFILE.education.map((e) => (
+            <li><strong>{e.award}</strong>{' '}<span>{e.institution}{e.years && <>, <span class="nowrap">{e.years}</span></>}</span></li>
+          ))}
+        </ul>
+      </details>
+      <details name="about">
+        <summary><span class="f-title">Experience</span><span class="f-peek">{latestRole.role}, {latestRole.organisation}</span></summary>
+        <ul class="timeline">
+          {PROFILE.experience.map((x) => (
+            <li><strong>{x.role}</strong>{' '}<span>{x.organisation}, <span class="nowrap">{x.years}</span></span></li>
+          ))}
+        </ul>
+      </details>
+      <details name="about">
+        <summary><span class="f-title">Expertise</span><span class="f-peek">{PROFILE.methods.length} methods and tools</span></summary>
+        <ul class="tags">{PROFILE.methods.map((m) => <li>{m}</li>)}</ul>
+      </details>
+      <details name="about">
+        <summary><span class="f-title">Research interests</span><span class="f-peek">{PROFILE.interests.slice(0, 2).join(', ')}…</span></summary>
+        <ul class="tags">{PROFILE.interests.map((i) => <li>{i}</li>)}</ul>
+      </details>
+      <p class="cv">
+        {PROFILE.cv
+          ? <a href={PROFILE.cv}>Download CV (PDF)</a>
+          : <>Full CV available on request — <a href={`mailto:${SITE.contact.email}`}>{SITE.contact.email}</a>.</>}
+      </p>
+    </div>
+  </div>
 </BaseLayout>
 
 <style>
   .about-head { display: flex; align-items: center; gap: 1.25rem; }
   .about-role { margin-top: 0.4rem; color: var(--sea); font-weight: 600; font-size: var(--text-lg); }
-  .about-grid { display: grid; gap: 2.5rem; }
-  .facts { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 52rem; }
-  .fact { display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: 0.5rem 2rem; padding-block: 1.15rem; border-bottom: 1px solid var(--line); }
-  .fact dt { font-weight: 700; }
-  .fact dd { margin: 0; }
-  .fact ul:not(.tags):not(.social) { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
-  .fact li strong { display: block; font-weight: 600; }
-  .fact li span { color: var(--ink-soft); }
-  .fact p a { color: var(--sea); }
+  .about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; padding-block: 2.25rem var(--space-section); }
+  .about-bio { display: grid; gap: 1rem; font-family: var(--font-read); font-size: 1.12rem; line-height: 1.7; }
+  .about-bio :global(.social) { margin-top: 0.5rem; font-family: var(--font-sans); }
+
+  .facts { border-top: 2px solid var(--ink); }
+  details { border-bottom: 1px solid var(--line); }
+  summary {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem;
+    min-height: 3.25rem; padding-block: 0.6rem; cursor: pointer; list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-size: 1.3rem; line-height: 1; color: var(--sea); transition: transform .2s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  .f-title { font-weight: 700; }
+  .f-peek { font-size: 0.88rem; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
+  details[open] .f-peek { visibility: hidden; }
+  details > :not(summary) { margin-bottom: 1rem; }
+  .timeline { list-style: none; padding: 0 0 0 1rem; border-left: 2px solid var(--sea-wash); display: grid; gap: 0.7rem; }
+  .timeline li { position: relative; }
+  .timeline li::before { content: ''; position: absolute; left: calc(-1rem - 5px); top: 0.5rem; width: 8px; height: 8px; border-radius: 50%; background: var(--sea); }
+  .timeline strong { display: block; font-weight: 600; }
+  .timeline span { color: var(--ink-soft); }
   .nowrap { white-space: nowrap; }
-  @media (max-width: 40rem) { .fact { grid-template-columns: 1fr; } }
+  .cv { padding-top: 1rem; font-size: 0.92rem; color: var(--ink-soft); }
+  .cv a { color: var(--sea); }
+  @media (max-width: 52rem) { .about { grid-template-columns: 1fr; } }
 </style>
