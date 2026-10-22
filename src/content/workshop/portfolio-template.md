@@ -6,8 +6,8 @@ status: Released
 version: "1.0.0"
 licence: MIT (code only)
 date: 2026-10-22
-source: https://github.com/DANIELKHAN26/danielkhan26.github.io
-requirements: Node.js 24 or newer; a free GitHub account to host it
+source: https://github.com/DANIELKHAN26/danielkhan.org
+requirements: Node.js 24 or newer; free GitHub and Cloudflare accounts
 tags: [Web design, Astro, Open source]
 basedOn:
   - name: Astro
@@ -32,7 +32,7 @@ basedOn:
     licence: SIL Open Font License 1.1
 ---
 
-Everything you see here is built from plain Markdown files and published free on GitHub Pages. If you want a site like it, you can copy the whole thing.
+Everything you see here is built from plain Markdown files and published free on Cloudflare. If you want a site like it, you can copy the whole thing.
 
 ## What you get
 
@@ -47,7 +47,7 @@ Everything you see here is built from plain Markdown files and published free on
 1. Fork the repository, or click **Use this template** on GitHub.
 2. Edit `src/site.config.ts` with your name, links and contact options.
 3. Replace the Markdown files in `src/content/` and the photos in `src/assets/`.
-4. Push — the included GitHub Actions workflow builds and publishes the site.
+4. Change the domain in `wrangler.jsonc`, add your Cloudflare API token and account ID as repository secrets, and push — the included GitHub Actions workflow checks, builds and publishes the site.
 
 The README in the repository covers each step.
 

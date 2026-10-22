@@ -10,7 +10,7 @@ date: 2026-10-22
 draft: true
 download: /downloads/my-file.zip                 # file you put in public/downloads/, or an https:// release asset
 source: https://github.com/DANIELKHAN26/my-tool   # optional: repository
-# demo: https://danielkhan26.github.io/tools/... # optional: live demo
+# demo: /tools/my-tool/                         # optional: live demo (a /path on this site or https:// URL)
 requirements: What it needs to run
 tags: [Topic]
 basedOn:               # credit anything you adapted — keep the original licence terms

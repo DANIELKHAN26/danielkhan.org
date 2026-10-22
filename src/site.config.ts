@@ -4,7 +4,7 @@
  */
 export const SITE = {
   name: 'Daniel Khan',
-  url: 'https://danielkhan26.github.io',
+  url: 'https://danielkhan.org',
   description:
     'Daniel Khan — research on public questions, evidence-led writing, documentary work and free open tools.',
   headline: 'Good questions deserve a full answer.',

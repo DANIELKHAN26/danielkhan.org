@@ -1,6 +1,6 @@
 ## Project notes for coding agents
 
-- Astro 7 static site, deployed to GitHub Pages by `.github/workflows/deploy.yml`.
+- Astro 7 static site, deployed to Cloudflare Workers static assets (`wrangler.jsonc`) by `.github/workflows/deploy.yml`; HTTP headers in `public/_headers`.
 - Owner-editable settings live in `src/site.config.ts`; content schemas in `src/content.config.ts`.
 - Run `npm test` before committing: type-check, build (with Pagefind), and `scripts/verify-dist.mjs`.
 - CSP is enabled (`security.csp`): no inline `style=""` attributes, no external scripts/styles, no Shiki.

@@ -1,0 +1,17 @@
+// Cloudflare Workers static-assets deployment (no server code). Deployed by .github/workflows/deploy.yml.
+{
+  "name": "danielkhan-org",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/",
+    // /about/ serves about/index.html; /about redirects to /about/.
+    "html_handling": "auto-trailing-slash",
+    // Unknown paths get dist/404.html with a real 404 status.
+    "not_found_handling": "404-page"
+  },
+  // Cloudflare creates the DNS record and HTTPS certificate for this hostname on deploy.
+  "routes": [{ "pattern": "danielkhan.org", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+  "send_metrics": false
+}

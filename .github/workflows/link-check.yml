@@ -25,7 +25,7 @@ jobs:
           args: >-
             --no-progress --max-retries 3 --timeout 30
             --root-dir "${{ github.workspace }}/dist"
-            --exclude '^https://danielkhan26\.github\.io'
+            --exclude '^https://danielkhan\.org'
             --exclude '^https://github\.com/.*/(issues/new|discussions)'
             'dist/**/*.html'
           fail: true

@@ -1,8 +1,8 @@
 # Daniel Khan — portfolio, open workshop and log
 
-Live site: **https://danielkhan26.github.io**
+Live site: **https://danielkhan.org**
 
-A fast, private-by-default personal site built with [Astro](https://astro.build) and published free on GitHub Pages. Everything is plain Markdown in `src/content/`. Pushing to `main` rebuilds and publishes it automatically.
+A fast, private-by-default personal site built with [Astro](https://astro.build) and served free from Cloudflare's global network. Everything is plain Markdown in `src/content/`. Pushing to `main` checks, rebuilds and publishes it automatically.
 
 | Section | What goes there | Folder |
 |---|---|---|
@@ -22,7 +22,7 @@ A fast, private-by-default personal site built with [Astro](https://astro.build)
 2. Rename it: lowercase words with hyphens, e.g. `new-explainer-format.md`. The filename becomes the web address (`/log/new-explainer-format/`).
 3. Fill in the fields at the top. Write the body in Markdown.
 4. Keep `draft: true` while you write. Set `draft: false` when it's ready.
-5. Commit and push. The site updates in about two minutes.
+5. Commit and push. The site updates in about two minutes, once every check passes.
 
 You can do all of this on **github.com** in the browser: open the folder, click **Add file → Create new file**, paste, then **Commit**.
 
@@ -76,9 +76,18 @@ npm run preview      # serve the production build (search works here)
 - **Content schema:** a missing date, a bad link format or a missing image description stops the build with a clear message.
 - **`scripts/verify-dist.mjs`** checks every built page for broken internal links, missing titles, descriptions or canonical URLs, missing alt text, leaked drafts and placeholder text.
 - **Content Security Policy** on every page (hash-based), no cookies, no analytics, no third-party requests. Fonts are self-hosted.
-- **GitHub Actions** (`.github/workflows/deploy.yml`) runs all checks before publishing. A failed check never replaces the live site.
+- **GitHub Actions** (`.github/workflows/deploy.yml`) runs all checks, then deploys to Cloudflare. A failed check never replaces the live site.
+- **HTTP security headers** (`public/_headers`): HSTS, clickjacking protection, `nosniff`, a strict referrer and permissions policy. Fingerprinted files are cached for a year.
 - **Monthly link check** (`link-check.yml`) tests external links. GitHub emails you if any break.
 - **Dependabot** opens monthly update pull requests. Merge them when the checks pass.
+
+## Hosting and domain
+
+- **Domain:** `danielkhan.org`, registered at Cloudflare Registrar (auto-renews yearly; keep the card on file current).
+- **Hosting:** Cloudflare Workers static assets, configured in `wrangler.jsonc`. Deploying creates the DNS record and HTTPS certificate automatically.
+- **www:** `workers/www-redirect/` sends every `www.danielkhan.org` and `http://` address to `https://danielkhan.org`.
+- **Deploy credentials:** the GitHub repository secrets `CLOUDFLARE_API_TOKEN` (template "Edit Cloudflare Workers", limited to this account and zone) and `CLOUDFLARE_ACCOUNT_ID`. If a deploy fails with an authentication error, create a new token and run `gh secret set CLOUDFLARE_API_TOKEN`.
+- **Cloudflare settings that must stay this way:** Always Use HTTPS on, minimum TLS 1.2, Email Address Obfuscation off, Bot Fight Mode off. The last two inject scripts that the site's security policy blocks.
 
 ## Project structure
 
@@ -91,7 +100,9 @@ src/
   pages/                ← routes: home, work, workshop, log, collaborate, about, search, tools
   layouts/, components/ ← page structure and reusable parts
   styles/global.css     ← design tokens (colours, type scale) and shared styles
-public/                 ← copied as-is: favicon, downloads/
+public/                 ← copied as-is: favicon, downloads/, _headers (HTTP headers)
+wrangler.jsonc          ← Cloudflare hosting config
+workers/www-redirect/   ← www → apex redirect
 scripts/verify-dist.mjs ← post-build checks
 ```
 

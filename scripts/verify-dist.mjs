@@ -14,7 +14,7 @@ function walk(dir) {
   });
 }
 
-/** Resolve a site path the way GitHub Pages does. */
+/** Resolve a site path the way a static host does (folder → index.html). */
 function exists(path) {
   const clean = decodeURIComponent(path.split(/[?#]/)[0]);
   const target = join(DIST, clean);
@@ -54,6 +54,12 @@ for (const d of drafts) if (existsSync(join(DIST, 'work', d))) errors.push(`draf
 for (const required of ['index.html', '404.html', 'rss.xml', 'sitemap-index.xml', 'pagefind/pagefind.js', 'favicon.svg']) {
   if (!existsSync(join(DIST, required))) errors.push(`missing ${required}`);
 }
+const headers = existsSync(join(DIST, '_headers')) ? readFileSync(join(DIST, '_headers'), 'utf8') : '';
+for (const h of ['Strict-Transport-Security', "frame-ancestors 'none'", 'X-Content-Type-Options: nosniff', 'immutable']) {
+  if (!headers.includes(h)) errors.push(`_headers is missing ${h}`);
+}
+for (const f of ['robots.txt', '.well-known/security.txt']) if (!existsSync(join(DIST, f))) errors.push(`missing ${f}`);
+
 const rss = readFileSync(join(DIST, 'rss.xml'), 'utf8');
 if (!rss.includes('<item>')) errors.push('rss.xml has no items');
 
