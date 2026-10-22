@@ -1,15 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
 ---
 
 <BaseLayout searchable title="Privacy and editorial policy" description="How this site handles your data, messages, corrections and licences.">
-  <header class="page-head wrap">
-    <p class="eyebrow">Policies</p>
-    <h1 class="display">Privacy and editorial policy.</h1>
-    <p class="lede">Short version: no cookies, no ads, no cross-site tracking. Messages are used only to reply.</p>
-  </header>
-  <section class="section wrap">
-    <div class="prose">
+  <PageHeader title="Privacy and editorial policy" lede="No cookies, no ads, no cross-site tracking. Messages are used only to reply." />
+  <section class="section">
+    <div class="container prose">
       <h2>Browsing</h2>
       <p>This is a static website served by Cloudflare. It sets no cookies and loads no advertising or third-party fonts. If you choose a light or dark theme, that preference is stored in your own browser only. Cloudflare, as the host, processes standard connection data (such as IP addresses) to deliver and protect the site; see the <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a>.</p>
       <h2>Visitor statistics</h2>

@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+import { socialLinks } from '../site.config';
+
+interface Props {
+  /** 'icons' = round icon buttons (hero, footer); 'list' = icon + name (About, Collaborate). */
+  variant?: 'icons' | 'list';
+  label?: string;
+}
+const { variant = 'icons', label = 'Daniel Khan elsewhere' } = Astro.props;
+---
+
+{socialLinks.length > 0 && (
+  <ul class:list={['social', `social-${variant}`]} aria-label={label}>
+    {socialLinks.map((s) => (
+      <li>
+        <a href={s.url} rel="me noopener" title={variant === 'icons' ? s.label : undefined}>
+          <Icon name={s.icon} size={variant === 'icons' ? 18 : 16} />
+          <span class={variant === 'icons' ? 'visually-hidden' : undefined}>{s.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .social { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .social a { color: inherit; text-decoration: none; transition: color .2s, border-color .2s, background-color .2s; }
+  .social-icons a {
+    display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+  }
+  .social-icons a:hover { color: var(--sea); border-color: var(--sea); }
+  .social-list a {
+    display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0.45rem 0.9rem;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-weight: 600; font-size: 0.95rem;
+  }
+  .social-list a:hover { color: var(--sea); border-color: var(--sea); }
+</style>

@@ -1,19 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
 ---
 
 <BaseLayout title="Search" description="Search Daniel Khan's work, workshop and log." noindex>
-  <header class="page-head wrap">
-    <p class="eyebrow">Search</p>
-    <h1 class="display">Find anything on the site.</h1>
+  <PageHeader title="Search">
     <form class="search-form" role="search" action="/search/" method="get">
       <label class="visually-hidden" for="q">Search the site</label>
-      <input id="q" name="q" type="search" placeholder="Try “Bangladesh”, “template” or “documentary”" autocomplete="off" />
+      <input id="q" name="q" type="search" placeholder="Try “Bangladesh”, “template” or “podcast”" autocomplete="off" />
       <button class="btn btn-primary" type="submit">Search</button>
     </form>
-  </header>
-  <section class="section wrap" aria-live="polite">
-    <p id="search-status" class="search-status mono"></p>
+  </PageHeader>
+  <section class="section container" aria-live="polite">
+    <p id="search-status" class="search-status"></p>
     <ol id="search-results" class="results"></ol>
   </section>
 </BaseLayout>
@@ -21,13 +20,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <style>
   .search-form { display: flex; gap: 0.75rem; margin-top: 2rem; max-width: 42rem; }
   .search-form input { font-size: 1.15rem; padding: 0.9rem 1.1rem; border-radius: 999px; }
-  .search-status { color: var(--ink-faint); margin-bottom: 1.5rem; }
+  .search-status { color: var(--ink-faint); font-size: var(--text-sm); margin-bottom: 1.25rem; }
   .results { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
   .results :global(li) { border-bottom: 1px solid var(--line); }
   .results :global(a) { display: grid; gap: 0.35rem; padding: 1.25rem 0; text-decoration: none; }
-  .results :global(.r-title) { font-size: var(--step-1); font-weight: 650; font-stretch: 88%; }
-  .results :global(.r-url) { font-family: var(--font-mono); font-size: 0.75rem; color: var(--shingle); }
-  .results :global(.r-excerpt) { font-family: var(--font-serif); color: var(--ink-soft); }
+  .results :global(.r-title) { font-size: var(--h3); font-weight: 650; }
+  .results :global(.r-url) { font-size: var(--text-sm); color: var(--ink-faint); }
+  .results :global(.r-excerpt) { color: var(--ink-soft); }
   .results :global(mark) { background: var(--sea-wash); color: inherit; padding: 0 0.1em; border-radius: 3px; }
   .results :global(a:hover .r-title) { color: var(--sea); }
   @media (max-width: 30rem) { .search-form { flex-direction: column; } }

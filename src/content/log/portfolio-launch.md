@@ -14,9 +14,9 @@ This site is now my main home online. It collects work that was previously scatt
 
 ## What's here
 
-- **[Work](/work/)** — The Annalist, REDE, my Bangladesh research programme, the documentary presenter lab and ScriptFlow.
+- **[Research](/research/)** and **[Projects](/work/)** — papers, The Annalist, REDE, the documentary presenter lab and ScriptFlow.
 - **[Open workshop](/workshop/)** — free templates and tools: an evidence ledger, a production card, a collaboration brief, a script timer, and the code for this site itself.
-- **This log** — where I'll record what I build, release and learn, in date order.
+- **Updates** — where I record what I build, release and learn, in date order.
 
 ## How to get involved
 

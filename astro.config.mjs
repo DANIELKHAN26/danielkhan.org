@@ -9,35 +9,23 @@ const LATIN = 'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U
 const LATIN_EXT = 'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF';
 
 /**
- * @font-face variants for a Fontsource variable package.
- * `axes` picks the smallest file that has what the design uses:
- * Bricolage "wdth" (width + weight, for condensed headlines), Newsreader "wght" (weight only).
+ * @font-face variants (Latin + Latin Extended) for a Fontsource variable package's weight-axis files.
  * @param {string} pkg
  * @param {'normal' | 'italic'} style
- * @param {'wght' | 'wdth'} axes
- * @param {string} [stretch]
+ * @param {string} weight  the range the font file supports
  */
-function variable(pkg, style, axes, stretch) {
+function variable(pkg, style, weight) {
   /** @param {string} subset @param {string} range */
   const face = (subset, range) => ({
-    weight: '200 800',
+    weight,
     style,
-    stretch,
-    src: /** @type {[string]} */ ([`@fontsource-variable/${pkg}/files/${pkg}-${subset}-${axes}-${style}.woff2`]),
+    src: /** @type {[string]} */ ([`@fontsource-variable/${pkg}/files/${pkg}-${subset}-wght-${style}.woff2`]),
     unicodeRange: /** @type {[string]} */ ([range]),
   });
   /** @type {[ReturnType<typeof face>, ReturnType<typeof face>]} */
   const faces = [face('latin', LATIN), face('latin-ext', LATIN_EXT)];
   return faces;
 }
-
-/** @param {400 | 500} weight */
-const plexMono = (weight) => ({
-  weight,
-  style: /** @type {const} */ ('normal'),
-  src: /** @type {[string]} */ ([`@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-${weight}-normal.woff2`]),
-  unicodeRange: /** @type {[string]} */ ([LATIN]),
-});
 
 export default defineConfig({
   site: SITE_URL,
@@ -54,24 +42,17 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.local(),
-      name: 'Bricolage Grotesque',
+      name: 'Schibsted Grotesk',
       cssVariable: '--font-display',
       fallbacks: ['system-ui', 'sans-serif'],
-      options: { variants: variable('bricolage-grotesque', 'normal', 'wdth', '75% 100%') },
+      options: { variants: variable('schibsted-grotesk', 'normal', '400 900') },
     },
     {
       provider: fontProviders.local(),
-      name: 'Newsreader',
+      name: 'Source Serif 4',
       cssVariable: '--font-serif',
       fallbacks: ['Georgia', 'serif'],
-      options: { variants: [...variable('newsreader', 'normal', 'wght'), ...variable('newsreader', 'italic', 'wght')] },
-    },
-    {
-      provider: fontProviders.local(),
-      name: 'IBM Plex Mono',
-      cssVariable: '--font-mono',
-      fallbacks: ['ui-monospace', 'monospace'],
-      options: { variants: [plexMono(400), plexMono(500)] },
+      options: { variants: [...variable('source-serif-4', 'normal', '200 900'), ...variable('source-serif-4', 'italic', '200 900')] },
     },
   ],
   // Content Security Policy, emitted as a <meta> tag with hashes for every script and style.

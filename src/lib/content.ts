@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import researchSource from '../content/research.yaml?raw';
 
 type Dated = { data: { date: Date; draft: boolean } };
 
@@ -12,6 +13,12 @@ export async function getWork() {
 export async function getWorkshop() {
   return (await getCollection('workshop', visible)).sort(newestFirst);
 }
+/** Research outputs, in the order they are written in src/content/research.yaml. */
+export async function getResearch() {
+  const order = [...researchSource.matchAll(/^- id: *(\S+)/gm)].map((m) => m[1]);
+  return (await getCollection('research')).sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+}
+
 export async function getLog() {
   return (await getCollection('log', visible)).sort(newestFirst);
 }
@@ -19,7 +26,7 @@ export async function getLog() {
 export const WORK_TYPES = {
   research: 'Research',
   writing: 'Writing',
-  media: 'Documentary & media',
+  media: 'Documentary',
   project: 'Project',
 } as const satisfies Record<CollectionEntry<'work'>['data']['type'], string>;
 

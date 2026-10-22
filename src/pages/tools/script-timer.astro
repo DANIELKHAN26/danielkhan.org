@@ -1,15 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 ---
 
 <BaseLayout searchable title="Script timer" description="A free tool that estimates how long a script takes to read aloud. Runs entirely in your browser.">
-  <header class="page-head wrap">
-    <p class="eyebrow">Free tool</p>
-    <h1 class="display">How long will this take to say?</h1>
-    <p class="lede">Paste a script to estimate its spoken length at the pace you choose. Everything happens in your browser — your text is never uploaded or stored.</p>
-  </header>
+  <PageHeader title="Script timer" lede="Paste a script to estimate how long it takes to say aloud. Everything runs in your browser — your text is never uploaded or stored." />
 
-  <section class="section wrap timer">
+  <section class="section container timer">
     <div class="timer-input">
       <label for="script" class="timer-label">Script</label>
       <textarea id="script" rows="14" placeholder="Paste or type your narration here…"></textarea>
@@ -39,18 +36,18 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <style>
   .timer { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
-  .timer-label { display: block; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.6rem; }
-  .timer textarea { min-height: 22rem; font-family: var(--font-serif); font-size: 1.15rem; line-height: 1.6; }
+  .timer-label { display: block; font-weight: 700; font-size: var(--text-sm); margin-bottom: 0.5rem; }
+  .timer textarea { min-height: 22rem; font-family: var(--font-read); font-size: 1.1rem; line-height: 1.6; }
   .timer-actions { display: flex; gap: 0.75rem; margin-top: 0.9rem; }
   .timer-panel { position: sticky; top: 6rem; display: grid; gap: 1.5rem; padding: 1.75rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
-  .pace input { width: 100%; accent-color: var(--sea); }
+  .pace input { width: 100%; height: 1.75rem; accent-color: var(--sea); cursor: pointer; }
   .pace-value { font-weight: 600; margin-top: 0.4rem; }
   .hint { font-size: 0.88rem; color: var(--ink-faint); }
   .figures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0; }
   .figures div { border-top: 1px solid var(--line); padding-top: 0.6rem; }
   .figures .big { grid-column: 1 / -1; border-top: 2px solid var(--ink); }
   .figures dt { font-size: 0.85rem; color: var(--ink-faint); }
-  .figures dd { margin: 0; font-family: var(--font-mono); font-size: 1.4rem; }
+  .figures dd { margin: 0; font-size: 1.4rem; font-weight: 650; font-variant-numeric: tabular-nums; }
   .figures .big dd { font-size: clamp(2.5rem, 6vw, 3.6rem); color: var(--sea); letter-spacing: -0.03em; }
   @media (max-width: 52rem) { .timer { grid-template-columns: 1fr; } .timer-panel { position: static; } }
 </style>

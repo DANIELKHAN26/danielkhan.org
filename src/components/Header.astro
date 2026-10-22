@@ -2,17 +2,17 @@
 import Mark from '../assets/brand/dk-mark.svg';
 
 const nav = [
-  { label: 'Work', href: '/work/' },
+  { label: 'Research', href: '/research/' },
+  { label: 'Projects', href: '/work/' },
   { label: 'Workshop', href: '/workshop/' },
-  { label: 'Log', href: '/log/' },
-  { label: 'About', href: '/about/' },
+  { label: 'Podcast', href: '/podcast/' },
 ];
 const path = Astro.url.pathname;
 const isCurrent = (href: string) => path === href || path.startsWith(href);
 ---
 
 <header class="site-header">
-  <div class="wrap header-inner">
+  <div class="container header-inner">
     <a class="wordmark" href="/" aria-label="Daniel Khan, home">
       <Mark class="wordmark-mark" aria-hidden="true" />
       <span class="wordmark-name">Daniel Khan</span>
@@ -52,14 +52,14 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
     backdrop-filter: saturate(1.4) blur(12px);
     border-bottom: 1px solid var(--line);
   }
-  .header-inner { display: flex; align-items: center; gap: 1rem; min-height: 4.25rem; }
+  .header-inner { display: flex; align-items: center; gap: 1rem; min-height: 4rem; }
   .wordmark { display: inline-flex; align-items: center; gap: 0.7rem; text-decoration: none; margin-right: auto; }
   .wordmark :global(.wordmark-mark) { width: 2.6rem; height: auto; color: var(--ink); flex: none; }
-  .wordmark-name { font-weight: 700; font-size: 1.12rem; font-stretch: 85%; letter-spacing: -0.01em; }
+  .wordmark-name { font-weight: 700; font-size: 1.08rem; letter-spacing: -0.01em; }
 
   .site-nav ul { display: flex; align-items: center; gap: 0.25rem; list-style: none; margin: 0; padding: 0; }
   .site-nav a:not(.btn) {
-    display: block; padding: 0.5rem 0.8rem; border-radius: 999px; text-decoration: none; font-weight: 550; font-size: 0.97rem; color: var(--ink-soft);
+    display: block; padding: 0.5rem 0.75rem; border-radius: 999px; text-decoration: none; font-weight: 550; font-size: 0.97rem; color: var(--ink-soft);
   }
   .site-nav a:not(.btn):hover { color: var(--ink); background: var(--sunk); }
   .site-nav a[aria-current='page']:not(.btn) { color: var(--ink); box-shadow: inset 0 -2px 0 var(--sea); border-radius: 0; }
@@ -79,7 +79,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
   .menu-btn[aria-expanded='true'] span:first-child { top: 1.25rem; transform: rotate(45deg); }
   .menu-btn[aria-expanded='true'] span:last-child { top: 1.25rem; transform: rotate(-45deg); }
 
-  @media (max-width: 52rem) {
+  @media (max-width: 56rem) {
     .menu-btn { display: grid; }
     .site-nav {
       position: absolute; inset: 100% 0 auto 0; background: var(--paper); border-bottom: 1px solid var(--line);

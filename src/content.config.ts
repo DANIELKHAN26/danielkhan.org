@@ -1,5 +1,5 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 /** A link must be https:// or a path on this site such as /downloads/file.csv */
@@ -94,4 +94,25 @@ const log = defineCollection({
   }),
 });
 
-export const collections = { work, workshop, log };
+/** Research outputs, edited in src/content/research.yaml. */
+export const RESEARCH_KINDS = {
+  'under-review': 'Under review',
+  accepted: 'Accepted paper',
+  presented: 'Conference paper',
+  seminar: 'Seminar paper',
+  thesis: 'Thesis project',
+  project: 'Research project',
+} as const;
+
+const research = defineCollection({
+  loader: file('src/content/research.yaml'),
+  schema: z.object({
+    title: z.string().min(5),
+    kind: z.enum(Object.keys(RESEARCH_KINDS) as [keyof typeof RESEARCH_KINDS, ...(keyof typeof RESEARCH_KINDS)[]]),
+    venue: z.string().optional(),
+    year: z.number().int().min(1990).max(2100).optional(),
+    url: href.optional(),
+  }),
+});
+
+export const collections = { work, workshop, log, research };

@@ -3,6 +3,7 @@ import { Font } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE, socialLinks } from '../site.config';
+import { PROFILE } from '../data/profile';
 import ogDefault from '../assets/og-card.png';
 import '../styles/global.css';
 
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const { title, description = SITE.description, ogType = 'website', published, noindex = false, searchable = false } = Astro.props;
-const fullTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.roles.join(' · ')}`;
+const fullTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.role}, ${SITE.affiliation}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(ogDefault.src, Astro.site);
 
@@ -28,6 +29,11 @@ const person = {
   '@type': 'Person',
   name: SITE.name,
   url: SITE.url,
+  image: ogImage.href,
+  jobTitle: SITE.role,
+  affiliation: { '@type': 'CollegeOrUniversity', name: SITE.affiliation },
+  alumniOf: PROFILE.education.slice(1).map((e) => ({ '@type': 'CollegeOrUniversity', name: e.institution.split(',')[0] })),
+  knowsAbout: PROFILE.interests,
   description: SITE.description,
   sameAs: socialLinks.map((s) => s.url),
 };
@@ -58,14 +64,13 @@ const person = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${SITE.name} on a windy beach, with the sea behind`} />
+    <meta property="og:image:alt" content={`${SITE.name} — ${SITE.role}, ${SITE.affiliation}`} />
     {published && <meta property="article:published_time" content={published.toISOString()} />}
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Preload the headline font only (prevents layout shift); body text uses size-matched fallbacks until its font arrives. -->
     <Font cssVariable="--font-display" preload />
     <Font cssVariable="--font-serif" />
-    <Font cssVariable="--font-mono" />
 
     <script type="application/ld+json" set:html={JSON.stringify(person)} />
 

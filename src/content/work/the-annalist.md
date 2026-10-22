@@ -1,30 +1,25 @@
 ---
 title: The Annalist
-summary: An explanatory-news project that turns fast-moving public events into short, sourced explainers and longer documentary stories.
+summary: A journal of record and interpretation — short, sourced explainers on public events, published on Substack.
 type: project
-status: In development
+status: Ongoing
 date: 2026-10-22
 featured: true
-tags: [Journalism, Explainers, Media]
+tags: [Journalism, Explainers, Substack]
+links:
+  - label: Read The Annalist on Substack
+    url: https://substack.com/@annalisthub
 collaboration:
   open: true
   needs: [Researchers and fact-checkers, Designers for explainer cards, Bangla–English translators]
 ---
 
-The Annalist is a format for following public events without being carried along by their urgency. It notices what is happening, gathers the records that matter, and presents the result in a form people can follow quickly.
+The Annalist follows public events without being carried along by their urgency. Each piece separates what is established from what is claimed, records the date of every source, and says what remains unknown.
 
-## The question behind it
+## Formats
 
-Can speed and careful attribution coexist? When an event becomes news, some things can be reported responsibly straight away. Others must stay open until better evidence arrives. The Annalist is designed to make that difference visible to the reader instead of hiding it.
+- **Short explainers** for the essential facts, each linked to its source.
+- **Research briefs** setting out what is established, disputed and unknown.
+- **Longer stories** for subjects that need time and context.
 
-## How it works
-
-- **Short explainer cards** for the essential facts, each linked to its source.
-- **Research briefs** that set out what is established, what is disputed and what is unknown.
-- **Longer scripted stories** for subjects that need time and context.
-
-Every piece separates a circulating claim from a verified report, records both the event date and the publication date of its sources, and goes through editorial review before it is posted.
-
-## Where it stands
-
-The editorial workflow and formats are being designed and tested. If you research, design, translate or fact-check, [offer to help](/collaborate/#projects) — the first formats are where outside eyes help most.
+It is published on [Substack](https://substack.com/@annalisthub). Researchers, designers, translators and fact-checkers are welcome to [offer help](/collaborate/).

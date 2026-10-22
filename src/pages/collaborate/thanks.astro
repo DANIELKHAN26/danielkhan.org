@@ -1,15 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 ---
 
 <BaseLayout title="Message sent" noindex>
-  <header class="page-head wrap">
-    <p class="eyebrow">Message sent</p>
-    <h1 class="display">Thank you — your message is on its way.</h1>
-    <p class="lede">I read every message and will reply as soon as I can. Meanwhile, the <a href="/workshop/">open workshop</a> has free tools you can use right now.</p>
-  </header>
+  <PageHeader title="Thank you — your message is on its way." lede="I read every message and will reply as soon as I can." />
 </BaseLayout>
 
-<style>
-  .lede a { color: var(--sea); }
-</style>

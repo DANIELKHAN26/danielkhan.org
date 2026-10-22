@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PodcastTeaser from '../components/PodcastTeaser.astro';
+import { SITE } from '../site.config';
+
+const substack = SITE.social.find((s) => s.icon === 'substack');
+---
+
+<BaseLayout searchable title="Podcast" description="Daniel Khan's personal podcast — coming soon on YouTube.">
+  <PodcastTeaser headingLevel="h1" />
+  <section class="section">
+    <div class="container details">
+      <div>
+        <h2>Get the first episode</h2>
+        <p>Subscribe to the <a href={SITE.podcast.channel} rel="noopener">YouTube channel</a> to be notified when it premieres{substack && <>, or follow <a href={substack.url} rel="noopener">The Annalist on Substack</a> for updates</>}.</p>
+      </div>
+      <div>
+        <h2>Suggest a guest or topic</h2>
+        <p>Have a question the podcast should take on, or someone it should hear from? <a href="/collaborate/">Send a suggestion</a>.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .details { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 2rem 3rem; }
+  .details h2 { font-size: var(--h3); }
+  .details p { margin-top: 0.5rem; color: var(--ink-soft); max-width: 34rem; }
+  .details a { color: var(--sea); }
+</style>

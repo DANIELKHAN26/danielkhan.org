@@ -1,32 +1,23 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { formatDayMonth, isoDate } from '../lib/content';
+import { formatDate, isoDate } from '../lib/content';
 
-interface Props { entries: CollectionEntry<'log'>[]; yearHeading?: 'h2' | 'h3' }
-const { entries, yearHeading: YearHeading = 'h2' } = Astro.props;
-
-const years = new Map<number, CollectionEntry<'log'>[]>();
-for (const entry of entries) {
-  const y = entry.data.date.getUTCFullYear();
-  years.set(y, [...(years.get(y) ?? []), entry]);
-}
+interface Props { entries: CollectionEntry<'log'>[]; headingLevel?: 'h2' | 'h3' }
+const { entries, headingLevel: Heading = 'h2' } = Astro.props;
 ---
 
-<div class="annal">
-  {[...years].map(([year, items]) => (
-    <section class="annal-year" aria-label={`Log entries from ${year}`}>
-      <YearHeading>{year}</YearHeading>
-      <ol class="annal-entries">
-        {items.map((entry) => (
-          <li class="annal-entry">
-            <a href={`/log/${entry.id}/`}>
-              <time datetime={isoDate(entry.data.date)}>{formatDayMonth(entry.data.date)}</time>
-              <strong>{entry.data.title}{entry.data.draft && ' (draft)'}</strong>
-              <span>{entry.data.summary}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
-    </section>
+<ol class="rows">
+  {entries.map((entry) => (
+    <li class="row">
+      <a class="row-link" href={`/log/${entry.id}/`}>
+        <Heading class="row-title">{entry.data.title}{entry.data.draft && ' (draft)'}</Heading>
+        <time class="row-meta date" datetime={isoDate(entry.data.date)}>{formatDate(entry.data.date)}</time>
+        <p class="row-text">{entry.data.summary}</p>
+      </a>
+    </li>
   ))}
-</div>
+</ol>
+
+<style>
+  .date { font-size: var(--text-sm); color: var(--ink-faint); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: 0.2rem; }
+</style>

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import { getWorkshop } from '../../lib/content';
 import { githubCommunityUrl } from '../../site.config';
@@ -7,44 +8,22 @@ import { githubCommunityUrl } from '../../site.config';
 const items = await getWorkshop();
 ---
 
-<BaseLayout title="Open workshop" description="Free templates, tools and designs by Daniel Khan — licensed for reuse, with credit for any work they build on.">
-  <header class="page-head wrap">
-    <p class="eyebrow">Open workshop</p>
-    <h1 class="display">Made to be used, adapted and improved.</h1>
-    <p class="lede">Things I've built or adapted — from my own templates to designs built on open-source projects — published so anyone can use them. Each one states its licence, version and credits.</p>
-  </header>
-
-  <section class="section wrap" aria-label="Resources">
-    {items.length > 0
-      ? <div class="card-grid">{items.map((entry) => <ResourceCard entry={entry} headingLevel="h2" />)}</div>
-      : <p class="lede">The first resources are being prepared.</p>}
-  </section>
-
-  <section class="section wrap how" aria-labelledby="how-title">
-    <h2 id="how-title" class="display">How to use the workshop</h2>
-    <div class="how-grid">
-      <div>
-        <h3>Use it</h3>
-        <p>Download or open anything here. The licence on each page says what you may do — most templates are CC0, so no permission or credit is needed.</p>
-      </div>
-      <div>
-        <h3>Improve it</h3>
-        <p>Found a bug or a better way? {githubCommunityUrl
-          ? <>Open an issue or discussion in the <a href={githubCommunityUrl}>public collaboration space</a>.</>
-          : <>Tell me through the <a href="/collaborate/">collaborate page</a>.</>}</p>
-      </div>
-      <div>
-        <h3>Share what you made</h3>
-        <p>If you build something on top of a resource, <a href="/collaborate/">let me know</a> — good adaptations can be credited and listed here.</p>
-      </div>
+<BaseLayout title="Workshop" description="Free templates, tools and designs by Daniel Khan — licensed for reuse, with credit for any work they build on.">
+  <PageHeader title="Workshop" lede="Templates, tools and designs I've made or adapted, free for anyone to use. Each one states its licence and credits." />
+  <section class="section">
+    <div class="container">
+      {items.length > 0
+        ? <div class="cards">{items.map((entry) => <ResourceCard entry={entry} headingLevel="h2" />)}</div>
+        : <p>The first resources are being prepared.</p>}
+      <p class="how">
+        Found a problem or made something with these?{' '}
+        {githubCommunityUrl ? <a href={githubCommunityUrl}>Share it in the collaboration space</a> : <a href="/collaborate/">Tell me</a>}.
+      </p>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .how h2 { font-size: var(--step-3); margin-bottom: 2rem; }
-  .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 2rem; }
-  .how h3 { font-size: var(--step-1); font-stretch: 88%; margin-bottom: 0.5rem; }
-  .how p { color: var(--ink-soft); font-family: var(--font-serif); }
+  .how { margin-top: 2rem; color: var(--ink-soft); }
   .how a { color: var(--sea); }
 </style>

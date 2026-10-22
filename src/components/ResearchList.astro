@@ -1,0 +1,30 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { RESEARCH_KINDS } from '../content.config';
+
+interface Props { items: CollectionEntry<'research'>[]; headingLevel?: 'h2' | 'h3' }
+const { items, headingLevel: Heading = 'h3' } = Astro.props;
+---
+
+<ol class="rows research">
+  {items.map(({ data }) => (
+    <li class="row">
+      <div class="row-static">
+        <Heading class="row-title research-title">
+          {data.url ? <a href={data.url}>{data.title}</a> : data.title}
+        </Heading>
+        <span class="row-meta"><span class="status" data-status={data.kind === 'under-review' ? 'Ongoing' : 'Published'}>{RESEARCH_KINDS[data.kind]}</span></span>
+        {(data.venue || data.year) && (
+          <p class="row-text venue">{[data.venue, data.year].filter(Boolean).join(', ')}</p>
+        )}
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .research-title { font-family: var(--font-read); font-weight: 600; font-size: 1.15rem; letter-spacing: 0; }
+  .research-title a { text-decoration: none; }
+  .research-title a:hover { color: var(--sea); text-decoration: underline; }
+  .venue { font-style: italic; }
+</style>

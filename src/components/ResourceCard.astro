@@ -1,24 +1,17 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import StatusBadge from './StatusBadge.astro';
-import { formatDate } from '../lib/content';
 
 interface Props { entry: CollectionEntry<'workshop'>; headingLevel?: 'h2' | 'h3' }
 const { entry, headingLevel: Heading = 'h3' } = Astro.props;
 const { data } = entry;
 ---
 
-<article class="resource">
-  <div class="resource-top">
-    <span class="resource-kind">{data.kind}</span>
-    <StatusBadge status={data.status} />
-  </div>
+<article class="card">
+  <span class="card-kind">Free {data.kind.toLowerCase()}</span>
   <Heading><a href={`/workshop/${entry.id}/`}>{data.title}{data.draft && ' (draft)'}</a></Heading>
   <p>{data.summary}</p>
-  <div class="resource-facts">
-    <span>v{data.version}</span>
+  <div class="card-facts">
+    <span>Version {data.version}</span>
     <span>{data.licence}</span>
-    <span>{formatDate(data.updated ?? data.date)}</span>
-    {data.basedOn.length > 0 && <span>Adapted work</span>}
   </div>
 </article>

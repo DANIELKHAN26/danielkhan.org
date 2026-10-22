@@ -1,22 +1,23 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import Annal from '../../components/Annal.astro';
 import { getLog } from '../../lib/content';
 
 const log = await getLog();
 ---
 
-<BaseLayout title="Log" description="Daniel Khan's running record: releases, progress on projects, and lessons from building things.">
-  <header class="page-head wrap">
-    <p class="eyebrow">Log</p>
-    <h1 class="display">The running record.</h1>
-    <p class="lede">Releases, progress and lessons, in date order — a public notebook of what I'm building. Follow it with the <a href="/rss.xml">RSS feed</a>.</p>
-  </header>
-  <section class="section wrap" aria-label="Log entries">
-    {log.length > 0 ? <Annal entries={log} /> : <p class="lede">The first entry is on its way.</p>}
+<BaseLayout title="Updates" description="Dated updates from Daniel Khan: releases, project progress and notes.">
+  <PageHeader title="Updates" lede="Releases, progress and notes, newest first. Follow along by RSS.">
+    <p class="rss"><a href="/rss.xml">RSS feed</a></p>
+  </PageHeader>
+  <section class="section">
+    <div class="container">
+      {log.length > 0 ? <Annal entries={log} /> : <p>The first update is on its way.</p>}
+    </div>
   </section>
 </BaseLayout>
 
 <style>
-  .lede a { color: var(--sea); }
+  .rss a { font-weight: 600; }
 </style>

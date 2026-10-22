@@ -5,13 +5,13 @@
 export const SITE = {
   name: 'Daniel Khan',
   url: 'https://danielkhan.org',
+  role: 'PhD candidate in Arts',
+  affiliation: 'Macquarie University',
+  /** One sentence shown under your name on the home page and in search results. */
+  focus:
+    'I research digital authoritarianism, affective media and digital cultures, with a focus on Bangladesh and the Global South.',
   description:
-    'Daniel Khan — research on public questions, evidence-led writing, documentary work and free open tools.',
-  headline: 'Good questions deserve a full answer.',
-  intro:
-    'I research public questions, write about what the evidence can and cannot show, make documentary work, and build small open tools that make careful work easier.',
-  /** Short role line under the name (hero eyebrow + social cards). */
-  roles: ['Research', 'Writing', 'Documentary', 'Open tools'],
+    'Daniel Khan — PhD candidate in Arts at Macquarie University researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South.',
 
   /** Public GitHub account and the public repo used for collaboration (Discussions + issue forms). */
   github: {
@@ -20,28 +20,31 @@ export const SITE = {
   },
 
   contact: {
-    /** A public email address, e.g. 'hello@yourdomain.com'. Empty = hidden. */
+    /** A public email address, e.g. 'hello@danielkhan.org'. Empty = hidden. */
     email: '',
-    /**
-     * Private contact form. Web3Forms is free and needs no account:
-     * request an access key at https://web3forms.com and paste it here.
-     * Empty = the form is replaced by the other contact routes.
-     */
+    /** Free private contact form: paste a Web3Forms access key (https://web3forms.com). Empty = hidden. */
     web3formsAccessKey: '',
   },
 
-  /** Profiles elsewhere. Only https:// links; empty ones are hidden. */
+  /**
+   * Profiles elsewhere, in display order. Only https:// links are shown.
+   * `icon` must match a name in src/components/Icon.astro.
+   */
   social: [
-    { label: 'GitHub', url: 'https://github.com/DANIELKHAN26' },
-    { label: 'LinkedIn', url: '' },
-    { label: 'YouTube', url: '' },
-    { label: 'Substack', url: '' },
-    { label: 'Bluesky', url: '' },
-    { label: 'ORCID', url: '' },
+    { label: 'LinkedIn', icon: 'linkedin', url: 'https://www.linkedin.com/in/danielkhan6/' },
+    { label: 'Substack', icon: 'substack', url: 'https://substack.com/@annalisthub' },
+    { label: 'YouTube', icon: 'youtube', url: 'https://www.youtube.com/@DanielKhan1M' },
+    { label: 'Facebook', icon: 'facebook', url: 'https://www.facebook.com/danielmd.khan/' },
+    { label: 'GitHub', icon: 'github', url: 'https://github.com/DANIELKHAN26' },
   ],
 
-  /** Link to a public CV (PDF in /public/ or an https:// URL). Empty = hidden. */
-  cvUrl: '',
+  podcast: {
+    /** 'coming-soon' shows the podcast teaser; change to 'live' once episodes are out. */
+    status: 'coming-soon' as 'coming-soon' | 'live',
+    channel: 'https://www.youtube.com/@DanielKhan1M',
+    /** Optional: what the show is about, in your own words (one or two sentences). Empty = hidden. */
+    premise: '',
+  },
 } as const;
 
 export const githubCommunityUrl = SITE.github.user && SITE.github.communityRepo

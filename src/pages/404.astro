@@ -1,18 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
 ---
 
 <BaseLayout title="Page not found" noindex>
-  <header class="page-head wrap">
-    <p class="eyebrow">Error 404</p>
-    <h1 class="display">This page isn't on the record.</h1>
-    <p class="lede">It may have moved, or the link may be incomplete. Try the search, or start from one of these:</p>
+  <PageHeader title="Page not found" lede="This page may have moved, or the link may be incomplete.">
     <div class="actions">
       <a class="btn btn-primary" href="/">Home</a>
+      <a class="btn btn-ghost" href="/research/">Research</a>
       <a class="btn btn-ghost" href="/search/">Search</a>
-      <a class="btn btn-ghost" href="/work/">Work</a>
     </div>
-  </header>
+  </PageHeader>
 </BaseLayout>
 
 <style>

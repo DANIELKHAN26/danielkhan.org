@@ -1,0 +1,46 @@
+# Your research outputs, newest status first. Add an entry by copying one block.
+# kind: under-review | accepted | presented | seminar | thesis | project
+# venue, year and url are optional — leave them out rather than guessing.
+# Convention (humanities): don't name the journal while a paper is under review.
+# Add `venue:` once it is accepted (and change kind to `accepted`).
+
+- id: crowd-forecasting
+  title: "Seeing the Crowd in Forecasting: Randomized Evidence and a Redundancy Benchmark"
+  kind: under-review
+
+- id: credibility-testimonial-injustice
+  title: "When Credibility Does Not Learn: A Formal Model of Testimonial Injustice"
+  kind: under-review
+
+- id: corroboration-hidden-common-source
+  title: "Corroboration under a Hidden Common Source: A Bayesian Theory of When Agreement Stops Being Evidence"
+  kind: under-review
+
+- id: parental-mobile-use
+  title: "Parental Perception and Practices of Children's Mobile Use: A Qualitative Study in an Urban City of Bangladesh"
+  kind: accepted
+  venue: IUAES-WAU World Anthropology Congress, India
+  year: 2023
+
+- id: rakhain-maternal-health
+  title: "The Factors Influencing Maternal Health Care Choices among the Rakhain Community of the South-East Coastal Bangladesh"
+  kind: presented
+  venue: North East India Council for Social Science Research (NEICSSR), India
+
+- id: hijra-health-seeking
+  title: "Understanding Hijra (Third Gender) Individual's Health Seeking Behavior in Bangladesh: Exploring Social Regulations and Access Barriers"
+  kind: thesis
+  venue: MRes project, University of Brighton
+
+- id: media-narratives-gender
+  title: "Patriarchal Influence on Media Narratives: A Qualitative Study of Gender Role Negotiation and Women's Representation"
+  kind: seminar
+  venue: Shahjalal University of Science and Technology
+
+- id: nijhum-island-covid
+  title: "Understanding Attitudes Toward the Corona Virus and Information Flow Among the Vibrant Community of Nijhum Island of Bangladesh"
+  kind: project
+
+- id: digital-deluge
+  title: "Navigating the Digital Deluge: Understanding Youth Addiction to Pornography"
+  kind: project

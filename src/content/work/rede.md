@@ -1,6 +1,6 @@
 ---
-title: REDE — a community for useful guidance
-summary: A community-platform concept connecting students, early-career professionals and mentors to exchange advice, opportunities and practical resources.
+title: REDE
+summary: A concept for a community where students, early-career professionals and mentors exchange advice they can actually verify.
 type: project
 status: Concept
 date: 2026-10-22
@@ -10,14 +10,8 @@ collaboration:
   needs: [Product and UX designers, Experienced mentors, Web developers]
 ---
 
-People looking for study or career advice usually need more than a list of anonymous tips. They need to know who is answering, why that person is qualified, and how one suggestion compares with another path.
+People seeking study or career advice need to know who is answering, why that person is qualified, and how one suggestion compares with another path.
 
-REDE is a concept for a community that makes those things clear: public posts, expert profiles, opportunities and reusable document examples, with identity and moderation designed in from the start.
+REDE is a concept for a community built around that: clear identities, evidence of expertise, transparent feedback, fair moderation, and an easy way to challenge a claim or report a misleading offer.
 
-## The design problem
-
-A trust badge or ranking can make an interface feel reassuring without proving that its advice is any good. The core design work is therefore about **evidence of expertise**, transparent feedback, fair moderation, and an easy way to challenge a claim or report a misleading offer.
-
-## Where it stands
-
-REDE is at concept stage — research, user needs and early design. There is no live membership service yet. Designers, mentors and developers who want to shape it early are welcome to [get involved](/collaborate/#projects).
+It is at concept stage — research, user needs and early design. There is no live service yet.

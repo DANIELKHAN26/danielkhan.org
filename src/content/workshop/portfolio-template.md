@@ -36,9 +36,11 @@ Everything you see here is built from plain Markdown files and published free on
 
 ## What you get
 
-- **Work** — an index of projects, research, writing and media with honest status labels and type filters.
-- **Open workshop** — downloadable resources and tools, each with a version, licence and credits.
-- **Log** — a dated, year-by-year record of what you build.
+- **Research** — papers and projects, edited in one YAML file.
+- **Projects** — work in progress with honest status labels.
+- **Workshop** — downloadable resources and tools, each with a version, licence and credits.
+- **Podcast** — a "coming soon" teaser that switches to "live" with one setting.
+- **Updates** — a dated record of what you build.
 - **Collaborate** — join-a-project forms, public discussions and an optional private contact form.
 - **Built in** — site search, RSS, sitemap, light and dark themes, social preview cards, a strict content security policy, and no tracking.
 

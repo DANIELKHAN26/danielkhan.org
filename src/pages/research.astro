@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ResearchList from '../components/ResearchList.astro';
+import { getResearch } from '../lib/content';
+import { PROFILE } from '../data/profile';
+import { SITE } from '../site.config';
+
+const all = await getResearch();
+const groups = [
+  { title: 'Under review', items: all.filter((r) => r.data.kind === 'under-review') },
+  { title: 'Conference and seminar papers', items: all.filter((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)) },
+  { title: 'Research projects', items: all.filter((r) => ['thesis', 'project'].includes(r.data.kind)) },
+].filter((g) => g.items.length > 0);
+---
+
+<BaseLayout searchable title="Research" description={`Research by ${SITE.name}: papers under review, conference papers and research projects.`}>
+  <PageHeader title="Research" lede={SITE.focus}>
+    <ul class="tags interests" aria-label="Research interests">{PROFILE.interests.map((i) => <li>{i}</li>)}</ul>
+  </PageHeader>
+
+  {groups.map((g, i) => (
+    <section class="section" aria-labelledby={`group-${i}`}>
+      <div class="container">
+        <div class="section-title"><h2 id={`group-${i}`}>{g.title}</h2></div>
+        <ResearchList items={g.items} />
+      </div>
+    </section>
+  ))}
+
+  <section class="section">
+    <div class="container note">
+      <p>Ongoing: the <a href="/work/bangladesh-public-interest-research/">Bangladesh public-interest research programme</a>. Interested in a paper or working together? <a href="/collaborate/">Get in touch</a>.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .interests { margin-top: 1.25rem; }
+  .note p { color: var(--ink-soft); max-width: var(--measure); }
+  .note a { color: var(--sea); }
+</style>

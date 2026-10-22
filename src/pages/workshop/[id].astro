@@ -10,7 +10,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { data } = entry;
-const { Content, headings } = await render(entry);
+const { Content } = await render(entry);
 const actions = [
   data.demo && { label: data.kind === 'Tool' ? 'Open the tool' : 'View demo', url: data.demo, primary: true },
   data.download && { label: 'Download', url: data.download, primary: !data.demo },
@@ -21,17 +21,16 @@ const actions = [
 <EntryLayout
   title={data.title}
   summary={data.summary}
-  section={{ label: 'Open workshop', href: '/workshop/' }}
-  kicker={`Free ${data.kind.toLowerCase()}`}
+  section={{ label: 'Workshop', href: '/workshop/' }}
+  kicker={`Free ${data.kind.toLowerCase()} · version ${data.version} · ${data.licence}`}
   date={data.date}
   updated={data.updated}
   status={data.status}
   tags={data.tags}
-  headings={headings}
   draft={data.draft}
   ogType="website"
 >
-  <div class="use-bar not-prose">
+  <div class="use-bar">
     {actions.map((a) => (
       <a
         class={`btn ${a.primary ? 'btn-primary' : 'btn-ghost'}`}
@@ -61,22 +60,8 @@ const actions = [
   ) : (
     <p>Original work by Daniel Khan.</p>
   )}
-
-  <Fragment slot="aside">
-    <div class="aside-block">
-      <p class="aside-label">At a glance</p>
-      <dl class="facts">
-        <dt>Type</dt><dd>{data.kind}</dd>
-        <dt>Version</dt><dd>{data.version}</dd>
-        <dt>Licence</dt><dd>{data.licence}</dd>
-      </dl>
-    </div>
-  </Fragment>
 </EntryLayout>
 
 <style>
-  .use-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 1.25rem; border-radius: var(--radius); background: var(--sea-wash); font-family: var(--font-display); }
-  .facts { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; margin: 0; font-size: 0.95rem; }
-  .facts dt { color: var(--ink-faint); }
-  .facts dd { margin: 0; font-weight: 600; }
+  .use-bar { display: flex; flex-wrap: wrap; gap: 0.6rem; font-family: var(--font-sans); }
 </style>

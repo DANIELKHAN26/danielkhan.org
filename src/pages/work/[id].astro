@@ -11,21 +11,20 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { data } = entry;
-const { Content, headings } = await render(entry);
+const { Content } = await render(entry);
 const collab = data.collaboration?.open ? data.collaboration : undefined;
 ---
 
 <EntryLayout
   title={data.title}
   summary={data.summary}
-  section={{ label: 'All work', href: '/work/' }}
+  section={{ label: 'Projects', href: '/work/' }}
   kicker={WORK_TYPES[data.type]}
   date={data.date}
   updated={data.updated}
   status={data.status}
   tags={data.tags}
   minutes={data.type === 'writing' ? readingMinutes(entry.body) : undefined}
-  headings={headings}
   cover={data.cover}
   coverAlt={data.coverAlt}
   draft={data.draft}
@@ -33,26 +32,24 @@ const collab = data.collaboration?.open ? data.collaboration : undefined;
 >
   <Content />
 
-  <Fragment slot="aside">
+  <Fragment slot="actions">
+    {collab && (
+      <div class="collab">
+        <p><strong>Open for collaborators.</strong>{collab.needs.length > 0 && <> Looking for: {collab.needs.join(', ')}.</>}</p>
+        <a class="btn btn-primary" href={joinProjectUrl(githubCommunityUrl, data.title)}>Offer to help</a>
+      </div>
+    )}
     {data.links.length > 0 && (
-      <div class="aside-block">
-        <p class="aside-label">Links</p>
+      <div class="links">
         {data.links.map((l) => (
           <a class="btn btn-ghost" href={l.url} rel={isExternal(l.url) ? 'noopener' : undefined}>{l.label} <span aria-hidden="true">↗</span></a>
         ))}
-      </div>
-    )}
-    {collab && (
-      <div class="aside-block collab-box">
-        <p class="aside-label">Open for collaborators</p>
-        {collab.needs.length > 0 && <ul class="needs">{collab.needs.map((n) => <li>{n}</li>)}</ul>}
-        <a class="btn btn-primary" href={joinProjectUrl(githubCommunityUrl, data.title)}>Offer to help</a>
       </div>
     )}
   </Fragment>
 </EntryLayout>
 
 <style>
-  .collab-box { padding: 1.1rem; border-radius: var(--radius); background: var(--sea-wash); }
-  .needs { margin: 0; padding-left: 1.1rem; font-size: 0.95rem; display: grid; gap: 0.3rem; }
+  .collab { display: grid; gap: 0.9rem; justify-items: start; padding: 1.1rem 1.25rem; border-radius: var(--radius); background: var(--sea-wash); }
+  .links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 </style>

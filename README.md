@@ -4,13 +4,16 @@ Live site: **https://danielkhan.org**
 
 A fast, private-by-default personal site built with [Astro](https://astro.build) and served free from Cloudflare's global network. Everything is plain Markdown in `src/content/`. Pushing to `main` checks, rebuilds and publishes it automatically.
 
-| Section | What goes there | Folder |
+| Section | What goes there | Where to edit |
 |---|---|---|
-| **Work** | Projects, research, writing, documentary/media, each with an honest status | `src/content/work/` |
-| **Open workshop** | Free tools, templates and designs others can use, with licence and credits | `src/content/workshop/` + files in `public/downloads/` |
-| **Log** | Dated updates: what you built, released or learned | `src/content/log/` |
-| **Collaborate** | Join-a-project forms, public discussions, private message form | `src/pages/collaborate/` (driven by config + content) |
-| **About** | Bio, photo, method, links | `src/pages/about.astro` |
+| **Home** | Photo, role, one-line focus, current research, projects, podcast teaser | `src/site.config.ts` (name, role, focus, social links) |
+| **Research** | Papers under review, conference papers, research projects | `src/content/research.yaml` |
+| **Projects** | Projects with honest status labels | `src/content/work/` |
+| **Workshop** | Free tools, templates and designs others can use, with licence and credits | `src/content/workshop/` + files in `public/downloads/` |
+| **Podcast** | "Coming soon" teaser; set `podcast.status: 'live'` when episodes are out | `src/site.config.ts` |
+| **Collaborate** | Join-a-project forms, LinkedIn message, public discussions, optional private form | driven by config + project files |
+| **About** (footer) | Short academic profile: education, experience, interests, methods | `src/data/profile.ts` |
+| **Updates** (footer) | Dated notes: what you built, released or learned | `src/content/log/` |
 
 ---
 
@@ -31,7 +34,7 @@ You can do all of this on **github.com** in the browser: open the folder, click 
 1. Check that the original licence lets you share your version, and keep its licence notice.
 2. Put your version in its own public repository (or a ZIP in `public/downloads/`).
 3. Add a `src/content/workshop/` entry with `source:` or `download:`, your `licence:`, and a `basedOn:` entry that credits the original. The page shows the credit automatically.
-4. Add a short Log entry announcing it.
+4. Add a short entry in `src/content/log/` (Updates) announcing it.
 
 ### Open a project for collaborators
 
@@ -45,14 +48,22 @@ collaboration:
 
 It then appears on the home page and on `/collaborate/` with an **Offer to help** button. The button opens a pre-filled issue form in [DANIELKHAN26/collaborate](https://github.com/DANIELKHAN26/collaborate).
 
+### Add a paper or update its status
+
+Edit **`src/content/research.yaml`**: copy a block, change the title and `kind`. The order in the file is the order on the site. Following humanities convention, don't name the journal while a paper is under review; add `venue:` once it is accepted.
+
 ### Change your name, links, email or contact form
 
 Edit **`src/site.config.ts`**. Empty values are hidden, so no empty or fake links ever appear on the site.
 
-- **Social links:** paste full `https://` URLs (LinkedIn, YouTube, Substack, Bluesky, ORCID).
+- **Social links:** full `https://` URLs. Icons are shown in each brand's official colours (their brand rules forbid recolouring); to add a new network, add its icon to `src/components/Icon.astro`.
 - **Public email:** set `contact.email`.
 - **Private contact form:** get a free access key at <https://web3forms.com> (250 messages/month) and paste it into `contact.web3formsAccessKey`. The key is designed to be public. Send yourself a test message after deploying.
-- **CV:** put `cv.pdf` in `public/` and set `cvUrl: '/cv.pdf'`.
+- **CV:** put a PDF in `public/` and set `cv: '/your-cv.pdf'` in `src/data/profile.ts`. **Remove your phone number, home address and date of birth first** — a public CV only needs your name, university and a contact link.
+
+### Change your photo
+
+Replace `src/assets/daniel-khan-profile.jpg` with a square photo (at least 880×880, face centred). It is used on the home page, About, and in the social card (`src/assets/og-card.png`).
 
 ### Add images
 
