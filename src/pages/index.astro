@@ -200,18 +200,19 @@ const hrefFor = (type: string) => (work.some((w) => w.data.type === type) ? `/wo
   .collab-band { background: var(--sea); color: var(--on-sea); padding-block: clamp(4rem, 9vw, 7rem); margin-bottom: calc(-1 * clamp(4rem, 10vw, 7rem)); }
   .collab-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: start; }
   .collab-band h2 { font-size: var(--step-4); margin-block: 1rem 1.25rem; max-width: 14ch; }
-  .eyebrow-light { color: inherit; opacity: 0.85; }
-  .collab-copy { font-family: var(--font-serif); font-size: var(--step-1); max-width: 34rem; opacity: 0.95; }
+  .eyebrow-light { color: inherit; }
+  .collab-copy { font-family: var(--font-serif); font-size: var(--step-1); max-width: 34rem; }
   .collab-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
   .collab-band .btn-outline-light { color: var(--on-sea); border-color: color-mix(in srgb, var(--on-sea) 50%, transparent); background: transparent; }
-  .open-projects { background: color-mix(in srgb, var(--on-sea) 10%, transparent); border-radius: var(--radius); padding: 1.5rem; }
-  .open-label { text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.85; margin-bottom: 0.5rem; }
+  /* Darker tint (not lighter) keeps small text above 4.5:1 contrast in both themes. */
+  .open-projects { background: rgb(0 0 0 / 14%); border-radius: var(--radius); padding: 1.5rem; }
+  .open-label { text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
   .open-projects ul { list-style: none; margin: 0; padding: 0; }
   .open-projects li { display: grid; gap: 0.25rem; padding-block: 1rem; border-bottom: 1px solid color-mix(in srgb, var(--on-sea) 22%, transparent); }
   .open-projects li:last-child { border-bottom: 0; }
   .open-title { font-weight: 650; font-size: var(--step-1); font-stretch: 88%; text-decoration: none; }
   .open-title:hover { text-decoration: underline; }
-  .open-projects span { font-size: 0.92rem; opacity: 0.88; }
+  .open-projects span { font-size: 0.92rem; }
   .open-join { font-weight: 600; font-size: 0.95rem; color: inherit; }
   @media (max-width: 52rem) { .collab-grid { grid-template-columns: 1fr; } }
 </style>
