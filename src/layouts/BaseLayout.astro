@@ -72,6 +72,7 @@ const person = {
     <Font cssVariable="--font-display" preload />
     <Font cssVariable="--font-serif" />
 
+    <slot name="head" />
     <script type="application/ld+json" set:html={JSON.stringify(person)} />
 
     <!-- Apply the saved theme before first paint so the page never flashes. -->

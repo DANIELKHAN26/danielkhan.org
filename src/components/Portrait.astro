@@ -1,6 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import photo from '../assets/daniel-khan-profile.jpg';
+import { PORTRAIT } from '../lib/portrait';
 
 interface Props { size?: 'large' | 'small'; eager?: boolean }
 const { size = 'large', eager = false } = Astro.props;
@@ -19,8 +20,8 @@ const { size = 'large', eager = false } = Astro.props;
   <Picture
     src={photo}
     formats={['avif', 'webp']}
-    widths={size === 'large' ? [320, 480, 640, 880] : [96, 192, 288]}
-    sizes={size === 'large' ? '(min-width: 56rem) 20rem, 15rem' : '6rem'}
+    widths={size === 'large' ? PORTRAIT.widths : [96, 192, 288]}
+    sizes={size === 'large' ? PORTRAIT.sizes : '6rem'}
     alt="Portrait of Daniel Khan"
     class="portrait-photo"
     loading={eager ? 'eager' : 'lazy'}
