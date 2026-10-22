@@ -77,15 +77,17 @@ export default defineConfig({
         "default-src 'self'",
         "img-src 'self' data:",
         "font-src 'self'",
-        "connect-src 'self' https://api.web3forms.com",
+        // Cloudflare Web Analytics (cookieless) reports visits to cloudflareinsights.com.
+        "connect-src 'self' https://api.web3forms.com https://cloudflareinsights.com",
         "form-action 'self' https://api.web3forms.com",
         "base-uri 'self'",
         "object-src 'none'",
         "frame-src 'none'",
         'upgrade-insecure-requests',
       ],
-      // 'wasm-unsafe-eval' lets the Pagefind search index (WebAssembly) run; nothing else needs it.
-      scriptDirective: { resources: ["'self'", "'wasm-unsafe-eval'"] },
+      // 'wasm-unsafe-eval' lets the Pagefind search index (WebAssembly) run.
+      // static.cloudflareinsights.com is Cloudflare Web Analytics, injected by Cloudflare with an integrity hash.
+      scriptDirective: { resources: ["'self'", "'wasm-unsafe-eval'", 'https://static.cloudflareinsights.com'] },
     },
   },
 });

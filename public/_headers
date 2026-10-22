@@ -10,6 +10,10 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
 
+# RFC 9116 requires an explicit charset.
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8
+
 # Fingerprinted build files (CSS, JS, fonts, optimised images) never change: cache for a year.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
