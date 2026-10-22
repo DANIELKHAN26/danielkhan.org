@@ -62,7 +62,8 @@ const person = {
     {published && <meta property="article:published_time" content={published.toISOString()} />}
     <meta name="twitter:card" content="summary_large_image" />
 
-    <Font cssVariable="--font-display" preload />
+    <!-- No font preloads: text paints at once in size-matched fallbacks, then swaps without layout shift. -->
+    <Font cssVariable="--font-display" />
     <Font cssVariable="--font-serif" />
     <Font cssVariable="--font-mono" />
 

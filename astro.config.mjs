@@ -9,18 +9,21 @@ const LATIN = 'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U
 const LATIN_EXT = 'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF';
 
 /**
- * @font-face variants for a Fontsource variable package's all-axes ("standard") files.
+ * @font-face variants for a Fontsource variable package.
+ * `axes` picks the smallest file that has what the design uses:
+ * Bricolage "wdth" (width + weight, for condensed headlines), Newsreader "wght" (weight only).
  * @param {string} pkg
  * @param {'normal' | 'italic'} style
+ * @param {'wght' | 'wdth'} axes
  * @param {string} [stretch]
  */
-function variable(pkg, style, stretch) {
+function variable(pkg, style, axes, stretch) {
   /** @param {string} subset @param {string} range */
   const face = (subset, range) => ({
     weight: '200 800',
     style,
     stretch,
-    src: /** @type {[string]} */ ([`@fontsource-variable/${pkg}/files/${pkg}-${subset}-standard-${style}.woff2`]),
+    src: /** @type {[string]} */ ([`@fontsource-variable/${pkg}/files/${pkg}-${subset}-${axes}-${style}.woff2`]),
     unicodeRange: /** @type {[string]} */ ([range]),
   });
   /** @type {[ReturnType<typeof face>, ReturnType<typeof face>]} */
@@ -39,13 +42,14 @@ const plexMono = (weight) => ({
 export default defineConfig({
   site: SITE_URL,
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  // Inline the small stylesheets so the first paint needs no extra request.
+  build: { format: 'directory', inlineStylesheets: 'always' },
   // Plain code blocks: Shiki's inline styles are incompatible with the strict CSP below.
   markdown: { syntaxHighlight: false },
   integrations: [
     sitemap({ filter: (page) => !page.endsWith('/search/') && !page.endsWith('/collaborate/thanks/') }),
   ],
-  // Fonts are self-hosted from installed npm packages (variable files with every axis):
+  // Fonts are self-hosted from installed npm packages (variable files):
   // no third-party font requests, and the build works offline.
   fonts: [
     {
@@ -53,14 +57,14 @@ export default defineConfig({
       name: 'Bricolage Grotesque',
       cssVariable: '--font-display',
       fallbacks: ['system-ui', 'sans-serif'],
-      options: { variants: variable('bricolage-grotesque', 'normal', '75% 100%') },
+      options: { variants: variable('bricolage-grotesque', 'normal', 'wdth', '75% 100%') },
     },
     {
       provider: fontProviders.local(),
       name: 'Newsreader',
       cssVariable: '--font-serif',
       fallbacks: ['Georgia', 'serif'],
-      options: { variants: [...variable('newsreader', 'normal'), ...variable('newsreader', 'italic')] },
+      options: { variants: [...variable('newsreader', 'normal', 'wght'), ...variable('newsreader', 'italic', 'wght')] },
     },
     {
       provider: fontProviders.local(),
