@@ -37,7 +37,9 @@ const correctionUrl = githubCommunityUrl
   <article>
     <header class="page-head">
       <div class="container">
-        <a class="crumb" href={section.href} data-pagefind-ignore><span aria-hidden="true">←</span> {section.label}</a>
+        <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore>
+          <a href="/">Home</a><span aria-hidden="true">/</span><a href={section.href}>{section.label}</a>
+        </nav>
         {draft && <p class="draft-flag" role="note">Draft — only visible in local preview. Set <code>draft: false</code> to publish.</p>}
         <h1>{title}</h1>
         <p>{summary}</p>
@@ -55,6 +57,7 @@ const correctionUrl = githubCommunityUrl
       {cover && coverAlt && (
         <Image class="entry-cover" src={cover} alt={coverAlt} widths={[640, 960, 1280]} sizes="(min-width: 46rem) 40rem, 100vw" />
       )}
+      <slot name="use" />
       <div class="prose">
         <slot />
       </div>
@@ -75,11 +78,9 @@ const correctionUrl = githubCommunityUrl
 </BaseLayout>
 
 <style>
-  .crumb { display: inline-flex; align-items: center; min-height: 2rem; gap: 0.4rem; text-decoration: none; color: var(--ink-soft); font-weight: 600; font-size: var(--text-sm); margin-bottom: 1.25rem; }
-  .crumb:hover { color: var(--sea); }
   .draft-flag { background: #fff3d6; color: #5a3d00; border: 1px solid #e9c46a; padding: 0.6rem 0.9rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; font-size: 0.95rem; }
   .entry-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; margin-top: 1.25rem; font-size: var(--text-sm); color: var(--ink-faint); }
-  .entry-body { padding-top: 2.25rem; }
+  .entry-body { padding-block: 2.25rem var(--space-section); }
   .entry-body :global(.entry-cover) { width: 100%; max-width: var(--measure); border-radius: var(--radius); margin-bottom: 2rem; }
   .entry-foot { max-width: var(--measure); margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); display: grid; gap: 1.25rem; }
   .entry-small { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: var(--text-sm); color: var(--ink-faint); }

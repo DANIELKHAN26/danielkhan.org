@@ -4,17 +4,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Portrait from '../components/Portrait.astro';
 import SocialLinks from '../components/SocialLinks.astro';
 import StatusBadge from '../components/StatusBadge.astro';
-import Icon from '../components/Icon.astro';
 import photo from '../assets/daniel-khan-profile.jpg';
 import { PORTRAIT } from '../lib/portrait';
-import { getWork, getResearch, getUpdates, formatDate, isoDate } from '../lib/content';
+import { getWork, getResearch, getUpdates, getLab, formatDate, isoDate, WORK_TYPES } from '../lib/content';
 import { RESEARCH_KINDS, PLATFORMS } from '../content.config';
 import { SITE } from '../site.config';
 
-const research = (await getResearch()).slice(0, 3);
+const allResearch = await getResearch();
+const underReview = allResearch.filter((r) => r.data.kind === 'under-review');
+// One of each kind of output, so the home page shows the range of the work rather than three of a kind.
+const research = [
+  underReview[0],
+  allResearch.find((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)),
+  allResearch.find((r) => ['thesis', 'project'].includes(r.data.kind)),
+].filter((r) => r !== undefined);
+
 const work = await getWork();
 const projects = [...work.filter((w) => w.data.featured), ...work.filter((w) => !w.data.featured)].slice(0, 3);
-const latest = (await getUpdates()).find((u) => !u.data.podcast);
+const seeking = work.filter((w) => w.data.collaboration?.open).length;
+
+const experiments = (await getLab()).filter((e) => e.data.kind === 'Experiment' && e.data.status === 'In progress');
+const updates = await getUpdates();
+const latest = updates.find((u) => !u.data.podcast);
+const podcastLive = SITE.podcast.status === 'live';
+
+// "Updated" = the newest date anywhere in the content, so the Now panel never claims to be fresher than it is.
+const lastChange = new Date(Math.max(
+  ...[...work, ...(await getLab()), ...updates].map((e) => ('updated' in e.data && e.data.updated ? e.data.updated : e.data.date).getTime()),
+));
+const email = SITE.contact.email;
+
 // Start downloading the portrait (the largest element on screen) before the browser reaches it.
 const heroImage = await getImage({ src: photo, format: 'avif', widths: [...PORTRAIT.widths] });
 ---
@@ -22,103 +41,202 @@ const heroImage = await getImage({ src: photo, format: 'avif', widths: [...PORTR
 <BaseLayout searchable schema="home">
   <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImage.srcSet.attribute} imagesizes={PORTRAIT.sizes} fetchpriority="high" />
 
-  <section class="hero container" aria-labelledby="hero-title">
-    <div class="hero-text">
-      <h1 id="hero-title">{SITE.name}</h1>
-      <p class="hero-motto">{SITE.motto}</p>
-      <p class="hero-focus">{SITE.focus}</p>
-      <SocialLinks withEmail label="Contact and channels" />
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <h1 id="hero-title">{SITE.name}</h1>
+        <p class="hero-motto rise">{SITE.motto}</p>
+        <p class="hero-focus rise">{SITE.focus}</p>
+        <div class="hero-actions rise">
+          {email && <a class="btn btn-primary" href={`mailto:${email}`}>Email me</a>}
+          <SocialLinks variant="icons" label="Daniel Khan elsewhere" />
+        </div>
+      </div>
+      <div class="hero-portrait">
+        <Portrait eager />
+        {seeking > 0 && (
+          <a class="hero-chip rise" href="/collaborate/#projects">
+            <span class="chip-dot" aria-hidden="true"></span>
+            {seeking} {seeking === 1 ? 'project' : 'projects'} open to collaborators
+          </a>
+        )}
+      </div>
     </div>
-    <div class="hero-portrait">
-      <Portrait eager />
+  </section>
+
+  <section class="now container" aria-labelledby="now-title">
+    <div class="now-head">
+      <h2 id="now-title"><span class="now-pulse" aria-hidden="true"></span>Now</h2>
+      <p>Updated <time datetime={isoDate(lastChange)}>{formatDate(lastChange)}</time></p>
+    </div>
+    <div class="now-grid">
+      {underReview.length > 0 && (
+        <a class="now-cell" href="/research/#under-review">
+          <span class="now-label">In peer review</span>
+          <span class="now-value">{underReview.length} journal {underReview.length === 1 ? 'manuscript' : 'manuscripts'}</span>
+          <span class="now-sub">Copies available on request</span>
+        </a>
+      )}
+      {experiments.length > 0 && (
+        <a class="now-cell" href="/lab/#experiments">
+          <span class="now-label">In the lab</span>
+          <span class="now-value">{experiments.length === 1 ? experiments[0].data.title : `${experiments.length} experiments in progress`}</span>
+          <span class="now-sub">{experiments.map((e) => e.data.title).join(' · ')}</span>
+        </a>
+      )}
+      {latest && (
+        <a class="now-cell" href={latest.data.url} rel="noopener">
+          <span class="now-label">Latest on {PLATFORMS[latest.data.platform].label}</span>
+          <span class="now-value">{latest.data.title}</span>
+          <span class="now-sub"><time datetime={isoDate(latest.data.date)}>{formatDate(latest.data.date)}</time> · opens {PLATFORMS[latest.data.platform].label}</span>
+        </a>
+      )}
+      <a class="now-cell" href="/updates/#podcast">
+        <span class="now-label">Podcast</span>
+        <span class="now-value">{podcastLive ? 'New episodes out now' : 'First episodes in production'}</span>
+        <span class="now-sub">{podcastLive ? 'Watch on YouTube' : 'Premiering on YouTube'}</span>
+      </a>
     </div>
   </section>
 
   <section class="brief container" aria-label="Research and projects">
     <div class="brief-col">
-      <div class="brief-head"><h2>Research</h2><a class="link-arrow" href="/research/">All research →</a></div>
-      <ol class="brief-list">
+      <div class="brief-head"><h2>Research</h2><a class="link-arrow" href="/research/">All {allResearch.length} →</a></div>
+      <ul class="brief-list">
         {research.map(({ data }) => (
-          <li>
-            <span class="brief-title serif">{data.title}</span>
-            <span class="brief-meta">{RESEARCH_KINDS[data.kind]}</span>
+          <li class:list={['paper', { pending: data.kind === 'under-review' }]}>
+            <span class="brief-kind">{RESEARCH_KINDS[data.kind]}</span>
+            <span class="paper-title">{data.title}</span>
+            {data.venue && <span class="brief-sub">{[data.venue, data.year].filter(Boolean).join(' · ')}</span>}
           </li>
         ))}
-      </ol>
+      </ul>
     </div>
     <div class="brief-col">
-      <div class="brief-head"><h2>Projects</h2><a class="link-arrow" href="/work/">All projects →</a></div>
+      <div class="brief-head"><h2>Projects</h2><a class="link-arrow" href="/work/">All {work.length} →</a></div>
       <ul class="brief-list">
         {projects.map((p) => (
-          <li>
-            <a class="brief-title" href={`/work/${p.id}/`}>{p.data.title}</a>
-            <span class="brief-meta"><StatusBadge status={p.data.status} /></span>
+          <li class="project">
+            <span class="project-top"><span class="brief-kind">{WORK_TYPES[p.data.type]}</span><StatusBadge status={p.data.status} /></span>
+            <a class="project-title" href={`/work/${p.id}/`}>{p.data.title}</a>
+            <span class="brief-sub">{p.data.summary}</span>
           </li>
         ))}
       </ul>
     </div>
   </section>
 
-  <section class="strip container" aria-label="Podcast and latest update">
-    <a class="strip-item" href="/updates/#podcast">
-      <span class="strip-icon onair" aria-hidden="true"><span class="dot"></span></span>
-      <span>
-        <span class="strip-label">Podcast · {SITE.podcast.status === 'live' ? 'Now playing' : 'Coming soon'}</span>
-        <span class="strip-title">{SITE.podcast.status === 'live' ? 'Listen to the latest episode' : 'First episodes in production on YouTube'}</span>
-      </span>
-    </a>
-    {latest && (
-      <a class="strip-item" href="/updates/">
-        <span class="strip-icon" aria-hidden="true"><Icon name={latest.data.platform} size={18} /></span>
-        <span>
-          <span class="strip-label">Latest on {PLATFORMS[latest.data.platform].label} · <time datetime={isoDate(latest.data.date)}>{formatDate(latest.data.date)}</time></span>
-          <span class="strip-title">{latest.data.title}</span>
-        </span>
-      </a>
-    )}
+  <section class="invite container" aria-labelledby="invite-title">
+    <div class="invite-inner">
+      <div>
+        <h2 id="invite-title">Have a question that deserves a full answer?</h2>
+        <p>I'm open to research collaborations, commissioned explainers, and media or speaking requests.</p>
+      </div>
+      <div class="invite-actions">
+        {email && <a class="btn btn-invite" href={`mailto:${email}`}>{email}</a>}
+        <a class="btn btn-invite-ghost" href="/collaborate/">Ways to collaborate</a>
+      </div>
+    </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* Hero */
-  .hero {
-    display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(1.5rem, 5vw, 4rem);
-    align-items: center; padding-block: clamp(2.25rem, 1.5rem + 4vw, 4.5rem) clamp(2rem, 1.5rem + 2vw, 3rem);
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; isolation: isolate; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, var(--surface), var(--paper)); }
+  .hero-grid {
+    display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(1.5rem, 5vw, 4.5rem); align-items: center;
+    padding-block: clamp(2.5rem, 1.5rem + 5vw, 5.5rem);
   }
-  .hero h1 { font-size: var(--display); letter-spacing: -0.03em; line-height: 1.02; }
-  .hero-motto { margin-top: 0.75rem; font-family: var(--font-read); font-style: italic; font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.75rem); color: var(--sea); line-height: 1.3; }
-  .hero-focus { margin-block: 1rem 1.5rem; max-width: 36rem; font-size: var(--text-lg); line-height: 1.55; color: var(--ink-soft); }
-  .hero-portrait { display: grid; justify-items: end; }
-  .hero-portrait :global(.portrait-large) { width: min(100%, 20rem); }
+  .hero h1 { font-size: clamp(3rem, 1.9rem + 4.8vw, 5.75rem); font-weight: 800; letter-spacing: -0.045em; line-height: 0.95; }
+  .hero-motto { margin-top: 1.1rem; font-family: var(--font-read); font-style: italic; font-size: clamp(1.35rem, 1.1rem + 1vw, 1.95rem); line-height: 1.25; color: var(--sea); }
+  .hero-focus { margin-top: 1.1rem; max-width: 35rem; font-size: var(--text-lg); line-height: 1.6; color: var(--ink-soft); }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin-top: 1.75rem; }
 
-  /* Research | Projects */
-  .brief { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 3.5rem); padding-block: clamp(1.75rem, 1.25rem + 2vw, 2.75rem); border-top: 1px solid var(--line); }
+  .hero-portrait { position: relative; display: grid; justify-items: end; }
+  /* soft light behind the portrait */
+  .hero-portrait::before {
+    content: ''; position: absolute; z-index: -1; inset: -12% -18% -12% 0;
+    background: radial-gradient(closest-side, var(--sea-wash), transparent); opacity: 0.9;
+  }
+  .hero-portrait :global(.portrait-large) { width: min(100%, 23rem); }
+  .hero-chip {
+    position: absolute; left: 0; bottom: 8%; display: inline-flex; align-items: center; gap: 0.55rem; min-height: 2.5rem;
+    padding: 0.45rem 0.95rem 0.45rem 0.8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+    box-shadow: var(--shadow-md); font-size: 0.88rem; font-weight: 600; color: var(--ink); text-decoration: none;
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .hero-chip:hover { border-color: var(--sea); transform: translateY(-2px); }
+  .chip-dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--sea); box-shadow: 0 0 0 3px var(--sea-wash); }
+
+  /* entrance: text settles in after the name; nothing important waits on it */
+  @media (prefers-reduced-motion: no-preference) {
+    .rise { animation: rise 0.7s var(--ease) both; }
+    .hero-motto { animation-delay: 0.08s; }
+    .hero-focus { animation-delay: 0.16s; }
+    .hero-actions { animation-delay: 0.24s; }
+    .hero-chip { animation-delay: 1.1s; }
+  }
+  @keyframes rise { from { opacity: 0; translate: 0 10px; } }
+
+  /* ---------- Now ---------- */
+  .now { padding-top: clamp(2rem, 1.5rem + 2vw, 3rem); }
+  .now-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.9rem; }
+  .now-head h2 { display: inline-flex; align-items: center; gap: 0.6rem; font-size: var(--h3); }
+  .now-head p { font-size: var(--text-sm); color: var(--ink-faint); }
+  .now-pulse { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--sea); }
+  @media (prefers-reduced-motion: no-preference) { .now-pulse { animation: pulse 2.4s ease-out infinite; } }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sea) 45%, transparent); } 70%, 100% { box-shadow: 0 0 0 0.5rem transparent; } }
+  .now-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1px;
+    border: 1px solid var(--line); border-radius: 14px; background: var(--line); overflow: hidden;
+  }
+  .now-cell {
+    display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; padding: 1.15rem 1.25rem 1.25rem;
+    background: var(--surface); color: inherit; text-decoration: none; transition: background-color var(--dur) var(--ease);
+  }
+  .now-cell:hover { background: color-mix(in srgb, var(--sea-wash) 45%, var(--surface)); }
+  .now-label { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint); }
+  .now-value { font-weight: 650; font-size: 1.05rem; line-height: 1.3; color: var(--ink); transition: color var(--dur); }
+  .now-cell:hover .now-value { color: var(--sea); }
+  .now-sub { margin-top: auto; padding-top: 0.25rem; font-size: 0.85rem; line-height: 1.45; color: var(--ink-soft); }
+
+  /* ---------- Research | Projects ---------- */
+  .brief { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.75rem, 4vw, 3.5rem); padding-block: clamp(2.25rem, 1.75rem + 2vw, 3.25rem); }
   .brief-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--ink); }
   .brief-head h2 { font-size: var(--h3); }
   .brief-head .link-arrow { font-size: var(--text-sm); }
   .brief-list { list-style: none; padding: 0; }
-  .brief-list li { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-block: 0.7rem; border-bottom: 1px solid var(--line); }
-  .brief-title { font-weight: 600; line-height: 1.35; text-decoration: none; }
-  .brief-title.serif { font-family: var(--font-read); font-weight: 500; font-size: 1.02rem; }
-  a.brief-title:hover { color: var(--sea); text-decoration: underline; }
-  .brief-meta { flex: none; font-size: 0.8rem; color: var(--ink-faint); white-space: nowrap; }
+  .brief-list li { display: grid; gap: 0.3rem; padding-block: 1rem; border-bottom: 1px solid var(--line); }
+  .brief-kind { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.8rem; font-weight: 600; color: var(--ink-faint); }
+  .brief-kind::before { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 2px; background: var(--sea); }
+  .pending .brief-kind::before { background: var(--shingle); }
+  .paper-title { font-family: var(--font-read); font-size: 1.06rem; line-height: 1.45; color: var(--ink); }
+  .brief-sub { font-size: 0.88rem; line-height: 1.5; color: var(--ink-soft); }
+  .project .brief-sub { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .project-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+  .project-title { display: inline-block; min-height: 1.5rem; font-weight: 650; font-size: 1.08rem; line-height: 1.35; text-decoration: none; justify-self: start; }
+  .project-title:hover { color: var(--sea); text-decoration: underline; text-underline-offset: 0.2em; }
 
-  /* Podcast + latest strip */
-  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 0.75rem; padding-bottom: clamp(1rem, 2vw, 1.5rem); }
-  .strip-item { display: flex; align-items: center; gap: 0.9rem; padding: 0.9rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); text-decoration: none; transition: border-color .2s; }
-  .strip-item:hover { border-color: var(--sea); }
-  .strip-icon { display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sunk); }
-  .onair { background: var(--band); }
-  .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: #ff6b5e; }
-  @media (prefers-reduced-motion: no-preference) { .dot { animation: pulse 2s ease-out infinite; } }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgb(255 107 94 / 55%); } 70%, 100% { box-shadow: 0 0 0 0.5rem rgb(255 107 94 / 0%); } }
-  .strip-label { display: block; font-size: 0.8rem; color: var(--ink-faint); }
-  .strip-title { display: block; font-weight: 600; line-height: 1.35; }
+  /* ---------- Invitation ---------- */
+  .invite { padding-bottom: var(--space-section); }
+  .invite-inner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 2.5rem;
+    padding: clamp(1.5rem, 1rem + 2.5vw, 2.5rem); border-radius: 16px; background: var(--band); color: var(--on-band);
+  }
+  .invite h2 { font-size: var(--h2); line-height: 1.2; max-width: 26ch; color: inherit; }
+  .invite p { margin-top: 0.5rem; max-width: 36rem; color: color-mix(in srgb, var(--on-band) 82%, transparent); }
+  .invite-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .btn-invite { background: #fff; color: #0b2a3c; }
+  .btn-invite:hover { background: #e6f3f1; }
+  .btn-invite-ghost { border-color: color-mix(in srgb, #fff 40%, transparent); color: #fff; }
+  .btn-invite-ghost:hover { border-color: #fff; background: rgb(255 255 255 / 8%); }
 
   @media (max-width: 52rem) {
-    .hero { grid-template-columns: 1fr; padding-top: 1.75rem; }
-    .hero-portrait { order: -1; justify-items: start; }
-    .hero-portrait :global(.portrait-large) { width: min(52vw, 12.5rem); }
+    .hero-grid { grid-template-columns: 1fr; padding-top: 1.75rem; }
+    .hero-portrait { order: -1; justify-items: start; width: fit-content; }
+    .hero-portrait::before { inset: -15%; }
+    .hero-portrait :global(.portrait-large) { width: min(52vw, 13rem); }
+    .hero-chip { position: static; margin-top: 0.75rem; justify-self: start; }
     .brief { grid-template-columns: 1fr; }
   }
 </style>

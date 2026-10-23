@@ -7,7 +7,7 @@ import { formatDate, isoDate } from '../lib/content';
 
 interface Props { entry: CollectionEntry<'updates'>; headingLevel?: 'h2' | 'h3' }
 const { entry, headingLevel: Heading = 'h3' } = Astro.props;
-const { title, url, platform, date, summary, image, imageAlt, draft } = entry.data;
+const { title, url, platform, date, summary, byline, image, imageAlt, draft } = entry.data;
 const label = PLATFORMS[platform].label;
 const videoId = platform === 'youtube' ? youtubeId(url) : undefined;
 const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', linkedin: 'View on LinkedIn', facebook: 'View on Facebook' }[platform];
@@ -40,6 +40,7 @@ const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', link
     </p>
     <Heading class="update-title"><a href={url} rel="noopener">{title}{draft && ' (draft)'}</a></Heading>
     {summary && <p class="update-summary">{summary}</p>}
+    {byline && <p class="update-byline">By {byline}</p>}
     <a class="update-action" href={url} rel="noopener" tabindex="-1" aria-hidden="true">{action} ↗</a>
   </div>
 </article>
@@ -67,6 +68,7 @@ const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', link
   .update-title a { display: inline-block; min-height: 1.5rem; text-decoration: none; }
   .update-title a:hover { color: var(--sea); text-decoration: underline; }
   .update-summary { color: var(--ink-soft); font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .update-byline { font-size: 0.82rem; color: var(--ink-faint); }
   .update-action { margin-top: auto; padding-top: 0.35rem; font-size: var(--text-sm); font-weight: 600; color: var(--sea); text-decoration: none; }
 </style>
 

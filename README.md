@@ -6,7 +6,7 @@ A fast, private-by-default personal site built with [Astro](https://astro.build)
 
 | Section | What goes there | Where to edit |
 |---|---|---|
-| **Home** | Name, motto, one-line focus, channel links, compact Research and Projects, podcast + latest post | `src/site.config.ts` |
+| **Home** | Name, motto, focus line and portrait; a **Now** panel (papers in review, experiments, latest post, podcast — filled in automatically from your content); selected Research and Projects; an invitation to get in touch | `src/site.config.ts` |
 | **Research** | Papers under review (with a *Request a copy* email button), conference papers, research projects — filterable by type | `src/content/research.yaml` |
 | **Projects** | Projects with honest status labels | `src/content/work/` |
 | **Lab** | Your experiments, a download shelf of free tools and templates (format, size, version and licence shown automatically), and a topic-filterable library of credited outside work | `src/content/lab/`, `src/content/library.yaml`, files in `public/downloads/` |
@@ -39,6 +39,7 @@ npm run add -- <linkedin-or-facebook-link> --title "Post title" --summary "One l
 
 - **Substack and YouTube:** `npm run sync` checks your public feeds (set in `src/data/feeds.json`) and adds anything new — nothing is ever duplicated or overwritten. Once you create a YouTube podcast playlist, put its feed URL in `youtubePodcastPlaylist` and episodes are marked automatically.
 - **LinkedIn and Facebook** block automatic reading, so give the title (and optionally `--summary`, `--image` with a screenshot, `--date 2026-11-01`) on the command line. Without `--title` you get a **draft** to finish.
+- If a Substack subtitle ends with "by Name & Name", that credit is moved to its own `byline:` line and shown under the summary, so co-authors keep their credit.
 - Images are copied into the site so visitors never load anything from the platforms — **only add your own posts** (or ones whose images you may show). `--no-image` skips the image.
 - YouTube videos play on your site only when pressed, through YouTube's privacy-enhanced player. Links must match their platform, tracking parameters are removed, network hiccups are retried, and mistyped options are refused.
 
@@ -63,7 +64,7 @@ It then appears on the home page and on `/collaborate/` with an **Offer to help*
 
 Edit **`src/content/research.yaml`**: copy a block, change the title and `kind`. The order in the file is the order on the site. Following humanities convention, don't name the journal while a paper is under review; add `venue:` once it is accepted.
 
-### Change your motto, focus line, links, email or podcast
+### Change your motto, focus line, footer tagline, links, email or podcast
 
 Edit **`src/site.config.ts`**. Empty values are hidden, so no empty or fake links ever appear on the site.
 

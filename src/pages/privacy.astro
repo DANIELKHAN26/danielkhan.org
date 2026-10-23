@@ -5,8 +5,8 @@ import PageHeader from '../components/PageHeader.astro';
 
 <BaseLayout searchable title="Privacy and editorial policy" description="How this site handles your data, messages, corrections and licences.">
   <PageHeader title="Privacy and editorial policy" lede="No cookies, no ads, no cross-site tracking. Messages are used only to reply." />
-  <section class="section">
-    <div class="container prose">
+  <div class="container policy">
+    <div class="prose">
       <h2>Browsing</h2>
       <p>This is a static website served by Cloudflare. It sets no cookies and loads no advertising or third-party fonts. If you choose a light or dark theme, that preference is stored in your own browser only. Cloudflare, as the host, processes standard connection data (such as IP addresses) to deliver and protect the site; see the <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a>.</p>
       <h2>Visitor statistics</h2>
@@ -20,7 +20,12 @@ import PageHeader from '../components/PageHeader.astro';
       <h2>Corrections</h2>
       <p>Every entry shows its status and date. If you find an error, use the “Suggest a correction” link on the page. Material corrections are made openly and noted on the page with the date.</p>
       <h2>Licences</h2>
-      <p>Writing, photographs and media on this site are © Daniel Khan unless stated otherwise. Each workshop resource states its own licence, and credits any work it adapts.</p>
+      <p>Writing, photographs and media on this site are © Daniel Khan unless stated otherwise. Each Lab tool and template states its own licence, and credits any work it adapts.</p>
     </div>
-  </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .policy { padding-block: 2.25rem var(--space-section); }
+  .policy .prose > :global(h2:first-child) { margin-top: 0; }
+</style>

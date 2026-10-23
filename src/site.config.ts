@@ -9,9 +9,11 @@ export const SITE = {
   affiliation: 'Macquarie University',
   /** Motto shown under your name on the home page. */
   motto: 'Good questions deserve a full answer.',
+  /** One line under the logo in the footer — what the site is about. */
+  tagline: 'Research, writing and tools on digital media and power in Bangladesh and the Global South.',
   /** What you work on, in one sentence (home page and Research page). */
   focus:
-    'I study digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South — and build language tools for verifying news.',
+    'I research digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South. Alongside, I write sourced explainers and build language tools for checking claims in the news.',
   description:
     'Daniel Khan — PhD candidate in Arts at Macquarie University researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South.',
 

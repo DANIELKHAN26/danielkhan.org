@@ -132,6 +132,12 @@ const slugify = (s, fallback) => (s || '').normalize('NFKD').replace(/[^\w\s-]/g
 
 /* ---------------- read a post's public preview ---------------- */
 
+/** Substack subtitles often end "… by Name & Name". Keep that credit, but as its own byline. */
+function splitByline(text) {
+  const m = text?.match(/^(.*\S)\s+by\s+(\p{Lu}[\p{L}’'.-]*(?:\s+\p{Lu}[\p{L}’'.-]*)*(?:\s*(?:&|,|and)\s*\p{Lu}[\p{L}’'.-]*(?:\s+\p{Lu}[\p{L}’'.-]*)*)*)$/u);
+  return m && m[2].length <= 120 ? { summary: m[1], byline: m[2] } : { summary: text, byline: undefined };
+}
+
 async function readPreview({ url, platform, videoId }) {
   const out = {};
   if (platform === 'youtube') {
@@ -143,7 +149,7 @@ async function readPreview({ url, platform, videoId }) {
   } else {
     const page = (await get(url, MAX_HTML, 'text/html')).toString('utf8');
     out.title = meta(page, 'og:title') || page.match(/<title>([^<]+)<\/title>/i)?.[1]?.trim();
-    out.summary = meta(page, 'og:description') || meta(page, 'description');
+    ({ summary: out.summary, byline: out.byline } = splitByline(meta(page, 'og:description') || meta(page, 'description')));
     out.imageUrl = meta(page, 'og:image');
     out.date = meta(page, 'article:published_time') || meta(page, 'datePublished') || jsonLdDate(page);
   }
@@ -165,6 +171,7 @@ async function addOne(link, options = {}) {
   }
   const title = options.title || preview.title;
   const summary = options.summary ?? preview.summary;
+  const byline = options.summary ? undefined : preview.byline;
   const dateRaw = options.date || preview.date;
   const day = dateRaw && !Number.isNaN(Date.parse(dateRaw)) ? new Date(dateRaw).toISOString().slice(0, 10) : localToday();
 
@@ -204,7 +211,7 @@ title: ${JSON.stringify(clip(title || 'TITLE — replace with the post title', 1
 date: ${day}
 platform: ${post.platform}
 url: ${JSON.stringify(post.url)}
-${summary ? `summary: ${JSON.stringify(clip(summary.replace(/\s+/g, ' '), 320))}\n` : ''}${imageField}${options.podcast ? 'podcast: true\n' : ''}draft: ${complete && !options.draft ? 'false' : 'true'}
+${summary ? `summary: ${JSON.stringify(clip(summary.replace(/\s+/g, ' '), 320))}\n` : ''}${byline ? `byline: ${JSON.stringify(clip(byline, 120))}\n` : ''}${imageField}${options.podcast ? 'podcast: true\n' : ''}draft: ${complete && !options.draft ? 'false' : 'true'}
 ---
 ${complete ? '' : '\n<!-- Fill in the title (and optionally a summary), then set draft: false. -->\n'}`);
 

@@ -1,10 +1,8 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
-import { getLab, getLibrary, isExternal } from '../../lib/content';
+import { getLab, getLibrary, isExternal, downloadInfo } from '../../lib/content';
 
 const lab = await getLab();
 const experiments = lab.filter((e) => e.data.kind === 'Experiment');
@@ -15,18 +13,6 @@ const topics = [...new Set(library.map((l) => l.data.topic))];
 const accentOf = (topic: (typeof topics)[number]) => `accent-${topics.indexOf(topic) % 3}`;
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const nonCommercial = (licence: string) => /\bNC\b|non-commercial/i.test(licence);
-
-const FORMATS: Record<string, string> = { csv: 'CSV', md: 'Markdown', txt: 'Text', pdf: 'PDF', zip: 'ZIP', json: 'JSON', docx: 'Word', xlsx: 'Excel' };
-/** Format and real size of a download, read from public/ at build time. A missing file fails the build. */
-function fileInfo(url: string) {
-  const ext = url.split(/[?#]/)[0].split('.').pop()?.toLowerCase() ?? '';
-  let size = '';
-  if (!isExternal(url)) {
-    const bytes = fs.statSync(path.join(process.cwd(), 'public', decodeURIComponent(url))).size;
-    size = bytes < 1024 ? `${bytes} bytes` : `${(bytes / 1024).toFixed(1)} KB`;
-  }
-  return { ext: ext.slice(0, 4).toUpperCase(), format: FORMATS[ext] ?? ext.toUpperCase(), size };
-}
 
 const sections = [
   { id: 'experiments', label: 'Experiments', count: experiments.length },
@@ -85,11 +71,11 @@ const sections = [
         </div>
         <ul class="kit">
           {tools.map((t) => {
-            const file = t.data.download ? fileInfo(t.data.download) : undefined;
+            const file = t.data.download ? downloadInfo(t.data.download) : undefined;
             const web = !file && !!t.data.demo;
             return (
               <li class="kit-item">
-                <span class:list={['glyph', { 'glyph-web': web }]} aria-hidden="true">{web ? 'WEB' : file?.ext}</span>
+                <span class:list={['glyph', { 'glyph-web': web }]} aria-hidden="true" data-pagefind-ignore>{web ? 'WEB' : file?.ext}</span>
                 <div class="kit-body">
                   <h3 class="kit-title"><a href={`/lab/${t.id}/`}>{t.data.title}{t.data.draft && ' (draft)'}</a></h3>
                   <p class="kit-text">{t.data.summary}</p>
@@ -131,13 +117,13 @@ const sections = [
         <ul class="tile-grid refs">
           {library.map(({ data }) => (
             <li class:list={['tile ref', accentOf(data.topic)]} data-topic={slug(data.topic)}>
-              <div class="tile-meta"><span class="tile-kind">{data.topic}</span></div>
-              <h3 class="tile-title"><a class="tile-link" href={data.url} rel="noopener">{data.title}<span class="ext" aria-hidden="true"> ↗</span></a></h3>
+              <div class="tile-meta" data-pagefind-ignore><span class="tile-kind">{data.topic}</span></div>
+              <h3 class="tile-title"><a class="tile-link" href={data.url} rel="noopener">{data.title}<span class="ext" aria-hidden="true" data-pagefind-ignore> ↗</span></a></h3>
               <p class="ref-by">{data.by}</p>
               <p class="tile-text">{data.note}</p>
               <div class="tile-foot ref-foot">
                 <span class="licence">{data.licence}</span>
-                {nonCommercial(data.licence) && <span class="nc">Non-commercial</span>}
+                {nonCommercial(data.licence) && <span class="nc" data-pagefind-ignore>Non-commercial</span>}
               </div>
             </li>
           ))}

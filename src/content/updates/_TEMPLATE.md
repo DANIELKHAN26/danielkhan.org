@@ -7,6 +7,7 @@ date: 2026-10-23
 platform: linkedin
 url: https://www.linkedin.com/posts/your-post-link
 summary: One or two sentences shown on the card (optional).
+byline: Daniel Khan            # optional: who wrote it (co-authors get credit here)
 # image: ../../assets/updates/my-post.jpg   # optional — save a screenshot or the post image there
 # imageAlt: What the image shows
 # podcast: true                             # YouTube podcast episodes only

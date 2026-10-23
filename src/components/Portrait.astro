@@ -10,11 +10,11 @@ const { size = 'large', eager = false } = Astro.props;
 <div class:list={['portrait', `portrait-${size}`]}>
   {size === 'large' && (
     <svg class="portrait-lines" viewBox="0 0 400 400" aria-hidden="true">
-      <circle cx="200" cy="200" r="171" fill="none" class="l-base" />
-      <path d="M200.0 16.0 A184 184 0 0 1 372.9 137.1" fill="none" class="l-sea" />
+      <circle cx="200" cy="200" r="171" fill="none" class="l-base draw" pathLength="1" transform="rotate(-90 200 200)" />
+      <path d="M200.0 16.0 A184 184 0 0 1 372.9 137.1" fill="none" class="l-sea draw" pathLength="1" />
       <circle cx="372.9" cy="137.1" r="5" class="d-sea" />
-      <path d="M40.7 292.0 A184 184 0 0 1 18.8 232.0" fill="none" class="l-warm" />
-      <path d="M267.0 384.2 A196 196 0 0 0 338.6 338.6" fill="none" class="l-faint" />
+      <path d="M40.7 292.0 A184 184 0 0 1 18.8 232.0" fill="none" class="l-warm draw" pathLength="1" />
+      <path d="M267.0 384.2 A196 196 0 0 0 338.6 338.6" fill="none" class="l-faint draw" pathLength="1" />
     </svg>
   )}
   <Picture
@@ -44,4 +44,12 @@ const { size = 'large', eager = false } = Astro.props;
   .d-sea { fill: var(--sea); }
   .l-warm { stroke: var(--shingle); stroke-width: 3; stroke-linecap: round; }
   .l-faint { stroke: var(--ink-faint); stroke-width: 1.5; stroke-linecap: round; opacity: 0.6; }
+  /* The lines draw themselves in once, on load. Reduced-motion users see them complete. */
+  @media (prefers-reduced-motion: no-preference) {
+    .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.4s var(--ease) 0.15s forwards; }
+    .l-sea { animation-delay: 0.55s; } .l-warm { animation-delay: 0.85s; } .l-faint { animation-delay: 1s; }
+    .d-sea { opacity: 0; animation: appear 0.4s var(--ease) 1.35s forwards; }
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes appear { to { opacity: 1; } }
 </style>

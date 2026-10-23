@@ -9,12 +9,6 @@ const { title, lede, stats = [] } = Astro.props;
 ---
 
 <header class="page-head">
-  <!-- The arc motif from the portrait, as a quiet background mark. -->
-  <svg class="page-arc" viewBox="0 0 400 400" fill="none" aria-hidden="true" focusable="false">
-    <circle class="a3" cx="200" cy="200" r="171" stroke-width="1.5" />
-    <path class="a1" d="M200 16 A184 184 0 0 1 372.9 137.1" stroke-width="3" stroke-linecap="round" />
-    <path class="a2" d="M40.7 292 A184 184 0 0 1 18.8 232" stroke-width="3" stroke-linecap="round" />
-  </svg>
   <div class="container">
     <nav class="crumbs" aria-label="Breadcrumb">
       <a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">{title}</span>

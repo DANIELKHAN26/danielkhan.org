@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import researchSource from '../content/research.yaml?raw';
 import librarySource from '../content/library.yaml?raw';
@@ -29,8 +31,6 @@ export async function getResearch() {
   return (await getCollection('research')).sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 }
 
-
-
 export const WORK_TYPES = {
   research: 'Research',
   writing: 'Writing',
@@ -58,4 +58,16 @@ export function joinProjectUrl(community: string, projectTitle: string) {
   if (!community) return '/collaborate/#message';
   const params = new URLSearchParams({ template: 'join-a-project.yml', title: `[Join] ${projectTitle}`, project: projectTitle });
   return `${community}/issues/new?${params}`;
+}
+
+const FORMATS: Record<string, string> = { csv: 'CSV', md: 'Markdown', txt: 'Text', pdf: 'PDF', zip: 'ZIP', json: 'JSON', docx: 'Word', xlsx: 'Excel' };
+/** Format and real size of a download, read from public/ at build time. A missing local file fails the build. */
+export function downloadInfo(url: string) {
+  const ext = url.split(/[?#]/)[0].split('.').pop()?.toLowerCase() ?? '';
+  let size = '';
+  if (!isExternal(url)) {
+    const bytes = fs.statSync(path.join(process.cwd(), 'public', decodeURIComponent(url))).size;
+    size = bytes < 1024 ? `${bytes} bytes` : `${(bytes / 1024).toFixed(1)} KB`;
+  }
+  return { ext: ext.slice(0, 4).toUpperCase(), format: FORMATS[ext] ?? ext.toUpperCase(), size };
 }

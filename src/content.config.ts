@@ -146,6 +146,8 @@ const updates = defineCollection({
         url: httpsUrl,
         /** A sentence or two shown on the card — usually the post's own opening. */
         summary: z.string().max(320).optional(),
+        /** Who wrote it, e.g. "Daniel Khan & Raima Paromita" — shown under the summary. */
+        byline: z.string().max(120).optional(),
         image: image().optional(),
         imageAlt: z.string().optional(),
         /** true = an episode of the podcast (shown in the Podcast section). */
