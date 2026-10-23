@@ -7,7 +7,7 @@ import { formatDate, isoDate } from '../lib/content';
 
 interface Props { entry: CollectionEntry<'updates'>; headingLevel?: 'h2' | 'h3' }
 const { entry, headingLevel: Heading = 'h3' } = Astro.props;
-const { title, url, platform, date, summary, byline, image, imageAlt, draft } = entry.data;
+const { title, url, platform, date, summary, byline, image, imageAlt, imageCredit, imageCreditUrl, draft } = entry.data;
 const label = PLATFORMS[platform].label;
 const videoId = platform === 'youtube' ? youtubeId(url) : undefined;
 const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', linkedin: 'View on LinkedIn', facebook: 'View on Facebook' }[platform];
@@ -19,16 +19,16 @@ const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', link
       <a class="video-link" href={url} rel="noopener">
         {image && imageAlt
           ? <Image src={image} alt="" widths={[400, 640, 960]} sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw" />
-          : <span class="media-fallback"><Icon name="youtube" size={40} /></span>}
+          : <span class="media-fallback"><Icon name="youtube" size={22} /><span class="fallback-title">{title}</span></span>}
         <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M8 5v14l11-7z" fill="currentColor" /></svg></span>
         <span class="visually-hidden">Play “{title}” (loads the YouTube player)</span>
       </a>
     </div>
   ) : (
-    <a class="update-media" href={url} rel="noopener" tabindex="-1" aria-hidden="true">
+    <a class="update-media" href={url} rel="noopener" tabindex="-1" aria-hidden="true" data-pagefind-ignore>
       {image && imageAlt
         ? <Image src={image} alt="" widths={[400, 640, 960]} sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw" />
-        : <span class="media-fallback"><Icon name={platform} size={40} /></span>}
+        : <span class="media-fallback"><Icon name={platform} size={22} /><span class="fallback-title">{title}</span></span>}
     </a>
   )}
   <div class="update-body">
@@ -41,6 +41,9 @@ const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', link
     <Heading class="update-title"><a href={url} rel="noopener">{title}{draft && ' (draft)'}</a></Heading>
     {summary && <p class="update-summary">{summary}</p>}
     {byline && <p class="update-byline">By {byline}</p>}
+    {image && imageCredit && (
+      <p class="update-credit">{imageCreditUrl ? <a href={imageCreditUrl} rel="license noopener">{imageCredit}</a> : imageCredit}</p>
+    )}
     <a class="update-action" href={url} rel="noopener" tabindex="-1" aria-hidden="true">{action} ↗</a>
   </div>
 </article>
@@ -54,7 +57,15 @@ const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', link
   .update-media { position: relative; display: block; aspect-ratio: 16 / 9; background: var(--sunk); overflow: hidden; }
   .update-media :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform .4s var(--ease); }
   .update:hover .update-media :global(img) { transform: scale(1.02); }
-  .media-fallback { display: grid; place-items: center; width: 100%; height: 100%; }
+  /* No picture (or none we may show): a typeset cover instead of an empty box. */
+  .media-fallback {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem; width: 100%; height: 100%;
+    padding: 1.1rem 1.25rem 1.25rem; background: var(--band); color: var(--on-band);
+  }
+  .fallback-title {
+    font-family: var(--font-read); font-size: clamp(1.25rem, 1rem + 1vw, 1.6rem); line-height: 1.2; font-weight: 600;
+    display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
   .video :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .video-link { display: block; width: 100%; height: 100%; }
   .play {
@@ -68,6 +79,8 @@ const action = { youtube: 'Watch on YouTube', substack: 'Read on Substack', link
   .update-title a { display: inline-block; min-height: 1.5rem; text-decoration: none; }
   .update-title a:hover { color: var(--sea); text-decoration: underline; }
   .update-summary { color: var(--ink-soft); font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .update-credit { font-size: 0.75rem; color: var(--ink-faint); }
+  .update-credit a { color: inherit; }
   .update-byline { font-size: 0.82rem; color: var(--ink-faint); }
   .update-action { margin-top: auto; padding-top: 0.35rem; font-size: var(--text-sm); font-weight: 600; color: var(--sea); text-decoration: none; }
 </style>

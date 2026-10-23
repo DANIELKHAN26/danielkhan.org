@@ -15,9 +15,9 @@ Important checks shouldn't depend on memory at the end of a long filming day. Th
 
 ## Four stages
 
-1. **Editorial** — the opening question, definitions, counter-reading, verified quotes and right of reply.
-2. **Recording** — microphone test, lens and exposure, prompter position, room sound, two clean takes.
+1. **Editorial** — the opening question, definitions, counter-reading, verified quotes and a documented opportunity to respond.
+2. **Recording** — microphone test, lens and exposure, prompter position, room sound, two coherent takes.
 3. **Editing** — qualifiers preserved, rights cleared, chart sources and denominators, captions, loudness.
-4. **Release and archive** — publication-day fact check, credits, correction log, private backups.
+4. **Release and archive** — publish-date fact check, credits, correction log, private backups.
 
 A checklist doesn't make a production good on its own. It makes recurring errors easier to catch: a qualifier lost in the edit, a wrong percentage in the captions, a licence forgotten for archive footage.

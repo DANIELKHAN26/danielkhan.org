@@ -32,14 +32,14 @@
   by: Thorne, Vlachos, Christodoulopoulos and Mittal — NAACL 2018
   topic: Verification & news data
   licence: Wikipedia licence terms (CC BY-SA 3.0); code Apache-2.0
-  note: 185,445 claims checked against Wikipedia — the standard benchmark for automated claim verification.
+  note: 185,445 claims checked against Wikipedia — a widely used benchmark for automated claim verification.
 
 - id: averitec
   title: "AVeriTeC: A Dataset for Real-world Claim Verification with Evidence from the Web"
   url: https://arxiv.org/abs/2305.13117
   by: Schlichtkrull, Guo and Vlachos — NeurIPS 2023
   topic: Verification & news data
-  licence: CC BY-NC 4.0 (non-commercial)
+  licence: CC BY-NC 4.0
   note: 4,568 real-world claims from 50 fact-checking organisations, with evidence gathered from the web.
 
 - id: whisper
@@ -55,7 +55,7 @@
   url: https://aclanthology.org/2022.findings-naacl.98/
   by: Bhattacharjee et al., CSE BUET NLP — Findings of NAACL 2022
   topic: Bengali NLP
-  licence: CC BY-NC-SA 4.0 (non-commercial research)
+  licence: CC BY-NC-SA 4.0
   note: Bangla language-understanding model and benchmark suite; code and weights at github.com/csebuetnlp/banglabert.
 
 - id: banglat5
@@ -63,5 +63,5 @@
   url: https://aclanthology.org/2023.findings-eacl.54/
   by: Bhattacharjee, Hasan, Ahmad and Shahriyar — Findings of EACL 2023
   topic: Bengali NLP
-  licence: CC BY-NC-SA 4.0 (non-commercial research)
+  licence: CC BY-NC-SA 4.0
   note: Bangla text-generation model and benchmarks — useful for summarising and explaining claims in Bangla.

@@ -40,7 +40,7 @@ npm run add -- <linkedin-or-facebook-link> --title "Post title" --summary "One l
 - **Substack and YouTube:** `npm run sync` checks your public feeds (set in `src/data/feeds.json`) and adds anything new — nothing is ever duplicated or overwritten. Once you create a YouTube podcast playlist, put its feed URL in `youtubePodcastPlaylist` and episodes are marked automatically.
 - **LinkedIn and Facebook** block automatic reading, so give the title (and optionally `--summary`, `--image` with a screenshot, `--date 2026-11-01`) on the command line. Without `--title` you get a **draft** to finish.
 - If a Substack subtitle ends with "by Name & Name", that credit is moved to its own `byline:` line and shown under the summary, so co-authors keep their credit.
-- Images are copied into the site so visitors never load anything from the platforms — **only add your own posts** (or ones whose images you may show). `--no-image` skips the image.
+- Images are copied into the site so visitors never load anything from the platforms. If a post's photo is someone else's, add its credit as `imageCredit:` (and the licence link as `imageCreditUrl:`) — it appears on the card, as in your Substack captions. `--no-image` skips the image.
 - YouTube videos play on your site only when pressed, through YouTube's privacy-enhanced player. Links must match their platform, tracking parameters are removed, network hiccups are retried, and mistyped options are refused.
 
 ### Add an experiment, tool or library item

@@ -34,6 +34,7 @@ Editing project location (PRIVATE):
 
 ## Release and archive
 - [ ] Publish-date fact check passed
+- [ ] Final names and numbers checked by: ______  Date: ______
 - [ ] Headline, summary, credits and description checked
 - [ ] Published URL and any correction log recorded
 - [ ] Raw video, script, assets, sources and masters backed up privately

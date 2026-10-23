@@ -4,7 +4,7 @@ summary: Paste a script and see how long it takes to say aloud at your pace, wit
 kind: Tool
 status: Released
 version: "1.0"
-licence: MIT
+licence: MIT License
 date: 2026-10-22
 demo: /tools/script-timer/
 requirements: Any modern browser

@@ -1,4 +1,4 @@
-# Collaboration brief — reusable template
+# Collaboration brief (reusable template)
 
 **Project / working title:**
 
@@ -27,4 +27,4 @@ Describe authorship, third-party licences, contribution attribution, consent and
 Who needs to review it? How will success be tested? What would cause a no-publish or no-merge decision?
 
 ---
-This template is dedicated to the public domain under CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/). Source: https://danielkhan.org/workshop/collaboration-brief/ — not legal advice.
+This template is dedicated to the public domain under CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/). Source: https://danielkhan.org/lab/collaboration-brief/ — not legal advice.

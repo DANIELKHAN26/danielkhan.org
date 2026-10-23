@@ -63,12 +63,13 @@ const structuredData = schema === 'home'
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#f3f6f7" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#06161f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f4f6f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#071820" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — new work and log`} href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — research, projects and updates`} href="/rss.xml" />
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE.name} />

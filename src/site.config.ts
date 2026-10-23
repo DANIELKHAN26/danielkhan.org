@@ -13,7 +13,7 @@ export const SITE = {
   tagline: 'Research, writing and tools on digital media and power in Bangladesh and the Global South.',
   /** What you work on, in one sentence (home page and Research page). */
   focus:
-    'I research digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South. Alongside, I write sourced explainers and build language tools for checking claims in the news.',
+    'I research digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South. I also write sourced explainers and am developing experimental language tools for checking claims in the news.',
   description:
     'Daniel Khan — PhD candidate in Arts at Macquarie University researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South.',
 

@@ -10,7 +10,7 @@ collaboration:
   needs: [Product and UX designers, Experienced mentors, Web developers]
 ---
 
-People seeking study or career advice need to know who is answering, why that person is qualified, and how one suggestion compares with another path.
+People seeking study or career advice need to know who is answering, why that person is qualified, and how one suggestion compares with another.
 
 REDE is a concept for a community built around that: clear identities, evidence of expertise, transparent feedback, fair moderation, and an easy way to challenge a claim or report a misleading offer.
 

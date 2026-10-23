@@ -1,14 +1,14 @@
 ---
 title: Bengali language model for verification
-summary: Training a Bengali language model for the same verification tasks — so news and public claims in Bangla can be transcribed, analysed and checked as well as English ones.
+summary: Adapting Bengali language models to the verification tasks in the video NLP experiment — so claims in Bangla can be analysed and checked, not only English ones.
 kind: Experiment
 status: In progress
-focus: Training and evaluating a Bengali model for claim detection and verification.
+focus: Adapting and evaluating Bengali language models for claim detection and verification.
 date: 2026-10-23
 tags: [Bengali, NLP, Language models, Verification]
 ---
 
-Bangla is one of the world's most widely spoken languages, but tools for analysing and checking claims in it lag far behind English. This experiment trains a Bengali model for the verification tasks in the [video NLP work](/lab/video-nlp-news-verification/).
+Bangla is one of the world's most widely spoken languages, but tools for analysing and checking claims in it lag far behind English. This experiment adapts and evaluates Bengali language models for the verification tasks in the [video NLP work](/lab/video-nlp-news-verification/).
 
 ## What it explores
 

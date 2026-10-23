@@ -14,7 +14,7 @@ export async function GET(context: APIContext) {
   ].sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
   return rss({
-    title: `${SITE.name} — new work and log`,
+    title: `${SITE.name} — research, projects and updates`,
     description: SITE.description,
     site: context.site!,
     items,

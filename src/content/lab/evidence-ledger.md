@@ -11,7 +11,7 @@ requirements: Any spreadsheet app (LibreOffice, Excel, Google Sheets)
 tags: [Research, Fact-checking, Template]
 ---
 
-When several reports describe the same event, it is easy to lose track of whether they checked the claim independently or simply repeated a common source. A claim ledger makes that difference visible while the research is still in progress.
+When several reports describe the same event, it is easy to lose track of whether they checked the claim independently or simply repeated a common source. An evidence ledger makes that difference visible while the research is still in progress.
 
 ## What's inside
 
@@ -21,7 +21,7 @@ The CSV opens in any spreadsheet app. Each row is one claim, with columns for:
 - publication date **and** event date, kept separate;
 - page or table reference, definition of the measure, geography and population;
 - whether the source is primary, any independent confirmation and any credible counter-evidence;
-- access status, your conclusion, publication status, and who checked it when.
+- access status, your conclusion, publication status, and who checked it and when.
 
 The first row is a labelled example — delete it before use.
 

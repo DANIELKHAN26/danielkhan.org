@@ -1,6 +1,6 @@
 ---
 title: Video NLP for verified news
-summary: Extending natural language processing to news video — so claims made on screen can be transcribed, extracted and checked against sources, with deeper analysis than text-only tools allow.
+summary: Extending natural language processing to news video — so claims made on screen can be transcribed, extracted and checked against sources — aiming for analysis that text-only tools cannot offer.
 kind: Experiment
 status: In progress
 focus: Transcription, claim extraction and source-checking for news video.

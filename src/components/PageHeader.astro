@@ -4,14 +4,16 @@ interface Props {
   lede?: string;
   /** Short facts shown under the lede, e.g. [{ value: 9, label: 'research outputs' }]. */
   stats?: { value: number | string; label: string }[];
+  /** Short name for the breadcrumb when the title is a sentence. */
+  crumb?: string;
 }
-const { title, lede, stats = [] } = Astro.props;
+const { title, lede, stats = [], crumb = title } = Astro.props;
 ---
 
 <header class="page-head">
   <div class="container">
     <nav class="crumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">{title}</span>
+      <a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">{crumb}</span>
     </nav>
     <h1>{title}</h1>
     {lede && <p>{lede}</p>}

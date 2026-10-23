@@ -10,7 +10,7 @@ collaboration:
   needs: [Testers with a webcam and microphone, Front-end developers]
 ---
 
-Scrolling words faster than someone can think produces an accurate reading with no connection. ScriptFlow shows a short, complete thought close to the camera line and lets the presenter decide when to move on.
+Words that scroll faster than a presenter can think produce a word-perfect reading that sounds disconnected. ScriptFlow shows a short, complete thought close to the camera line and lets the presenter decide when to move on.
 
 ## Planned features
 

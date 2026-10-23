@@ -150,6 +150,10 @@ const updates = defineCollection({
         byline: z.string().max(120).optional(),
         image: image().optional(),
         imageAlt: z.string().optional(),
+        /** Required by most photo licences when the image is not yours, e.g. "Photo: Jane Doe / Wikimedia Commons, CC BY-SA 4.0". */
+        imageCredit: z.string().max(160).optional(),
+        /** Optional link for the credit — usually the licence, e.g. https://creativecommons.org/licenses/by-sa/4.0/ */
+        imageCreditUrl: httpsUrl.optional(),
         /** true = an episode of the podcast (shown in the Podcast section). */
         podcast: z.boolean().default(false),
         draft: z.boolean().default(false),

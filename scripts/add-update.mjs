@@ -196,7 +196,9 @@ async function addOne(link, options = {}) {
         if (!ext) throw new Error('not a JPEG, PNG or WebP image');
         mkdirSync(ASSETS, { recursive: true });
         writeFileSync(join(ASSETS, `${name}.${ext}`), buf);
-        imageField = `image: ../../assets/updates/${name}.${ext}\nimageAlt: ${JSON.stringify(`Image for “${title || 'this post'}”`)}\n`;
+        imageField = `image: ../../assets/updates/${name}.${ext}\nimageAlt: ${JSON.stringify(`Image for “${title || 'this post'}”`)}\n`
+          + `# imageCredit: "Photo: Name / Source, licence"   # needed when the photo is not your own\n`;
+        if (!options.image) notes.push('preview image copied — keep it only if the photo is yours or its licence allows reuse (then add imageCredit); otherwise delete the image lines');
       }
     } catch (error) {
       notes.push(`image skipped (${error.message})`);

@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
+import { SITE } from '../site.config';
+
+const hasForm = SITE.contact.web3formsAccessKey.length > 0;
 ---
 
 <BaseLayout searchable title="Privacy and editorial policy" description="How this site handles your data, messages, corrections and licences.">
@@ -14,11 +17,11 @@ import PageHeader from '../components/PageHeader.astro';
       <h2>Videos and posts from other sites</h2>
       <p>Preview images for posts on the Updates page are stored on this site, so viewing them sends nothing to Substack, YouTube, LinkedIn or Facebook. A YouTube video loads only when you press play, using YouTube's privacy-enhanced mode (youtube-nocookie.com); from then on, YouTube's <a href="https://policies.google.com/privacy">privacy policy</a> applies. Links to other sites take you to services with their own policies.</p>
       <h2>Messages</h2>
-      <p>If you use the contact form, your name, email and message are delivered to me through Web3Forms, a third-party form service, and used only to reply to you. Please don't send passwords, confidential documents or information about research participants.</p>
+      <p>If you email me, your message and address are used only to reply to you.{hasForm && ' If you use the contact form, your name, email and message are delivered to me through Web3Forms, a third-party form service, for the same purpose.'} Please don't send passwords, confidential documents or information about research participants.</p>
       <h2>Public discussions</h2>
       <p>The collaboration links open GitHub Discussions and Issues. Anything posted there is public and governed by GitHub's terms.</p>
       <h2>Corrections</h2>
-      <p>Every entry shows its status and date. If you find an error, use the “Suggest a correction” link on the page. Material corrections are made openly and noted on the page with the date.</p>
+      <p>Every project and Lab entry shows its status and date. If you find an error, use the “Suggest a correction” link on the page. Material corrections are made openly and noted on the page with the date.</p>
       <h2>Licences</h2>
       <p>Writing, photographs and media on this site are © Daniel Khan unless stated otherwise. Each Lab tool and template states its own licence, and credits any work it adapts.</p>
     </div>

@@ -9,8 +9,8 @@ import { SITE } from '../site.config';
 const all = await getResearch();
 const groups = [
   { id: 'under-review', tab: 'Under review', title: 'Papers under review', note: 'Journal manuscripts currently in peer review. Copies available on request.', items: all.filter((r) => r.data.kind === 'under-review'), showKind: false },
-  { id: 'presentations', tab: 'Presentations', title: 'Conference and seminar papers', note: '', items: all.filter((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)), showKind: true },
-  { id: 'projects', tab: 'Projects', title: 'Research projects', note: '', items: all.filter((r) => ['thesis', 'project'].includes(r.data.kind)), showKind: true },
+  { id: 'presentations', tab: 'Conference papers', title: 'Conference and seminar papers', note: '', items: all.filter((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)), showKind: true },
+  { id: 'projects', tab: 'Research projects', title: 'Research projects', note: '', items: all.filter((r) => ['thesis', 'project'].includes(r.data.kind)), showKind: true },
 ].filter((g) => g.items.length > 0);
 ---
 
@@ -47,7 +47,7 @@ const groups = [
       </a>
       <a class="also-item" href="/lab/">
         <span class="also-label">Lab</span>
-        <span class="also-title">Language technology for verifying news →</span>
+        <span class="also-title">Language-technology experiments for news verification →</span>
       </a>
     </aside>
   </div>
