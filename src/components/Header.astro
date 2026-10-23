@@ -80,17 +80,23 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
   .menu-btn[aria-expanded='true'] span:last-child { top: 1.25rem; transform: rotate(-45deg); }
 
   @media (max-width: 56rem) {
-    .menu-btn { display: grid; }
-    .site-nav {
+    /* Without JavaScript the menu is a plain row of links under the name; with it, a drop-down. */
+    .header-inner { flex-wrap: wrap; }
+    .site-nav { order: 4; flex-basis: 100%; padding-bottom: 0.5rem; }
+    .site-nav ul { flex-wrap: wrap; }
+    .nav-cta { margin-left: 0; }
+    :global(.js) .header-inner { flex-wrap: nowrap; }
+    :global(.js) .menu-btn { display: grid; }
+    :global(.js) .site-nav {
       position: absolute; inset: 100% 0 auto 0; background: var(--paper); border-bottom: 1px solid var(--line);
       padding: 0.75rem var(--gutter) 1.5rem; display: none;
     }
-    .site-nav.open { display: block; }
-    .site-nav ul { flex-direction: column; align-items: stretch; gap: 0.1rem; }
-    .site-nav a:not(.btn) { padding: 0.85rem 0.5rem; font-size: 1.15rem; border-radius: var(--radius-sm); }
-    .site-nav a[aria-current='page']:not(.btn) { box-shadow: inset 3px 0 0 var(--sea); border-radius: 0; padding-left: 0.9rem; }
-    .nav-cta { margin: 0.75rem 0 0; }
-    .nav-cta .btn { width: 100%; min-height: 3rem; }
+    :global(.js) .site-nav.open { display: block; }
+    :global(.js) .site-nav ul { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 0.1rem; }
+    :global(.js) .site-nav a:not(.btn) { padding: 0.85rem 0.5rem; font-size: 1.15rem; border-radius: var(--radius-sm); }
+    :global(.js) .site-nav a[aria-current='page']:not(.btn) { box-shadow: inset 3px 0 0 var(--sea); border-radius: 0; padding-left: 0.9rem; }
+    :global(.js) .nav-cta { margin: 0.75rem 0 0; }
+    :global(.js) .nav-cta .btn { width: 100%; min-height: 3rem; }
     .header-tools { order: 3; }
   }
 </style>

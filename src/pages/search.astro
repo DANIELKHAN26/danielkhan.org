@@ -12,6 +12,7 @@ import PageHeader from '../components/PageHeader.astro';
     </form>
   </PageHeader>
   <section class="section container" aria-live="polite">
+    <noscript><p class="search-status">Search needs JavaScript. You can browse everything from the menu: Research, Projects, Lab and Updates.</p></noscript>
     <p id="search-status" class="search-status"></p>
     <ol id="search-results" class="results"></ol>
   </section>
@@ -97,7 +98,7 @@ import PageHeader from '../components/PageHeader.astro';
       if (!search) return; // superseded by a newer keystroke
       render(await Promise.all(search.results.slice(0, 20).map((r) => r.data())), q);
     } catch {
-      status.textContent = 'Search is available on the published site (run “npm run build” then “npm run preview” locally).';
+      status.textContent = 'Search couldn’t load just now. Check your connection and try again — or browse Research, Projects and the Lab from the menu.';
     }
   }
 

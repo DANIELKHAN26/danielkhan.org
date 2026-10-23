@@ -1,0 +1,116 @@
+---
+/**
+ * Every mailto: link on the site opens this panel instead of relying on the visitor having a
+ * mail app set up (on many computers a bare mailto: link silently does nothing).
+ * Without JavaScript, or in a browser without <dialog>, links fall back to plain mailto:.
+ */
+import { SITE } from '../site.config';
+const email = SITE.contact.email;
+---
+
+{email && (
+  <dialog id="email-dialog" class="email-dialog" aria-labelledby="email-dialog-title">
+    <button type="button" class="ed-close" data-close aria-label="Close">×</button>
+    <h2 id="email-dialog-title">Email {SITE.name}</h2>
+    <p class="ed-subject" id="ed-subject" hidden></p>
+    <div class="ed-address">
+      <span id="ed-addr">{email}</span>
+      <button type="button" class="btn btn-ghost btn-sm" id="ed-copy" autofocus>Copy address</button>
+    </div>
+    <p class="ed-status" id="ed-status" role="status"></p>
+    <p class="ed-label">Or write it in:</p>
+    <div class="ed-apps">
+      <a class="btn btn-primary btn-sm" id="ed-mailapp" href={`mailto:${email}`}>Your mail app</a>
+      <a class="btn btn-ghost btn-sm" id="ed-gmail" href="https://mail.google.com/" target="_blank" rel="noopener noreferrer">Gmail ↗</a>
+      <a class="btn btn-ghost btn-sm" id="ed-outlook" href="https://outlook.live.com/" target="_blank" rel="noopener noreferrer">Outlook ↗</a>
+    </div>
+  </dialog>
+)}
+
+<style>
+  .email-dialog {
+    width: min(100% - 2rem, 27rem); padding: 1.5rem 1.5rem 1.35rem; border: 1px solid var(--line); border-radius: 16px;
+    background: var(--surface); color: var(--ink); box-shadow: var(--shadow-md);
+  }
+  .email-dialog::backdrop { background: rgb(4 18 26 / 55%); }
+  .email-dialog h2 { font-size: var(--h3); padding-right: 2rem; }
+  .ed-close {
+    position: absolute; top: 0.75rem; right: 0.75rem; display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
+    border: 0; border-radius: 50%; background: transparent; color: var(--ink-soft); font-size: 1.5rem; line-height: 1; cursor: pointer;
+  }
+  .ed-close:hover { background: var(--sunk); color: var(--ink); }
+  .ed-subject { margin-top: 0.35rem; font-size: 0.88rem; color: var(--ink-soft); }
+  .ed-address {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1rem; margin-top: 1rem;
+    padding: 0.75rem 0.9rem; border-radius: 12px; background: var(--sunk);
+  }
+  .ed-address span { font-weight: 650; font-size: 1.05rem; overflow-wrap: anywhere; user-select: all; }
+  .ed-status { min-height: 1.4em; margin-top: 0.4rem; font-size: 0.85rem; color: var(--sea); }
+  .ed-label { margin-top: 0.4rem; font-size: 0.85rem; color: var(--ink-faint); }
+  .ed-apps { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+  @media (prefers-reduced-motion: no-preference) {
+    .email-dialog[open] { animation: ed-in 0.18s var(--ease); }
+    @keyframes ed-in { from { opacity: 0; translate: 0 6px; } }
+  }
+</style>
+
+<script>
+  const dialog = document.getElementById('email-dialog') as HTMLDialogElement | null;
+  if (dialog && typeof dialog.showModal === 'function') {
+    const addr = dialog.querySelector<HTMLElement>('#ed-addr')!;
+    const subjectLine = dialog.querySelector<HTMLElement>('#ed-subject')!;
+    const status = dialog.querySelector<HTMLElement>('#ed-status')!;
+    const mailApp = dialog.querySelector<HTMLAnchorElement>('#ed-mailapp')!;
+    const gmail = dialog.querySelector<HTMLAnchorElement>('#ed-gmail')!;
+    const outlook = dialog.querySelector<HTMLAnchorElement>('#ed-outlook')!;
+
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>('a[href^="mailto:"]');
+      if (!link || dialog.contains(link) || event.defaultPrevented) return;
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+
+      const url = new URL(link.href);
+      const to = decodeURIComponent(url.pathname);
+      const subject = url.searchParams.get('subject') ?? '';
+      const body = url.searchParams.get('body') ?? '';
+
+      addr.textContent = to;
+      subjectLine.hidden = !subject;
+      subjectLine.textContent = subject ? `Subject: ${subject}` : '';
+      status.textContent = '';
+      mailApp.href = link.href;
+      const g = new URLSearchParams({ view: 'cm', fs: '1', to });
+      if (subject) g.set('su', subject);
+      if (body) g.set('body', body);
+      gmail.href = `https://mail.google.com/mail/?${g}`;
+      const o = new URLSearchParams({ to });
+      if (subject) o.set('subject', subject);
+      if (body) o.set('body', body);
+      outlook.href = `https://outlook.live.com/mail/0/deeplink/compose?${o}`;
+      dialog.showModal();
+    });
+
+    dialog.querySelector('#ed-copy')!.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(addr.textContent ?? '');
+        status.textContent = 'Address copied.';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(addr);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+        status.textContent = 'Selected — press Ctrl+C (⌘C on a Mac) to copy.';
+      }
+    });
+    dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close());
+    // Click outside the panel closes it; choosing an app closes it too.
+    dialog.addEventListener('click', (event) => {
+      if (event.target !== dialog) return;
+      const r = dialog.getBoundingClientRect();
+      const inside = event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom;
+      if (!inside) dialog.close();
+    });
+    for (const a of [mailApp, gmail, outlook]) a.addEventListener('click', () => setTimeout(() => dialog.close(), 0));
+  }
+</script>

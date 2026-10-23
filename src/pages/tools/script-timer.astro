@@ -7,6 +7,7 @@ import PageHeader from '../../components/PageHeader.astro';
   <PageHeader title="Script timer" lede="Paste a script to estimate how long it takes to say aloud. Everything runs in your browser — your text is never uploaded or stored." />
 
   <section class="section container timer">
+    <noscript><p class="timer-noscript">The timer runs in your browser and needs JavaScript switched on.</p></noscript>
     <div class="timer-input">
       <label for="script" class="timer-label">Script</label>
       <textarea id="script" rows="14" placeholder="Paste or type your narration here…"></textarea>
@@ -49,6 +50,8 @@ import PageHeader from '../../components/PageHeader.astro';
   .figures dt { font-size: 0.85rem; color: var(--ink-faint); }
   .figures dd { margin: 0; font-size: 1.4rem; font-weight: 650; font-variant-numeric: tabular-nums; }
   .figures .big dd { font-size: clamp(2.5rem, 6vw, 3.6rem); color: var(--sea); letter-spacing: -0.03em; }
+  .timer > :global(noscript) { grid-column: 1 / -1; }
+  .timer-noscript { padding: 0.9rem 1.1rem; border-radius: var(--radius); background: var(--sea-wash); }
   @media (max-width: 52rem) { .timer { grid-template-columns: 1fr; } .timer-panel { position: static; } }
 </style>
 

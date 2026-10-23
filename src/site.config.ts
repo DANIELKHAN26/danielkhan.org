@@ -6,6 +6,8 @@ export const SITE = {
   name: 'Daniel Khan',
   url: 'https://danielkhan.org',
   role: 'PhD student in Humanities',
+  /** Short title used for the home page in search results and link previews. */
+  headline: 'Researcher and writer',
   /** Motto shown under your name on the home page. */
   motto: 'Good questions deserve a full answer.',
   /** One line under the logo in the footer — what the site is about. */
@@ -14,7 +16,7 @@ export const SITE = {
   focus:
     'I research digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South. I also write sourced explainers and am developing experimental language tools for checking claims in the news.',
   description:
-    'Daniel Khan — PhD student in Humanities researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South, and building experimental language tools for checking claims in the news.',
+    'PhD student in Humanities researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South. Research, sourced explainers and open tools.',
 
   /** Public GitHub account and the public repo used for collaboration (Discussions + issue forms). */
   github: {
