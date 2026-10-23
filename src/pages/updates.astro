@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader.astro';
 import PodcastTeaser from '../components/PodcastTeaser.astro';
 import UpdateCard from '../components/UpdateCard.astro';
 import Icon from '../components/Icon.astro';
-import { getUpdates, getLog, formatDate, isoDate } from '../lib/content';
+import { getUpdates } from '../lib/content';
 import { PLATFORMS, type Platform } from '../content.config';
 import { socialLinks } from '../site.config';
 
@@ -12,7 +12,6 @@ const updates = await getUpdates();
 const episodes = updates.filter((u) => u.data.podcast);
 const posts = updates.filter((u) => !u.data.podcast);
 const platformsWithPosts = (Object.keys(PLATFORMS) as Platform[]).filter((p) => posts.some((u) => u.data.platform === p));
-const notes = await getLog();
 ---
 
 <BaseLayout searchable title="Updates" description="Daniel Khan's writing, videos and posts from Substack, YouTube, LinkedIn and Facebook — plus the podcast, coming soon.">
@@ -61,20 +60,6 @@ const notes = await getLog();
       </section>
     )}
 
-    {notes.length > 0 && (
-      <section class="block" id="notes" aria-labelledby="notes-title">
-        <h2 id="notes-title">Notes from this site</h2>
-        <ul class="notes">
-          {notes.map((n) => (
-            <li>
-              <a href={`/log/${n.id}/`}>{n.data.title}{n.data.draft && ' (draft)'}</a>
-              <time datetime={isoDate(n.data.date)}>{formatDate(n.data.date)}</time>
-            </li>
-          ))}
-        </ul>
-        <p class="rss">Follow everything by <a href="/rss.xml">RSS</a>.</p>
-      </section>
-    )}
   </div>
 </BaseLayout>
 
@@ -84,8 +69,10 @@ const notes = await getLog();
   .block h2:not(.visually-hidden) { font-size: var(--h2); }
 
   .channels { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem; }
-  .channel { display: flex; align-items: center; gap: 0.8rem; height: 100%; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); text-decoration: none; transition: border-color .2s; }
-  .channel:hover { border-color: var(--sea); }
+  .channel { display: flex; align-items: center; gap: 0.8rem; height: 100%; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); text-decoration: none; transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+  .channel:hover { border-color: color-mix(in srgb, var(--sea) 45%, var(--line)); box-shadow: var(--shadow-md); }
+  .channel-go { transition: transform var(--dur) var(--ease); }
+  .channel:hover .channel-go { transform: translate(2px, -2px); }
   .channel-text { display: grid; gap: 0.1rem; min-width: 0; }
   .channel-name { font-weight: 700; }
   .channel-about { font-size: 0.88rem; color: var(--ink-soft); }
@@ -94,19 +81,13 @@ const notes = await getLog();
   .latest-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; margin-bottom: 1rem; }
   .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .chip { min-height: 2.25rem; padding: 0.3rem 0.85rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+  .chip:hover { border-color: var(--sea); }
   .chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); gap: 1rem; }
   .episodes { margin-top: 1rem; }
   .cell { display: grid; }
   .cell[hidden] { display: none; }
 
-  .notes { list-style: none; padding: 0; margin-top: 0.75rem; border-top: 1px solid var(--line); }
-  .notes li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1.5rem; padding-block: 0.75rem; border-bottom: 1px solid var(--line); }
-  .notes a { font-weight: 600; text-decoration: none; }
-  .notes a:hover { color: var(--sea); text-decoration: underline; }
-  .notes time { font-size: var(--text-sm); color: var(--ink-faint); }
-  .rss { margin-top: 1rem; font-size: var(--text-sm); color: var(--ink-faint); }
-  .rss a { color: var(--sea); }
 </style>
 
 <script>

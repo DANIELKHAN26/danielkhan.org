@@ -7,21 +7,25 @@ import { getWork } from '../../lib/content';
 const work = await getWork();
 const order = ['Ongoing', 'In progress', 'In development', 'Concept', 'Published', 'Released', 'Paused', 'Archived'];
 const sorted = [...work].sort((a, b) => order.indexOf(a.data.status) - order.indexOf(b.data.status) || b.data.date.getTime() - a.data.date.getTime());
+const open = work.filter((w) => w.data.collaboration?.open).length;
 ---
 
 <BaseLayout title="Projects" description="Independent projects by Daniel Khan in journalism, research, documentary and tools, each with its current status.">
-  <PageHeader title="Projects" lede="Independent work in journalism, research, documentary and tools. Each card shows where the project stands." />
-  <section class="container projects-wrap">
+  <PageHeader
+    title="Projects"
+    lede="Independent work in journalism, research, documentary and tools. Each project shows where it stands."
+    stats={[{ value: work.length, label: 'projects' }, { value: open, label: 'seeking collaborators' }]}
+  />
+  <section class="container projects-wrap" aria-label="All projects">
     {sorted.length > 0
-      ? <div class="projects">{sorted.map((entry) => <ProjectCard entry={entry} headingLevel="h2" />)}</div>
+      ? <div class="tile-grid">{sorted.map((entry) => <ProjectCard entry={entry} headingLevel="h2" />)}</div>
       : <p>New projects are on their way.</p>}
-    <p class="note">Looking for experiments and tools? See the <a href="/lab/">Lab</a>.</p>
+    <p class="note">Looking for experiments and tools? See the <a href="/lab/">Lab</a>. Want to help? <a href="/collaborate/#projects">Join a project</a>.</p>
   </section>
 </BaseLayout>
 
 <style>
   .projects-wrap { padding-block: 2rem var(--space-section); }
-  .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 1rem; }
   .note { margin-top: 1.75rem; color: var(--ink-soft); }
   .note a { color: var(--sea); }
 </style>

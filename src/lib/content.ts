@@ -29,9 +29,7 @@ export async function getResearch() {
   return (await getCollection('research')).sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 }
 
-export async function getLog() {
-  return (await getCollection('log', visible)).sort(newestFirst);
-}
+
 
 export const WORK_TYPES = {
   research: 'Research',

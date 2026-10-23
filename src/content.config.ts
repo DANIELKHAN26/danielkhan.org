@@ -166,15 +166,6 @@ const updates = defineCollection({
       }),
 });
 
-/* ---------- Notes (/log/<id>/): longer updates written on this site ---------- */
-const log = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/log' }),
-  schema: z.object({
-    ...common,
-    links: z.array(link).default([]),
-  }),
-});
-
 /* ---------- Research, edited in src/content/research.yaml ---------- */
 export const RESEARCH_KINDS = {
   'under-review': 'Under review',
@@ -196,4 +187,4 @@ const research = defineCollection({
   }),
 });
 
-export const collections = { work, lab, library, updates, log, research };
+export const collections = { work, lab, library, updates, research };

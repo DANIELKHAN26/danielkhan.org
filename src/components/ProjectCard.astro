@@ -8,25 +8,20 @@ const { entry, headingLevel: Heading = 'h3' } = Astro.props;
 const { data } = entry;
 ---
 
-<article class="project">
-  <div class="project-top">
-    <span class="project-type">{WORK_TYPES[data.type]}</span>
+<article class="tile">
+  <div class="tile-meta">
+    <span class="tile-kind">{WORK_TYPES[data.type]}</span>
     <StatusBadge status={data.status} />
   </div>
-  <Heading class="project-title"><a href={`/work/${entry.id}/`}>{data.title}{data.draft && ' (draft)'}</a></Heading>
-  <p class="project-summary">{data.summary}</p>
-  {data.collaboration?.open && <p class="project-open">Open to collaborators</p>}
+  <Heading class="tile-title"><a class="tile-link" href={`/work/${entry.id}/`}>{data.title}{data.draft && ' (draft)'}</a></Heading>
+  <p class="tile-text">{data.summary}</p>
+  <div class="tile-foot">
+    {data.collaboration?.open ? <span class="open">Seeking collaborators</span> : <ul class="tile-chips">{data.tags.slice(0, 2).map((t) => <li>{t}</li>)}</ul>}
+    <span class="tile-arrow" aria-hidden="true">→</span>
+  </div>
 </article>
 
 <style>
-  .project { position: relative; display: flex; flex-direction: column; gap: 0.5rem; padding: 1.15rem 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); transition: border-color .2s; }
-  .project:hover { border-color: var(--sea); }
-  .project-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-  .project-type { font-size: 0.82rem; font-weight: 600; color: var(--ink-faint); }
-  .project-title { font-size: var(--h3); line-height: 1.35; }
-  .project-title a { display: inline-block; text-decoration: none; }
-  .project-title a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
-  .project:hover .project-title a { color: var(--sea); }
-  .project-summary { color: var(--ink-soft); font-size: 0.95rem; }
-  .project-open { margin-top: auto; padding-top: 0.25rem; font-size: 0.82rem; font-weight: 600; color: var(--sea); }
+  .open { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--sea); }
+  .open::before { content: ''; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--sea); box-shadow: 0 0 0 3px var(--sea-wash); }
 </style>

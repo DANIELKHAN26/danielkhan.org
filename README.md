@@ -7,10 +7,10 @@ A fast, private-by-default personal site built with [Astro](https://astro.build)
 | Section | What goes there | Where to edit |
 |---|---|---|
 | **Home** | Name, motto, one-line focus, channel links, compact Research and Projects, podcast + latest post | `src/site.config.ts` |
-| **Research** | Papers under review, conference papers, research projects | `src/content/research.yaml` |
+| **Research** | Papers under review (with a *Request a copy* email button), conference papers, research projects — filterable by type | `src/content/research.yaml` |
 | **Projects** | Projects with honest status labels | `src/content/work/` |
-| **Lab** | Your experiments, free tools and templates, and a library of credited outside work | `src/content/lab/`, `src/content/library.yaml`, files in `public/downloads/` |
-| **Updates** | Your posts on Substack, YouTube, LinkedIn and Facebook (added by link), the podcast, and site notes | `npm run add -- <link>` → `src/content/updates/`; notes in `src/content/log/` |
+| **Lab** | Your experiments, a download shelf of free tools and templates (format, size, version and licence shown automatically), and a topic-filterable library of credited outside work | `src/content/lab/`, `src/content/library.yaml`, files in `public/downloads/` |
+| **Updates** | Your posts on Substack, YouTube, LinkedIn and Facebook (added by link), and the podcast | `npm run add -- <link>` → `src/content/updates/` |
 | **Collaborate** | Email, open projects with "Offer to help", public discussions | driven by config + project files |
 | **About** (footer) | Short bio with expandable education, experience, expertise and interests | `src/data/profile.ts` |
 
@@ -20,8 +20,8 @@ A fast, private-by-default personal site built with [Astro](https://astro.build)
 
 ### Add something new (no coding)
 
-1. Copy `_TEMPLATE.md` in the right folder, e.g. `src/content/log/_TEMPLATE.md`.
-2. Rename it: lowercase words with hyphens, e.g. `new-explainer-format.md`. The filename becomes the web address (`/log/new-explainer-format/`).
+1. Copy `_TEMPLATE.md` in the right folder, e.g. `src/content/work/_TEMPLATE.md`.
+2. Rename it: lowercase words with hyphens, e.g. `new-explainer-format.md`. The filename becomes the web address (`/work/new-explainer-format/`).
 3. Fill in the fields at the top. Write the body in Markdown.
 4. Keep `draft: true` while you write. Set `draft: false` when it's ready.
 5. Commit and push. The site updates in about two minutes, once every check passes.
@@ -44,7 +44,7 @@ npm run add -- <linkedin-or-facebook-link> --title "Post title" --summary "One l
 
 ### Add an experiment, tool or library item
 
-- **Experiment or tool:** copy `src/content/lab/_TEMPLATE.md`. Experiments need only a title, summary, status and a one-line `focus`; tools and templates also need a version, licence and a download, source or demo link.
+- **Experiment or tool:** copy `src/content/lab/_TEMPLATE.md`. Experiments need only a title, summary, status and a one-line `focus`; tools and templates also need a version, licence and a download, source or demo link. Put downloadable files in `public/downloads/`; the Lab shows their format and real size automatically, and the build stops if a listed file is missing.
 - **Library item (someone else's work):** add a block to `src/content/library.yaml` with the official link, authors, topic and the **exact licence** — some research resources are non-commercial only.
 
 ### Open a project for collaborators
@@ -120,7 +120,7 @@ npm run preview      # serve the production build (search works here)
 src/
   site.config.ts        ← your identity, links and contact options
   content.config.ts     ← the fields each content type accepts
-  content/{work,lab,updates,log}/ ← Markdown entries (+ _TEMPLATE.md); research.yaml, library.yaml
+  content/{work,lab,updates}/ ← Markdown entries (+ _TEMPLATE.md); research.yaml, library.yaml
   assets/               ← photos (optimised at build time)
   pages/                ← routes: home, research, work, lab, updates, collaborate, about, search, tools
   layouts/, components/ ← page structure and reusable parts

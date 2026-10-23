@@ -1,4 +1,6 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
@@ -9,21 +11,66 @@ const experiments = lab.filter((e) => e.data.kind === 'Experiment');
 const tools = lab.filter((e) => e.data.kind !== 'Experiment');
 const library = await getLibrary();
 const topics = [...new Set(library.map((l) => l.data.topic))];
+/** Colour key per topic (classes, not inline styles, so the CSP stays strict). */
+const accentOf = (topic: (typeof topics)[number]) => `accent-${topics.indexOf(topic) % 3}`;
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const nonCommercial = (licence: string) => /\bNC\b|non-commercial/i.test(licence);
+
+const FORMATS: Record<string, string> = { csv: 'CSV', md: 'Markdown', txt: 'Text', pdf: 'PDF', zip: 'ZIP', json: 'JSON', docx: 'Word', xlsx: 'Excel' };
+/** Format and real size of a download, read from public/ at build time. A missing file fails the build. */
+function fileInfo(url: string) {
+  const ext = url.split(/[?#]/)[0].split('.').pop()?.toLowerCase() ?? '';
+  let size = '';
+  if (!isExternal(url)) {
+    const bytes = fs.statSync(path.join(process.cwd(), 'public', decodeURIComponent(url))).size;
+    size = bytes < 1024 ? `${bytes} bytes` : `${(bytes / 1024).toFixed(1)} KB`;
+  }
+  return { ext: ext.slice(0, 4).toUpperCase(), format: FORMATS[ext] ?? ext.toUpperCase(), size };
+}
+
+const sections = [
+  { id: 'experiments', label: 'Experiments', count: experiments.length },
+  { id: 'tools', label: 'Tools', count: tools.length },
+  { id: 'library', label: 'Library', count: library.length },
+].filter((s) => s.count > 0);
 ---
 
 <BaseLayout searchable title="Lab" description="Daniel Khan's lab: language-technology experiments for verifying news, free research tools, and a library of credited outside work.">
-  <PageHeader title="Lab" lede="Experiments I'm running, tools anyone can use, and the outside work I build on — each labelled by its real stage and properly credited." />
+  <PageHeader
+    title="Lab"
+    lede="Experiments I'm running, tools anyone can use, and the outside work I build on — each labelled by its real stage and properly credited."
+    stats={[
+      { value: experiments.length, label: experiments.length === 1 ? 'experiment' : 'experiments' },
+      { value: tools.length, label: 'free tools & templates' },
+      { value: library.length, label: 'credited sources' },
+    ].filter((s) => s.value > 0)}
+  />
+
+  <nav class="subnav" aria-label="Lab sections">
+    <div class="container">
+      <ul>
+        {sections.map((s) => <li><a href={`#${s.id}`} data-section={s.id}>{s.label} <span>{s.count}</span></a></li>)}
+      </ul>
+    </div>
+  </nav>
 
   <div class="container lab">
     {experiments.length > 0 && (
-      <section class="block" aria-labelledby="experiments-title">
-        <h2 id="experiments-title">Experiments</h2>
-        <div class="experiments">
+      <section class="block" id="experiments" aria-labelledby="experiments-title">
+        <div class="block-head">
+          <h2 id="experiments-title">Experiments</h2>
+          <p>Work in progress. Methods and results are published as they hold up — nothing here is a finished claim.</p>
+        </div>
+        <div class="tile-grid">
           {experiments.map((e) => (
-            <article class="exp">
-              <div class="exp-top"><span class="exp-kind">Experiment</span><StatusBadge status={e.data.status} /></div>
-              <h3><a href={`/lab/${e.id}/`}>{e.data.title}{e.data.draft && ' (draft)'}</a></h3>
-              <p>{e.data.focus ?? e.data.summary}</p>
+            <article class="tile">
+              <div class="tile-meta"><span class="tile-kind">Experiment</span><StatusBadge status={e.data.status} /></div>
+              <h3 class="tile-title"><a class="tile-link" href={`/lab/${e.id}/`}>{e.data.title}{e.data.draft && ' (draft)'}</a></h3>
+              <p class="tile-text">{e.data.focus ?? e.data.summary}</p>
+              <div class="tile-foot">
+                <ul class="tile-chips">{e.data.tags.slice(0, 2).map((t) => <li>{t}</li>)}</ul>
+                <span class="tile-arrow" aria-hidden="true">→</span>
+              </div>
             </article>
           ))}
         </div>
@@ -31,78 +78,202 @@ const topics = [...new Set(library.map((l) => l.data.topic))];
     )}
 
     {tools.length > 0 && (
-      <section class="block" aria-labelledby="tools-title">
-        <h2 id="tools-title">Tools and templates</h2>
-        <ul class="tools">
-          {tools.map((t) => (
-            <li class="tool">
-              <div>
-                <a class="tool-title" href={`/lab/${t.id}/`}>{t.data.title}{t.data.draft && ' (draft)'}</a>
-                <p class="tool-meta">{t.data.kind} · v{t.data.version} · {t.data.licence}</p>
-              </div>
-              <div class="tool-actions">
-                {t.data.demo && <a class="btn btn-ghost btn-sm" href={t.data.demo}>Open</a>}
-                {t.data.download && <a class="btn btn-ghost btn-sm" href={t.data.download} download={isExternal(t.data.download) ? undefined : ''}>Download</a>}
-              </div>
-            </li>
-          ))}
+      <section class="block" id="tools" aria-labelledby="tools-title">
+        <div class="block-head">
+          <h2 id="tools-title">Tools &amp; templates</h2>
+          <p>Free to use and adapt. Each one shows its version and licence; no sign-up, no tracking.</p>
+        </div>
+        <ul class="kit">
+          {tools.map((t) => {
+            const file = t.data.download ? fileInfo(t.data.download) : undefined;
+            const web = !file && !!t.data.demo;
+            return (
+              <li class="kit-item">
+                <span class:list={['glyph', { 'glyph-web': web }]} aria-hidden="true">{web ? 'WEB' : file?.ext}</span>
+                <div class="kit-body">
+                  <h3 class="kit-title"><a href={`/lab/${t.id}/`}>{t.data.title}{t.data.draft && ' (draft)'}</a></h3>
+                  <p class="kit-text">{t.data.summary}</p>
+                  <p class="kit-meta">{[t.data.kind, `v${t.data.version}`, t.data.licence, t.data.requirements].filter(Boolean).join(' · ')}</p>
+                </div>
+                <div class="kit-actions">
+                  {file && t.data.download && (
+                    <a class="btn btn-primary btn-sm" href={t.data.download} download={isExternal(t.data.download) ? undefined : ''}>
+                      Download {file.format}
+                    </a>
+                  )}
+                  {t.data.demo && <a class:list={['btn btn-sm', file ? 'btn-ghost' : 'btn-primary']} href={t.data.demo}>Open tool</a>}
+                  {file?.size && <span class="kit-size">{file.size}</span>}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </section>
     )}
 
     {library.length > 0 && (
       <section class="block" id="library" aria-labelledby="library-title">
-        <h2 id="library-title">Library</h2>
-        <p class="intro">Established, openly documented work I use or recommend. It belongs to its authors; follow each link for terms of use.</p>
-        {topics.map((topic) => (
-          <div class="shelf">
-            <h3>{topic}</h3>
-            <ul class="refs">
-              {library.filter((l) => l.data.topic === topic).map(({ data }) => (
-                <li class="ref">
-                  <a class="ref-title" href={data.url} rel="noopener">{data.title} <span aria-hidden="true">↗</span></a>
-                  <p class="ref-by">{data.by} · {data.licence}</p>
-                  <p class="ref-note">{data.note}</p>
-                </li>
-              ))}
-            </ul>
+        <div class="block-head">
+          <h2 id="library-title">Library</h2>
+          <p>Established, openly documented work I use or recommend. It belongs to its authors — check each licence before reuse.</p>
+        </div>
+        {topics.length > 1 && (
+          <div class="filters" role="group" aria-label="Filter by topic" hidden>
+            <button type="button" class="filter" data-topic="all" aria-pressed="true">All <span>{library.length}</span></button>
+            {topics.map((topic) => (
+              <button type="button" class:list={['filter', accentOf(topic)]} data-topic={slug(topic)} aria-pressed="false">
+                {topic} <span>{library.filter((l) => l.data.topic === topic).length}</span>
+              </button>
+            ))}
           </div>
-        ))}
+        )}
+        <p class="visually-hidden" role="status" id="library-status"></p>
+        <ul class="tile-grid refs">
+          {library.map(({ data }) => (
+            <li class:list={['tile ref', accentOf(data.topic)]} data-topic={slug(data.topic)}>
+              <div class="tile-meta"><span class="tile-kind">{data.topic}</span></div>
+              <h3 class="tile-title"><a class="tile-link" href={data.url} rel="noopener">{data.title}<span class="ext" aria-hidden="true"> ↗</span></a></h3>
+              <p class="ref-by">{data.by}</p>
+              <p class="tile-text">{data.note}</p>
+              <div class="tile-foot ref-foot">
+                <span class="licence">{data.licence}</span>
+                {nonCommercial(data.licence) && <span class="nc">Non-commercial</span>}
+              </div>
+            </li>
+          ))}
+        </ul>
       </section>
     )}
   </div>
 </BaseLayout>
 
 <style>
+  /* Section bar: stays under the site header while you scroll the Lab. */
+  .subnav {
+    position: sticky; top: calc(4rem + 1px); z-index: 40;
+    background: color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter: saturate(1.4) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .subnav ul { display: flex; gap: 0.25rem; list-style: none; margin: 0; padding: 0.45rem 0; overflow-x: auto; scrollbar-width: none; }
+  .subnav a {
+    display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.25rem; padding: 0.3rem 0.9rem; border-radius: 999px;
+    font-size: 0.9rem; font-weight: 600; color: var(--ink-soft); text-decoration: none; white-space: nowrap;
+    transition: background-color var(--dur), color var(--dur);
+  }
+  .subnav a span { font-size: 0.78rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .subnav a:hover { color: var(--ink); background: var(--sunk); }
+  .subnav a[aria-current='true'] { background: var(--ink); color: var(--paper); }
+  .subnav a[aria-current='true'] span { color: inherit; opacity: 0.75; }
+  @media (max-width: 30rem) { .subnav a { padding-inline: 0.6rem; font-size: 0.86rem; } }
+
   .lab { padding-bottom: var(--space-section); }
-  .block { padding-top: clamp(2rem, 1.5rem + 2vw, 3rem); }
-  .block > h2 { font-size: var(--h2); margin-bottom: 1rem; }
-  .intro { color: var(--ink-soft); max-width: var(--measure); margin: -0.5rem 0 1rem; }
+  .block { padding-top: clamp(2.25rem, 1.75rem + 2vw, 3.25rem); scroll-margin-top: 8.5rem; }
+  .block-head { margin-bottom: 1.25rem; }
+  .block-head h2 { font-size: var(--h2); }
+  .block-head p { margin-top: 0.35rem; max-width: var(--measure); color: var(--ink-soft); }
 
-  .experiments { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem; }
-  .exp { position: relative; display: flex; flex-direction: column; gap: 0.5rem; padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); border-top: 3px solid var(--sea); transition: border-color .2s; }
-  .exp:hover { border-color: var(--sea); }
-  .exp-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-  .exp-kind { font-size: 0.82rem; font-weight: 600; color: var(--sea); }
-  .exp h3 { font-size: var(--h3); line-height: 1.35; }
-  .exp h3 a { display: inline-block; text-decoration: none; }
-  .exp h3 a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
-  .exp p { color: var(--ink-soft); }
-
-  .tools, .refs { list-style: none; padding: 0; border-top: 1px solid var(--line); }
-  .tool { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1.5rem; padding-block: 0.85rem; border-bottom: 1px solid var(--line); }
-  .tool-title { display: inline-block; font-weight: 600; text-decoration: none; }
-  .tool-title:hover { color: var(--sea); text-decoration: underline; }
-  .tool-meta { font-size: 0.85rem; color: var(--ink-faint); }
-  .tool-actions { display: flex; gap: 0.5rem; }
+  /* Tools & templates: a release shelf, one row per download. */
+  .kit { list-style: none; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+  .kit-item {
+    position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem 1.4rem;
+    padding: 1.2rem 1.35rem; transition: background-color var(--dur) var(--ease);
+  }
+  .kit-item + .kit-item { border-top: 1px solid var(--line); }
+  .kit-item:hover { background: color-mix(in srgb, var(--sunk) 55%, var(--surface)); }
+  .glyph {
+    /* a file with a folded corner, labelled with its real format */
+    position: relative; display: grid; place-items: end center; width: 2.9rem; height: 3.5rem; padding-bottom: 0.45rem;
+    border-radius: 5px 13px 5px 5px; background: var(--sea-wash); color: var(--sea);
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; align-self: start;
+  }
+  .glyph::before {
+    content: ''; position: absolute; top: 0; right: 0; width: 0.9rem; height: 0.9rem; border-radius: 0 0 0 4px;
+    background: color-mix(in srgb, var(--sea) 30%, var(--sea-wash));
+  }
+  .glyph-web { border-radius: 6px; place-items: center; padding: 0.6rem 0 0; }
+  .glyph-web::before { inset: 0 0 auto; width: auto; height: 0.75rem; border-radius: 6px 6px 0 0; }
+  .kit-title { font-size: 1.1rem; font-weight: 650; line-height: 1.3; }
+  .kit-title a { text-decoration: none; color: var(--ink); }
+  .kit-title a:hover { color: var(--sea); text-decoration: underline; text-underline-offset: 0.2em; }
+  .kit-text { margin-top: 0.3rem; max-width: 46rem; color: var(--ink-soft); font-size: 0.95rem; }
+  .kit-meta { margin-top: 0.5rem; font-size: 0.82rem; color: var(--ink-faint); }
+  .kit-actions { display: flex; flex-direction: column; align-items: stretch; gap: 0.4rem; min-width: 10.5rem; }
+  .kit-actions .btn { justify-content: center; }
+  .kit-size { text-align: center; font-size: 0.78rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   :global(.btn-sm) { min-height: 2.25rem; padding: 0.35rem 0.9rem; font-size: 0.88rem; }
+  @media (max-width: 44rem) {
+    .kit-item { grid-template-columns: auto minmax(0, 1fr); }
+    .kit-actions { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; min-width: 0; }
+    .kit-size { text-align: left; }
+  }
 
-  .shelf + .shelf { margin-top: 1.5rem; }
-  .shelf h3 { font-size: 0.95rem; color: var(--ink-soft); margin-bottom: 0.5rem; }
-  .ref { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 0.2rem 1.5rem; padding-block: 0.85rem; border-bottom: 1px solid var(--line); }
-  .ref-title { grid-row: span 2; font-weight: 600; text-decoration: none; display: inline-block; align-self: start; }
-  .ref-title:hover { color: var(--sea); text-decoration: underline; }
-  .ref-by { font-size: 0.85rem; color: var(--ink-faint); }
-  .ref-note { color: var(--ink-soft); font-size: 0.95rem; }
-  @media (max-width: 44rem) { .ref { grid-template-columns: 1fr; } .ref-title { grid-row: auto; } }
+  /* Library */
+  .accent-0 { --tile-accent: var(--sea); }
+  .accent-1 { --tile-accent: var(--shingle); }
+  .accent-2 { --tile-accent: var(--ink-soft); }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
+  .filter {
+    display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.25rem; padding: 0.3rem 0.9rem; cursor: pointer;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-soft); font-size: 0.88rem; font-weight: 600;
+    transition: border-color var(--dur), background-color var(--dur), color var(--dur);
+  }
+  .filter[data-topic]:not([data-topic='all'])::before { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 2px; background: var(--tile-accent); }
+  .filter span { font-size: 0.78rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .filter:hover { border-color: var(--sea); color: var(--ink); }
+  .filter[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .filter[aria-pressed='true'] span { color: inherit; opacity: 0.75; }
+  .refs { list-style: none; padding: 0; }
+  .ref[hidden] { display: none; }
+  .ref .tile-title { font-size: 1.05rem; }
+  .ref .tile-link { display: inline; }
+  .ext { color: var(--sea); }
+  .ref-by { margin-top: -0.25rem; font-size: 0.85rem; color: var(--ink-faint); }
+  .ref-foot { justify-content: flex-start; flex-wrap: wrap; gap: 0.4rem 0.6rem; border-top: 1px dashed var(--line); margin-top: auto; }
+  .licence { color: var(--ink-soft); }
+  .nc {
+    padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.02em;
+    color: var(--shingle); background: color-mix(in srgb, var(--shingle) 12%, transparent); border: 1px solid color-mix(in srgb, var(--shingle) 35%, transparent);
+  }
 </style>
+
+<script>
+  // Highlight the section you are reading in the Lab bar.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.subnav a[data-section]')];
+  const targets = links.map((a) => document.getElementById(a.dataset.section ?? '')).filter((el): el is HTMLElement => !!el);
+  if (targets.length && 'IntersectionObserver' in window) {
+    const visible = new Set<string>();
+    const mark = () => {
+      const current = targets.find((t) => visible.has(t.id))?.id;
+      for (const a of links) {
+        if (a.dataset.section === current) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      }
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id);
+      mark();
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    targets.forEach((t) => io.observe(t));
+  }
+
+  // Library topic filter.
+  const bar = document.querySelector<HTMLElement>('.filters');
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('.filters .filter')];
+  const refs = [...document.querySelectorAll<HTMLElement>('.refs .ref')];
+  const status = document.getElementById('library-status');
+  if (bar && refs.length) {
+    bar.hidden = false;
+    for (const b of buttons) {
+      b.addEventListener('click', () => {
+        const topic = b.dataset.topic ?? 'all';
+        for (const x of buttons) x.setAttribute('aria-pressed', String(x === b));
+        let shown = 0;
+        for (const r of refs) {
+          r.hidden = topic !== 'all' && r.dataset.topic !== topic;
+          if (!r.hidden) shown++;
+        }
+        if (status) status.textContent = `Showing ${shown} of ${refs.length} sources`;
+      });
+    }
+  }
+</script>

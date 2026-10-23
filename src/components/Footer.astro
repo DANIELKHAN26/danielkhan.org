@@ -1,46 +1,85 @@
 ---
 import Lockup from '../assets/brand/dk-lockup.svg';
-import SocialLinks from './SocialLinks.astro';
-import { SITE } from '../site.config';
+import Icon from './Icon.astro';
+import { SITE, socialLinks } from '../site.config';
 const year = new Date().getFullYear();
-const links = [
+const explore = [
   { label: 'Research', href: '/research/' },
   { label: 'Projects', href: '/work/' },
   { label: 'Lab', href: '/lab/' },
   { label: 'Updates', href: '/updates/' },
-  { label: 'Collaborate', href: '/collaborate/' },
   { label: 'About', href: '/about/' },
   { label: 'Search', href: '/search/' },
 ];
+const email = SITE.contact.email;
 ---
 
 <footer class="site-footer">
-  <div class="container footer-top">
+  <div class="container footer-grid">
     <div class="footer-brand">
       <a href="/" aria-label="Daniel Khan, home"><Lockup class="footer-logo" aria-hidden="true" /></a>
-      {SITE.contact.email && <a class="footer-email" href={`mailto:${SITE.contact.email}`}>{SITE.contact.email}</a>}
+      <p class="footer-motto">{SITE.motto}</p>
     </div>
-    <SocialLinks variant="icons" />
+
+    <nav class="footer-col" aria-labelledby="footer-explore">
+      <h2 id="footer-explore">Explore</h2>
+      <ul>{explore.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+    </nav>
+
+    {socialLinks.length > 0 && (
+      <div class="footer-col">
+        <h2 id="footer-follow">Follow</h2>
+        <ul aria-labelledby="footer-follow">
+          {socialLinks.map((s) => (
+            <li><a href={s.url} rel="me noopener"><Icon name={s.icon} size={15} />{s.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <div class="footer-col">
+      <h2 id="footer-contact">Contact</h2>
+      <ul aria-labelledby="footer-contact">
+        {email && <li><a class="footer-email" href={`mailto:${email}`}>{email}</a></li>}
+        <li><a href="/collaborate/">Collaborate with me</a></li>
+      </ul>
+    </div>
   </div>
-  <nav class="container footer-nav" aria-label="Footer">
-    <ul>{links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
-  </nav>
+
   <div class="container footer-base">
     <span>© {year} {SITE.name}</span>
-    <span><a href="/privacy/">Privacy</a> · <a href="/rss.xml">RSS</a></span>
+    <span><a href="/privacy/">Privacy</a><span aria-hidden="true"> · </span><a href="/rss.xml">RSS feed</a></span>
   </div>
 </footer>
 
 <style>
   .site-footer { margin-top: auto; border-top: 1px solid var(--line); background: var(--surface); }
-  .footer-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 2rem; padding-block: 2rem 1.25rem; }
-  .footer-brand { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+  .footer-grid {
+    display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); gap: 2rem 2.5rem;
+    padding-block: clamp(2.25rem, 1.75rem + 2vw, 3.25rem) 2rem;
+  }
   .footer-brand :global(.footer-logo) { display: block; width: 8.5rem; height: auto; color: var(--ink); }
-  .footer-email { color: var(--sea); font-weight: 600; }
-  .footer-email:hover { color: var(--sea-strong); }
-  .footer-nav ul { list-style: none; padding: 0 0 1.25rem; display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; }
-  .footer-nav a { display: inline-block; padding-block: 0.25rem; color: var(--ink-soft); text-decoration: none; }
-  .footer-nav a:hover { color: var(--sea); text-decoration: underline; }
-  .footer-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; padding-block: 1rem 1.5rem; border-top: 1px solid var(--line); font-size: var(--text-sm); color: var(--ink-faint); }
+  .footer-motto { margin-top: 0.9rem; max-width: 22rem; font-family: var(--font-read); font-style: italic; font-size: 1.05rem; line-height: 1.5; color: var(--ink-soft); }
+  .footer-col h2 { margin-bottom: 0.75rem; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+  .footer-col ul { list-style: none; padding: 0; display: grid; gap: 0.15rem; }
+  .footer-col a {
+    display: inline-flex; align-items: center; gap: 0.55rem; min-height: 2rem; color: var(--ink-soft); text-decoration: none;
+    overflow-wrap: anywhere; transition: color var(--dur) var(--ease);
+  }
+  .footer-col a:hover { color: var(--sea); text-decoration: underline; text-underline-offset: 0.2em; }
+  .footer-col .footer-email { color: var(--sea); font-weight: 600; }
+  .footer-base {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; padding-block: 1.1rem 1.5rem;
+    border-top: 1px solid var(--line); font-size: var(--text-sm); color: var(--ink-faint);
+  }
   .footer-base a { color: inherit; }
+  .footer-base a:hover { color: var(--sea); }
+  @media (max-width: 52rem) {
+    .footer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .footer-brand { grid-column: 1 / -1; }
+  }
+  @media (max-width: 34rem) {
+    .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .footer-col:last-child { grid-column: 1 / -1; }
+  }
 </style>

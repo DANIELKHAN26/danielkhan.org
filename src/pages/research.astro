@@ -8,43 +8,86 @@ import { SITE } from '../site.config';
 
 const all = await getResearch();
 const groups = [
-  { id: 'under-review', title: 'Papers under review', items: all.filter((r) => r.data.kind === 'under-review') },
-  { id: 'presentations', title: 'Conference and seminar papers', items: all.filter((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)) },
-  { id: 'projects', title: 'Research projects', items: all.filter((r) => ['thesis', 'project'].includes(r.data.kind)) },
+  { id: 'under-review', tab: 'Under review', title: 'Papers under review', note: 'Journal manuscripts currently in peer review. Copies available on request.', items: all.filter((r) => r.data.kind === 'under-review'), showKind: false },
+  { id: 'presentations', tab: 'Presentations', title: 'Conference and seminar papers', note: '', items: all.filter((r) => ['accepted', 'presented', 'seminar'].includes(r.data.kind)), showKind: true },
+  { id: 'projects', tab: 'Projects', title: 'Research projects', note: '', items: all.filter((r) => ['thesis', 'project'].includes(r.data.kind)), showKind: true },
 ].filter((g) => g.items.length > 0);
 ---
 
 <BaseLayout searchable title="Research" description={`Research by ${SITE.name}: papers under review, conference papers and research projects.`}>
-  <PageHeader title="Research" lede={SITE.focus}>
+  <PageHeader
+    title="Research"
+    lede={SITE.focus}
+    stats={groups.map((g) => ({ value: g.items.length, label: g.tab.toLowerCase() }))}
+  >
     <ul class="tags interests" aria-label="Research interests">{PROFILE.interests.map((i) => <li>{i}</li>)}</ul>
   </PageHeader>
 
   <div class="container research">
-    <nav class="jump" aria-label="On this page">
-      {groups.map((g) => <a href={`#${g.id}`}>{g.title} <span>{g.items.length}</span></a>)}
-    </nav>
+    <div class="tabs" role="group" aria-label="Show" hidden>
+      <button type="button" class="tab" data-filter="all" aria-pressed="true">All <span>{all.length}</span></button>
+      {groups.map((g) => <button type="button" class="tab" data-filter={g.id} aria-pressed="false">{g.tab} <span>{g.items.length}</span></button>)}
+    </div>
+    <p class="visually-hidden" role="status" id="research-status"></p>
+
     {groups.map((g) => (
-      <section class="group" id={g.id} aria-labelledby={`${g.id}-title`}>
-        <h2 id={`${g.id}-title`}>{g.title}</h2>
-        <ResearchList items={g.items} />
+      <section class="group" id={g.id} data-group={g.id} aria-labelledby={`${g.id}-title`}>
+        <div class="group-head">
+          <h2 id={`${g.id}-title`}>{g.title}</h2>
+          {g.note && <p>{g.note}</p>}
+        </div>
+        <ResearchList items={g.items} showKind={g.showKind} />
       </section>
     ))}
-    <p class="note">
-      Ongoing: the <a href="/work/bangladesh-public-interest-research/">Bangladesh public-interest research programme</a>{' '}
-      and <a href="/lab/">language-technology experiments in the Lab</a>. To discuss a paper, <a href="/collaborate/">get in touch</a>.
-    </p>
+
+    <aside class="also" aria-label="Related work">
+      <a class="also-item" href="/work/bangladesh-public-interest-research/">
+        <span class="also-label">Ongoing programme</span>
+        <span class="also-title">Bangladesh public-interest research →</span>
+      </a>
+      <a class="also-item" href="/lab/">
+        <span class="also-label">Lab</span>
+        <span class="also-title">Language technology for verifying news →</span>
+      </a>
+    </aside>
   </div>
 </BaseLayout>
 
 <style>
   .interests { margin-top: 1.25rem; }
-  .research { padding-block: 1.5rem var(--space-section); }
-  .jump { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .jump a { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.25rem; padding: 0.3rem 0.8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 0.9rem; font-weight: 600; text-decoration: none; }
-  .jump a:hover { border-color: var(--sea); color: var(--sea); }
-  .jump span { font-size: 0.8rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-  .group { padding-top: clamp(1.75rem, 1.25rem + 2vw, 2.75rem); }
-  .group h2 { font-size: var(--h3); margin-bottom: 0.75rem; }
-  .note { margin-top: 2.25rem; color: var(--ink-soft); max-width: var(--measure); }
-  .note a { color: var(--sea); }
+  .research { padding-block: 1.75rem var(--space-section); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); width: fit-content; max-width: 100%; }
+  .tab { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.25rem; padding: 0.3rem 0.95rem; border: 0; border-radius: 999px; background: transparent; font-size: 0.9rem; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: background-color var(--dur), color var(--dur); }
+  .tab span { font-size: 0.78rem; font-weight: 600; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+  .tab[aria-pressed='true'] span { color: inherit; opacity: 0.75; }
+  .group { padding-top: 2rem; scroll-margin-top: 5rem; }
+  .group[hidden] { display: none; }
+  .group-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 1rem; margin-bottom: 0.9rem; }
+  .group-head h2 { font-size: var(--h3); }
+  .group-head p { font-size: 0.9rem; color: var(--ink-faint); }
+  .also { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 0.75rem; margin-top: 2.5rem; }
+  .also-item { display: grid; gap: 0.2rem; padding: 1rem 1.2rem; border-radius: 12px; background: var(--sunk); text-decoration: none; transition: background-color var(--dur); }
+  .also-item:hover { background: var(--sea-wash); }
+  .also-label { font-size: 0.8rem; color: var(--ink-faint); }
+  .also-title { font-weight: 650; color: var(--ink); }
 </style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('.tabs');
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('.tabs .tab')];
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-group]')];
+  const status = document.getElementById('research-status');
+  if (bar && groups.length) {
+    bar.hidden = false;
+    for (const tab of tabs) {
+      tab.addEventListener('click', () => {
+        const f = tab.dataset.filter ?? 'all';
+        for (const t of tabs) t.setAttribute('aria-pressed', String(t === tab));
+        for (const g of groups) g.hidden = f !== 'all' && g.dataset.group !== f;
+        if (status) status.textContent = f === 'all' ? 'Showing all research' : `Showing ${tab.textContent?.replace(/\s*\d+$/, '').trim().toLowerCase()}`;
+      });
+    }
+  }
+</script>

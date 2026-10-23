@@ -1,31 +1,59 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { RESEARCH_KINDS } from '../content.config';
+import { SITE } from '../site.config';
 
-interface Props { items: CollectionEntry<'research'>[] }
-const { items } = Astro.props;
+interface Props {
+  items: CollectionEntry<'research'>[];
+  /** Hide the kind label when the whole group shares it (e.g. "Papers under review"). */
+  showKind?: boolean;
+}
+const { items, showKind = true } = Astro.props;
+const email = SITE.contact.email;
+const requestHref = (title: string) =>
+  `mailto:${email}?subject=${encodeURIComponent(`Copy request: ${title}`)}&body=${encodeURIComponent('Hello Daniel,\n\nCould you share a copy of this paper?\n\n')}`;
 ---
 
 <ol class="pubs">
-  {items.map(({ data }) => (
-    <li class="pub">
-      <span class:list={['pub-kind', { pending: data.kind === 'under-review' }]}>{RESEARCH_KINDS[data.kind]}</span>
-      <div class="pub-main">
-        <p class="pub-title">{data.url ? <a href={data.url}>{data.title}</a> : data.title}</p>
-        {(data.venue || data.year) && <p class="pub-venue">{[data.venue, data.year].filter(Boolean).join(', ')}</p>}
-      </div>
-    </li>
-  ))}
+  {items.map(({ data }) => {
+    const meta = [
+      data.kind === 'under-review' ? 'Journal article · manuscript under review' : showKind ? RESEARCH_KINDS[data.kind] : '',
+      data.venue,
+      data.year,
+    ].filter(Boolean);
+    return (
+      <li class:list={['pub', { 'pub-pending': data.kind === 'under-review' }]}>
+        <div class="pub-body">
+          <p class="pub-title">{data.url ? <a href={data.url}>{data.title}</a> : data.title}</p>
+          {meta.length > 0 && <p class="pub-meta">{meta.join(' · ')}</p>}
+        </div>
+        {data.kind === 'under-review' && email && (
+          <a class="pub-action" href={requestHref(data.title)}>Request a copy</a>
+        )}
+      </li>
+    );
+  })}
 </ol>
 
 <style>
-  .pubs { list-style: none; padding: 0; border-top: 1px solid var(--line); }
-  .pub { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 0.35rem 1.5rem; padding-block: 0.95rem; border-bottom: 1px solid var(--line); }
-  .pub-kind { font-size: 0.82rem; font-weight: 600; color: var(--sea); padding-top: 0.2rem; }
-  .pub-kind.pending { color: var(--shingle); }
-  .pub-title { font-family: var(--font-read); font-size: 1.08rem; line-height: 1.45; max-width: 46rem; }
+  .pubs { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
+  .pub {
+    position: relative; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem 2rem;
+    padding: 1rem 1.25rem 1rem 1.4rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+    transition: border-color var(--dur) var(--ease);
+  }
+  .pub::before { content: ''; position: absolute; left: -1px; top: 0.9rem; bottom: 0.9rem; width: 3px; border-radius: 0 3px 3px 0; background: var(--sea); }
+  .pub-pending::before { background: var(--shingle); }
+  .pub:hover { border-color: color-mix(in srgb, var(--sea) 45%, var(--line)); }
+  .pub-body { min-width: 0; }
+  .pub-title { font-family: var(--font-read); font-size: 1.08rem; line-height: 1.45; max-width: 48rem; }
   .pub-title a { color: inherit; }
   .pub-title a:hover { color: var(--sea); }
-  .pub-venue { margin-top: 0.2rem; font-size: 0.92rem; color: var(--ink-soft); font-style: italic; }
-  @media (max-width: 36rem) { .pub { grid-template-columns: 1fr; } .pub-kind { padding-top: 0; } }
+  .pub-meta { margin-top: 0.3rem; font-size: 0.86rem; color: var(--ink-faint); }
+  .pub-action {
+    flex: none; display: inline-flex; align-items: center; min-height: 2.25rem; padding: 0.3rem 0.85rem;
+    border: 1px solid var(--line); border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: var(--sea); text-decoration: none; white-space: nowrap;
+  }
+  .pub-action:hover { border-color: var(--sea); background: var(--sea-wash); }
+  @media (max-width: 40rem) { .pub { flex-direction: column; align-items: flex-start; } }
 </style>

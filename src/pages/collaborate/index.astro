@@ -47,9 +47,9 @@ const linkedin = socialLinks.find((s) => s.icon === 'linkedin');
         <h2 id="projects-title">Open projects</h2>
         <div class="open">
           {open.map((p) => (
-            <article class="open-card">
+            <article class="tile open-card">
               <div class="open-top">
-                <h3><a href={`/work/${p.id}/`}>{p.data.title}</a></h3>
+                <h3 class="tile-title"><a href={`/work/${p.id}/`}>{p.data.title}</a></h3>
                 <StatusBadge status={p.data.status} />
               </div>
               {p.data.collaboration?.needs.length ? (
@@ -115,7 +115,7 @@ const linkedin = socialLinks.find((s) => s.icon === 'linkedin');
 <style>
   .collab { padding-block: 2rem var(--space-section); }
   .ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
-  .way { display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; padding: 1.35rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); scroll-margin-top: 6rem; }
+  .way { display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; padding: 1.35rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); scroll-margin-top: 6rem; }
   .way-icon { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--sea-wash); color: var(--sea); }
   .way h2 { font-size: var(--h3); }
   .way p { color: var(--ink-soft); flex: 1; }
@@ -126,9 +126,8 @@ const linkedin = socialLinks.find((s) => s.icon === 'linkedin');
   .block { padding-top: clamp(2rem, 1.5rem + 2vw, 3rem); scroll-margin-top: 5rem; }
   .block > h2 { font-size: var(--h2); margin-bottom: 1rem; }
   .open { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
-  .open-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 1.15rem 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .open-card { align-items: flex-start; gap: 0.75rem; }
   .open-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; width: 100%; }
-  .open-top h3 { font-size: var(--h3); line-height: 1.35; }
   .open-top a { display: inline-block; text-decoration: none; }
   .open-top a:hover { color: var(--sea); text-decoration: underline; }
   .needs { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; flex: 1; align-content: flex-start; }

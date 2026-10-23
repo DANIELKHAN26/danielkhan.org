@@ -3,4 +3,5 @@
 /workshop/portfolio-template/ /lab/             301
 /workshop/*                /lab/:splat          301
 /podcast/                  /updates/#podcast    301
-/log/                      /updates/#notes      301
+/log/                      /updates/            301
+/log/*                     /updates/            301
