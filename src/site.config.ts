@@ -5,8 +5,7 @@
 export const SITE = {
   name: 'Daniel Khan',
   url: 'https://danielkhan.org',
-  role: 'PhD candidate in Arts',
-  affiliation: 'Macquarie University',
+  role: 'PhD student in Humanities',
   /** Motto shown under your name on the home page. */
   motto: 'Good questions deserve a full answer.',
   /** One line under the logo in the footer — what the site is about. */
@@ -15,7 +14,7 @@ export const SITE = {
   focus:
     'I research digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South. I also write sourced explainers and am developing experimental language tools for checking claims in the news.',
   description:
-    'Daniel Khan — PhD candidate in Arts at Macquarie University researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South.',
+    'Daniel Khan — PhD student in Humanities researching digital authoritarianism, affective media and digital cultures in Bangladesh and the Global South, and building experimental language tools for checking claims in the news.',
 
   /** Public GitHub account and the public repo used for collaboration (Discussions + issue forms). */
   github: {

@@ -4,8 +4,9 @@
  */
 export const PROFILE = {
   bio: [
-    'I am an anthropologist and PhD candidate in Arts at Macquarie University. My research connects anthropology with digital authoritarianism, affective media and digital cultures — and asks what they mean for equity, resilience and representation among marginalised communities in Bangladesh and the Global South.',
-    'Alongside research, I write The Annalist on Substack, am developing experimental language tools to support news verification — including video and Bengali NLP — and am preparing a podcast.',
+    'I am a PhD student in Humanities with a background in anthropology. I study digital authoritarianism, affective media and digital cultures — and what they mean for equity, resilience and representation among marginalised communities in Bangladesh and the Global South.',
+    'My work combines field surveys and interviews with data analysis: coding qualitative material in ATLAS.ti, running statistics in SPSS and working with data in Python, with training in computational social science methods.',
+    'Beyond research, I write The Annalist — sourced explainers on Substack — am building experimental tools for checking claims in news video and Bengali text, and am preparing a podcast.',
   ],
   interests: [
     'Digital authoritarianism',
@@ -15,7 +16,7 @@ export const PROFILE = {
     'Bangladesh and the Global South',
   ],
   education: [
-    { award: 'PhD in Arts', institution: 'Macquarie University, Australia', years: '2026–present' },
+    { award: 'PhD in Humanities', institution: '', years: '2026–present' },
     { award: 'Master of Research (MRes) in Humanities', institution: 'University of Brighton, United Kingdom', years: '' },
     { award: 'Bachelor of Social Science in Anthropology', institution: 'Shahjalal University of Science and Technology, Bangladesh', years: '' },
   ],
@@ -30,5 +31,10 @@ export const PROFILE = {
    * Remove phone number, home address and date of birth from any CV you publish.
    */
   cv: '',
-  methods: ['Qualitative interviews and fieldwork', 'Python', 'ATLAS.ti', 'SPSS', 'EndNote', 'Figma', 'DaVinci Resolve'],
+  /** Skills from your CV, grouped as they appear on the About page. */
+  expertise: [
+    { area: 'Research methods', items: ['Field surveys and interviews', 'Qualitative coding and analysis', 'Quantitative data analysis', 'Computational social science'] },
+    { area: 'Data tools', items: ['Python', 'ATLAS.ti', 'SPSS', 'EndNote'] },
+    { area: 'Design and media', items: ['Figma', 'Adobe XD', 'DaVinci Resolve', 'Photoshop', 'Capture One'] },
+  ],
 } as const;

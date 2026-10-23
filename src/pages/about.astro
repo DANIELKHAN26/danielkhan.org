@@ -16,7 +16,7 @@ const highestDegree = PROFILE.education[0];
       <div>
         <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">About</span></nav>
         <h1>About</h1>
-        <p class="about-role">{SITE.role}, {SITE.affiliation}</p>
+        <p class="about-role">{SITE.role}</p>
       </div>
     </div>
   </header>
@@ -35,7 +35,7 @@ const highestDegree = PROFILE.education[0];
         <summary><span class="f-title">Education</span><span class="f-peek">{highestDegree.award}</span></summary>
         <ul class="timeline">
           {PROFILE.education.map((e) => (
-            <li><strong>{e.award}</strong>{' '}<span>{e.institution}{e.years && <>, <span class="nowrap">{e.years}</span></>}</span></li>
+            <li><strong>{e.award}</strong>{' '}<span>{[e.institution, e.years].filter(Boolean).join(', ')}</span></li>
           ))}
         </ul>
       </details>
@@ -48,8 +48,12 @@ const highestDegree = PROFILE.education[0];
         </ul>
       </details>
       <details name="about">
-        <summary><span class="f-title">Expertise</span><span class="f-peek">{PROFILE.methods.length} methods and tools</span></summary>
-        <ul class="tags">{PROFILE.methods.map((m) => <li>{m}</li>)}</ul>
+        <summary><span class="f-title">Expertise</span><span class="f-peek">{PROFILE.expertise.map((g) => g.area).join(', ')}</span></summary>
+        <dl class="skills">
+          {PROFILE.expertise.map((g) => (
+            <div><dt>{g.area}</dt><dd><ul class="tags">{g.items.map((i) => <li>{i}</li>)}</ul></dd></div>
+          ))}
+        </dl>
       </details>
       <details name="about">
         <summary><span class="f-title">Research interests</span><span class="f-peek">{PROFILE.interests.slice(0, 2).join(', ')}…</span></summary>
@@ -91,6 +95,9 @@ const highestDegree = PROFILE.education[0];
   .timeline strong { display: block; font-weight: 600; }
   .timeline span { color: var(--ink-soft); }
   .nowrap { white-space: nowrap; }
+  .skills { display: grid; gap: 0.9rem; }
+  .skills dt { margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); }
+  .skills dd { margin: 0; }
   .cv { padding-top: 1rem; font-size: 0.92rem; color: var(--ink-soft); }
   .cv a { color: var(--sea); }
   @media (max-width: 52rem) { .about { grid-template-columns: 1fr; } }
