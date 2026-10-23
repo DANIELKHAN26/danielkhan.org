@@ -13,13 +13,13 @@ import { SITE } from '../site.config';
 
 const research = (await getResearch()).slice(0, 3);
 const work = await getWork();
-const projects = [...work.filter((w) => w.data.featured), ...work.filter((w) => !w.data.featured)].slice(0, 4);
+const projects = [...work.filter((w) => w.data.featured), ...work.filter((w) => !w.data.featured)].slice(0, 3);
 const latest = (await getUpdates()).find((u) => !u.data.podcast);
 // Start downloading the portrait (the largest element on screen) before the browser reaches it.
 const heroImage = await getImage({ src: photo, format: 'avif', widths: [...PORTRAIT.widths] });
 ---
 
-<BaseLayout searchable>
+<BaseLayout searchable schema="home">
   <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImage.srcSet.attribute} imagesizes={PORTRAIT.sizes} fetchpriority="high" />
 
   <section class="hero container" aria-labelledby="hero-title">

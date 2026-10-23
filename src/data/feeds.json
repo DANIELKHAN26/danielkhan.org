@@ -1,0 +1,6 @@
+{
+  "_comment": "Public feeds that `npm run sync` reads to import YOUR new posts. Leave a value empty to skip it.",
+  "substack": "https://annalisthub.substack.com/feed",
+  "youtubeChannel": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIRAIIyU6KaJuxQqfGKmUrg",
+  "youtubePodcastPlaylist": ""
+}

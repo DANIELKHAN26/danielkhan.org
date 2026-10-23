@@ -31,11 +31,16 @@ You can do all of this on **github.com** in the browser: open the folder, click 
 ### Add a post from YouTube, Substack, LinkedIn or Facebook
 
 ```bash
-npm run add -- https://annalisthub.substack.com/p/your-post
-npm run add -- https://youtu.be/VIDEO_ID --podcast     # a podcast episode
+npm run sync                                            # import NEW posts from your Substack and YouTube automatically
+npm run add -- https://annalisthub.substack.com/p/your-post            # one post, details read automatically
+npm run add -- https://youtu.be/VIDEO_ID --podcast                     # a podcast episode
+npm run add -- <linkedin-or-facebook-link> --title "Post title" --summary "One line" --image ~/Pictures/post.png
 ```
 
-This reads the post's public preview (title, summary, image), saves the image inside the site, and writes a file in `src/content/updates/`. Visitors never load anything from the platform until they choose to — YouTube videos play only when pressed, through YouTube's privacy-enhanced player. LinkedIn and Facebook often block automatic reading; then a **draft** is created: open it, paste the title (and optionally a summary and a screenshot as `image`), and set `draft: false`. Links must match their platform (a "youtube" post must link to youtube.com), and duplicates are refused.
+- **Substack and YouTube:** `npm run sync` checks your public feeds (set in `src/data/feeds.json`) and adds anything new — nothing is ever duplicated or overwritten. Once you create a YouTube podcast playlist, put its feed URL in `youtubePodcastPlaylist` and episodes are marked automatically.
+- **LinkedIn and Facebook** block automatic reading, so give the title (and optionally `--summary`, `--image` with a screenshot, `--date 2026-11-01`) on the command line. Without `--title` you get a **draft** to finish.
+- Images are copied into the site so visitors never load anything from the platforms — **only add your own posts** (or ones whose images you may show). `--no-image` skips the image.
+- YouTube videos play on your site only when pressed, through YouTube's privacy-enhanced player. Links must match their platform, tracking parameters are removed, network hiccups are retried, and mistyped options are refused.
 
 ### Add an experiment, tool or library item
 
@@ -93,7 +98,8 @@ npm run preview      # serve the production build (search works here)
 - **Content schema:** a missing date, a bad link format or a missing image description stops the build with a clear message.
 - **`scripts/verify-dist.mjs`** checks every built page for broken internal links, missing titles, descriptions or canonical URLs, missing alt text, leaked drafts and placeholder text.
 - **Content Security Policy** on every page (hash-based), no cookies, no analytics, no third-party requests. Fonts are self-hosted.
-- **GitHub Actions** (`.github/workflows/deploy.yml`) runs all checks, then deploys to Cloudflare. A failed check never replaces the live site.
+- **GitHub Actions** (`.github/workflows/deploy.yml`) runs all checks, then deploys to Cloudflare. A failed check never replaces the live site. Actions are pinned to exact commits, run with least privilege, and each deploy keeps a 90-day record (`deploy-manifest`) of every published file's fingerprint.
+- **Rollback:** revert the bad commit and push, or run `npx wrangler rollback` (after a one-time `npx wrangler login`) to return instantly to the previous Cloudflare version.
 - **HTTP security headers** (`public/_headers`): HSTS, clickjacking protection, `nosniff`, a strict referrer and permissions policy. Fingerprinted files are cached for a year.
 - **Monthly link check** (`link-check.yml`) tests external links. GitHub emails you if any break.
 - **Dependabot** opens monthly update pull requests. Merge them when the checks pass.

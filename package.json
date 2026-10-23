@@ -12,7 +12,8 @@
     "astro": "astro",
     "check": "astro check",
     "test": "npm run check && npm run build && node scripts/verify-dist.mjs",
-    "add": "node scripts/add-update.mjs"
+    "add": "node scripts/add-update.mjs",
+    "sync": "node scripts/add-update.mjs --sync"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

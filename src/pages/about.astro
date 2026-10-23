@@ -9,7 +9,7 @@ const latestRole = PROFILE.experience[0];
 const highestDegree = PROFILE.education[0];
 ---
 
-<BaseLayout searchable title="About" description={`About ${SITE.name}: research focus, education, experience and expertise.`}>
+<BaseLayout searchable schema="profile" title="About" description={`About ${SITE.name}: research focus, education, experience and expertise.`}>
   <header class="page-head">
     <div class="container about-head">
       <Portrait size="small" eager />

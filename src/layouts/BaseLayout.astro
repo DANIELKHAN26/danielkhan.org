@@ -1,10 +1,11 @@
 ---
-import { Font } from 'astro:assets';
+import { Font, getImage } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE, socialLinks } from '../site.config';
 import { PROFILE } from '../data/profile';
 import ogDefault from '../assets/og-card.png';
+import portraitPhoto from '../assets/daniel-khan-profile.jpg';
 import '../styles/global.css';
 
 interface Props {
@@ -17,19 +18,22 @@ interface Props {
   noindex?: boolean;
   /** Include this page's main content in the site search (listing pages leave it off). */
   searchable?: boolean;
+  /** Structured data for search engines: 'home' = WebSite + Person; 'profile' = ProfilePage (About). */
+  schema?: 'home' | 'profile';
 }
 
-const { title, description = SITE.description, ogType = 'website', published, noindex = false, searchable = false } = Astro.props;
+const { title, description = SITE.description, ogType = 'website', published, noindex = false, searchable = false, schema } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.role}, ${SITE.affiliation}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(ogDefault.src, Astro.site);
 
+// Google: use the person's real photo (never a placeholder) and only facts shown on the site.
+const photo = await getImage({ src: portraitPhoto, width: 640, format: 'jpg' });
 const person = {
-  '@context': 'https://schema.org',
   '@type': 'Person',
   name: SITE.name,
-  url: SITE.url,
-  image: ogImage.href,
+  url: `${SITE.url}/`,
+  image: new URL(photo.src, Astro.site).href,
   jobTitle: SITE.role,
   affiliation: { '@type': 'CollegeOrUniversity', name: SITE.affiliation },
   alumniOf: PROFILE.education.slice(1).map((e) => ({ '@type': 'CollegeOrUniversity', name: e.institution.split(',')[0] })),
@@ -37,6 +41,16 @@ const person = {
   description: SITE.description,
   sameAs: socialLinks.map((s) => s.url),
 };
+// ProfilePage belongs on the About page (Google lists general home pages as invalid for it);
+// WebSite on the home page declares the site name.
+const structuredData = schema === 'home'
+  ? [
+      { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, alternateName: 'danielkhan.org', url: `${SITE.url}/` },
+      { '@context': 'https://schema.org', ...person },
+    ]
+  : schema === 'profile'
+    ? [{ '@context': 'https://schema.org', '@type': 'ProfilePage', url: canonical.href, mainEntity: person }]
+    : [];
 ---
 
 <!doctype html>
@@ -73,7 +87,7 @@ const person = {
     <Font cssVariable="--font-serif" />
 
     <slot name="head" />
-    <script type="application/ld+json" set:html={JSON.stringify(person)} />
+    {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
 
     <!-- Apply the saved theme before first paint so the page never flashes. -->
     <script is:inline>

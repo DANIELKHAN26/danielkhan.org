@@ -70,6 +70,16 @@ for (const h of ['Strict-Transport-Security', "frame-ancestors 'none'", 'X-Conte
 }
 for (const f of ['robots.txt', '.well-known/security.txt']) if (!existsSync(join(DIST, f))) errors.push(`missing ${f}`);
 
+// Cloudflare Workers static-asset limits: 20,000 files and 25 MiB per file.
+const allFiles = walk(DIST);
+if (allFiles.length > 20000) errors.push(`${allFiles.length} files — over Cloudflare's 20,000-file limit`);
+let totalBytes = 0;
+for (const f of allFiles) {
+  const size = statSync(f).size;
+  totalBytes += size;
+  if (size > 25 * 1024 * 1024) errors.push(`${relative(DIST, f)} is ${(size / 1048576).toFixed(1)} MiB — over the 25 MiB per-file limit (host videos on YouTube instead)`);
+}
+
 const rss = readFileSync(join(DIST, 'rss.xml'), 'utf8');
 if (!rss.includes('<item>')) errors.push('rss.xml has no items');
 
@@ -77,4 +87,4 @@ if (errors.length) {
   console.error(`✗ ${errors.length} problem(s) in dist/:\n  ` + errors.join('\n  '));
   process.exit(1);
 }
-console.log(`✓ dist/ verified: ${pages.length} pages, internal links, metadata, CSP, drafts and placeholders all OK.`);
+console.log(`✓ dist/ verified: ${pages.length} pages, ${allFiles.length} files, ${(totalBytes / 1048576).toFixed(1)} MiB — links, metadata, CSP, drafts, placeholders and size limits OK.`);

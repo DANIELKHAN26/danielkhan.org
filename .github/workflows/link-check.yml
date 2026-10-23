@@ -1,31 +1,44 @@
 name: Monthly link check
 
-# Checks every external link on the live site once a month.
-# GitHub emails you if it fails, so broken links never go unnoticed for long.
+# Checks every external link on the site once a month. GitHub emails you if it fails.
 on:
   schedule:
     - cron: '0 6 1 * *'
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: link-check
+  cancel-in-progress: true
 
 jobs:
   links:
+    name: Check external links
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci && npm run build
-      - uses: lycheeverse/lychee-action@v2
+      # LinkedIn (HTTP 999) and Facebook (HTTP 400) refuse automated checkers, so they would always
+      # look broken; those profile links are checked by hand instead. 429 = rate-limited, not broken.
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
-            --no-progress --max-retries 3 --timeout 30
+            --no-progress --max-retries 3 --retry-wait-time 5 --timeout 30
+            --accept '200..=299,429'
             --root-dir "${{ github.workspace }}/dist"
             --exclude '^https://danielkhan\.org'
+            --exclude '^https://(www\.)?linkedin\.com'
+            --exclude '^https://(www\.|m\.)?facebook\.com'
             --exclude '^https://github\.com/.*/(issues/new|discussions)'
             'dist/**/*.html'
           fail: true

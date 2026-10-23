@@ -6,22 +6,30 @@ on:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No permissions by default; each job asks only for what it needs.
+permissions: {}
 
 concurrency:
   group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel a production deploy halfway; superseded pull-request builds may be cancelled.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   WRANGLER_VERSION: '4.151.3'
 
 jobs:
   build:
+    name: Check and build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      # Actions are pinned to exact commits (tags can be moved); Dependabot proposes updates.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -30,21 +38,37 @@ jobs:
         run: npm run check
       - name: Build site and search index
         run: npm run build
-      - name: Verify links, metadata and drafts
+      - name: Verify links, metadata, drafts and size limits
         run: node scripts/verify-dist.mjs
+      - name: Record exactly what will be published
+        run: |
+          mkdir -p manifest
+          (cd dist && find . -type f -print0 | sort -z | xargs -0 sha256sum) > manifest/dist-sha256.txt
+          echo "commit ${GITHUB_SHA} · files $(wc -l < manifest/dist-sha256.txt) · bytes $(du -sb dist | cut -f1)" > manifest/summary.txt
+          cat manifest/summary.txt
       - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site
           path: dist
           include-hidden-files: true
           retention-days: 7
+      - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: deploy-manifest
+          path: manifest
+          retention-days: 90
 
   # Publishes to Cloudflare only after every check above has passed.
   deploy:
+    name: Deploy to Cloudflare
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     environment:
       name: production
       url: https://danielkhan.org
@@ -53,16 +77,18 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       WRANGLER_SEND_METRICS: 'false'
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: site
           path: dist
       - name: Deploy site
-        run: npx --yes wrangler@${{ env.WRANGLER_VERSION }} deploy
+        run: npx --yes "wrangler@${WRANGLER_VERSION}" deploy
       - name: Deploy www → apex redirect
         working-directory: workers/www-redirect
-        run: npx --yes wrangler@${{ env.WRANGLER_VERSION }} deploy
+        run: npx --yes "wrangler@${WRANGLER_VERSION}" deploy
