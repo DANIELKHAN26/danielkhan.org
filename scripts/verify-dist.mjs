@@ -38,7 +38,7 @@ for (const file of pages) {
   // A bare `alt` attribute is valid (it equals alt="", used for decorative images).
   if (/<img(?![^>]*\salt(?:=|[\s>]))[^>]*>/.test(html)) fail(file, 'image without alt attribute');
   // Look for placeholders only in the page's own text, not inside its scripts.
-  const outsideScripts = html.split(/<script\b[\s\S]*?<\/script\s*>/i).join(' ');
+  const outsideScripts = html.split(/<script\b[\s\S]*?<\/script[^>]*>/i).join(' ');
   const placeholder = outsideScripts.match(placeholders);
   if (placeholder) fail(file, `placeholder text found: ${placeholder[0]}`);
   for (const d of drafts) if (html.includes(`/work/${d}/`)) fail(file, `links to draft "${d}"`);
