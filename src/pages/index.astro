@@ -38,7 +38,7 @@ const email = SITE.contact.email;
 const heroImage = await getImage({ src: photo, format: 'avif', widths: [...PORTRAIT.widths] });
 ---
 
-<BaseLayout searchable schema="home">
+<BaseLayout searchable schema="home" preloadSerif={false}>
   <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImage.srcSet.attribute} imagesizes={PORTRAIT.sizes} fetchpriority="high" />
 
   <section class="hero" aria-labelledby="hero-title">
