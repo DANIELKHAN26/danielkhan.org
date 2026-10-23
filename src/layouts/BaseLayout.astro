@@ -21,11 +21,11 @@ interface Props {
   searchable?: boolean;
   /** Structured data for search engines: 'home' = WebSite + Person; 'profile' = ProfilePage (About). */
   schema?: 'home' | 'profile';
-  /** Fetch the reading (serif) font early — for pages whose text starts in it, so nothing shifts as it loads. */
-  preloadSerif?: boolean;
+  /** Which reading (serif) font style to fetch early: the one visible at the top of the page. */
+  preloadSerif?: 'normal' | 'italic';
 }
 
-const { title, description = SITE.description, ogType = 'website', published, noindex = false, searchable = false, schema, preloadSerif = true } = Astro.props;
+const { title, description = SITE.description, ogType = 'website', published, noindex = false, searchable = false, schema, preloadSerif = 'normal' } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.headline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(ogDefault.src, Astro.site);
@@ -87,7 +87,7 @@ const structuredData = schema === 'home'
 
     <!-- Preload the headline font only (prevents layout shift); body text uses size-matched fallbacks until its font arrives. -->
     <Font cssVariable="--font-display" preload />
-    <Font cssVariable="--font-serif" preload={preloadSerif ? [{ style: 'normal' }] : false} />
+    <Font cssVariable="--font-serif" preload={[{ style: preloadSerif }]} />
 
     <slot name="head" />
     {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />)}

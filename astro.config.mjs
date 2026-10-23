@@ -52,6 +52,9 @@ export default defineConfig({
       name: 'Source Serif 4',
       cssVariable: '--font-serif',
       fallbacks: ['Georgia', 'serif'],
+      // Reading font: never swap in after text is showing (no layout shift on phones without Georgia/Times).
+      // It is preloaded, so it is normally ready in time; otherwise the next page uses it from cache.
+      display: 'optional',
       options: { variants: [...variable('source-serif-4', 'normal', '200 900'), ...variable('source-serif-4', 'italic', '200 900')] },
     },
   ],
