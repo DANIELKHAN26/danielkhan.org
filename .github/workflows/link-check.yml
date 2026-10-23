@@ -29,12 +29,14 @@ jobs:
           cache: npm
       - run: npm ci && npm run build
       # LinkedIn (HTTP 999) and Facebook (HTTP 400) refuse automated checkers, so they would always
-      # look broken; those profile links are checked by hand instead. 429 = rate-limited, not broken.
+      # look broken; those profile links are checked by hand instead. Accepted as "not broken":
+      # 403 = the site blocks datacenter bots (Substack does this to GitHub's servers — verified 200 from
+      # a normal connection) and 429 = rate-limited. Real breakage (404, 410, 5xx, DNS, TLS) still fails.
       - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
             --no-progress --max-retries 3 --retry-wait-time 5 --timeout 30
-            --accept '200..=299,429'
+            --accept '200..=299,403,429'
             --root-dir "${{ github.workspace }}/dist"
             --exclude '^https://danielkhan\.org'
             --exclude '^https://(www\.)?linkedin\.com'
