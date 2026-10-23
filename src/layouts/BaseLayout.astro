@@ -87,7 +87,7 @@ const structuredData = schema === 'home'
     <Font cssVariable="--font-serif" />
 
     <slot name="head" />
-    {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+    {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />)}
 
     <!-- Apply the saved theme before first paint so the page never flashes. -->
     <script is:inline>

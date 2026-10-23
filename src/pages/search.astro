@@ -49,6 +49,17 @@ import PageHeader from '../components/PageHeader.astro';
     return pagefind;
   }
 
+  /** Rebuild an excerpt as plain text plus <mark> highlights only — no other markup is ever inserted. */
+  function highlighted(html: string): Node[] {
+    const doc = new DOMParser().parseFromString(html, 'text/html'); // inert: nothing in it runs
+    return [...doc.body.childNodes].map((n) => {
+      if (n.nodeName !== 'MARK') return document.createTextNode(n.textContent ?? '');
+      const mark = document.createElement('mark');
+      mark.textContent = n.textContent;
+      return mark;
+    });
+  }
+
   function render(results: Result[], query: string) {
     list.replaceChildren(
       ...results.map((r) => {
@@ -63,7 +74,7 @@ import PageHeader from '../components/PageHeader.astro';
         url.textContent = r.url;
         const excerpt = document.createElement('span');
         excerpt.className = 'r-excerpt';
-        excerpt.innerHTML = r.excerpt; // Pagefind escapes page text and only adds <mark> tags.
+        excerpt.append(...highlighted(r.excerpt));
         a.append(title, url, excerpt);
         li.append(a);
         return li;
