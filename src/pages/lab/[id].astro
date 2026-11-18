@@ -1,5 +1,6 @@
 ---
 import { render } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
 import EntryLayout from '../../layouts/EntryLayout.astro';
 import { getLab, isExternal, downloadInfo } from '../../lib/content';
 
@@ -12,11 +13,19 @@ const { entry } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
 const file = data.download ? downloadInfo(data.download) : undefined;
+const coverPdf = data.coverPdf ? downloadInfo(data.coverPdf) : undefined;
+const sourceLabel = data.source && /github\.com/i.test(data.source) ? 'View on GitHub' : 'Source code';
 const actions = [
   data.demo && { label: data.kind === 'Tool' ? 'Open the tool' : 'View demo', url: data.demo, primary: true },
   data.download && { label: `Download ${file?.format ?? ''}`.trim(), url: data.download, primary: !data.demo, download: true },
-  data.source && { label: 'Source code', url: data.source, primary: false },
+  data.source && { label: sourceLabel, url: data.source, primary: !data.demo && !data.download },
 ].filter((a): a is { label: string; url: string; primary: boolean; download?: boolean } => Boolean(a));
+
+// Each figure links to a large copy so its small print can be read on any screen.
+const figures = await Promise.all(
+  data.figures.map(async (f) => ({ ...f, full: await getImage({ src: f.src, width: Math.min(f.src.width, 2600), format: 'webp' }) })),
+);
+const coverFull = data.cover ? await getImage({ src: data.cover, width: Math.min(data.cover.width, 1600), format: 'webp' }) : undefined;
 ---
 
 <EntryLayout
@@ -30,41 +39,81 @@ const actions = [
   tags={data.tags}
   draft={data.draft}
   ogType="website"
+  ogImage={data.ogImage}
+  ogImageAlt={data.ogImage ? data.coverAlt : undefined}
 >
-  {actions.length > 0 && <div class="use-bar" slot="use">
-    {actions.map((a) => (
-      <a
-        class={`btn ${a.primary ? 'btn-primary' : 'btn-ghost'}`}
-        href={a.url}
-        download={a.download && !isExternal(a.url) ? '' : undefined}
-        rel={isExternal(a.url) ? 'noopener' : undefined}
-      >{a.label} <span aria-hidden="true">{a.download ? '↓' : isExternal(a.url) ? '↗' : '→'}</span></a>
-    ))}
-    {file?.size && <span class="use-size">{file.size}</span>}
-  </div>}
+  {(actions.length > 0 || data.cover) && (
+    <div class:list={['use', { 'use-with-cover': data.cover }]} slot="use">
+      {data.cover && data.coverAlt && coverFull && (
+        <a class="use-cover" href={coverFull.src}>
+          <Image src={data.cover} alt={data.coverAlt} widths={[320, 480, 640, 960]} sizes="(min-width: 46rem) 16rem, 70vw" loading="eager" />
+        </a>
+      )}
+      <div class="use-side">
+        <div class="use-bar">
+          {actions.map((a) => (
+            <a
+              class={`btn ${a.primary ? 'btn-primary' : 'btn-ghost'}`}
+              href={a.url}
+              download={a.download && !isExternal(a.url) ? '' : undefined}
+              rel={isExternal(a.url) ? 'noopener' : undefined}
+            >{a.label} <span aria-hidden="true">{a.download ? '↓' : isExternal(a.url) ? '↗' : '→'}</span></a>
+          ))}
+          {data.coverPdf && coverPdf && (
+            <a class="btn btn-ghost" href={data.coverPdf} download>Download the card ({coverPdf.format}) <span aria-hidden="true">↓</span></a>
+          )}
+          {file?.size && <span class="use-size">{file.size}</span>}
+        </div>
+        {data.kind !== 'Experiment' && (
+          <dl class="facts">
+            <div><dt>Version</dt><dd>{data.version}</dd></div>
+            <div><dt>Licence</dt><dd>{data.licence}</dd></div>
+            {data.requirements && <div><dt>Needs</dt><dd>{data.requirements}</dd></div>}
+          </dl>
+        )}
+      </div>
+    </div>
+  )}
 
   <Content />
 
-  {data.kind !== 'Experiment' && (
-    <>
-      <h2 id="licence-and-credits">Licence and credits</h2>
-      <p>
-        Version {data.version}, released under <strong>{data.licence}</strong>.{data.requirements && <> Requirements: {data.requirements}.</>}
-      </p>
-      {data.basedOn.length > 0 ? (
-        <>
-          <p>This resource adapts other people's work. Their licences still apply:</p>
-          <ul>
-            {data.basedOn.map((b) => (
-              <li><a href={b.url} rel="noopener">{b.name}</a>{b.author && <> by {b.author}</>} — {b.licence}</li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <p>Original work by Daniel Khan.</p>
-      )}
-    </>
-  )}
+  <div slot="wide">
+    {figures.length > 0 && (
+      <section class="figures" aria-labelledby="figures-title">
+        <h2 id="figures-title">Figures</h2>
+        {figures.map((f, i) => (
+          <figure class="fig">
+            <a href={f.full.src} class="fig-link" aria-label={`Figure ${i + 1}, full size`}>
+              <Image src={f.src} alt={f.alt} widths={[640, 960, 1280, 1920]} sizes="(min-width: 72rem) 68rem, 100vw" />
+            </a>
+            <figcaption><strong>Figure {i + 1}. {f.title}.</strong>{' '}{f.caption}</figcaption>
+          </figure>
+        ))}
+        <p class="fig-note">Select a figure to open it at full size.</p>
+      </section>
+    )}
+
+    {data.kind !== 'Experiment' && (
+      <div class="prose licence">
+        <h2 id="licence-and-credits">Licence and credits</h2>
+        <p>
+          Version {data.version}, released under <strong>{data.licence}</strong>.{data.requirements && <> Requirements: {data.requirements}.</>}
+        </p>
+        {data.basedOn.length > 0 ? (
+          <>
+            <p>This resource adapts other people's work. Their licences still apply:</p>
+            <ul>
+              {data.basedOn.map((b) => (
+                <li><a href={b.url} rel="noopener">{b.name}</a>{b.author && <> by {b.author}</>} — {b.licence}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p>{data.credit ?? 'Original work by Daniel Khan.'}</p>
+        )}
+      </div>
+    )}
+  </div>
 
   <Fragment slot="actions">
     {data.links.length > 0 && (
@@ -76,7 +125,30 @@ const actions = [
 </EntryLayout>
 
 <style>
-  .use-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.9rem; margin-bottom: 2rem; }
+  .use { margin-bottom: 2rem; }
+  .use-with-cover { display: grid; grid-template-columns: 16rem minmax(0, 1fr); gap: 1.75rem; align-items: center; max-width: 52rem; }
+  .use-cover { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); transition: box-shadow var(--dur) var(--ease); }
+  .use-cover:hover { box-shadow: var(--shadow-md); }
+  .use-cover :global(img) { display: block; width: 100%; height: auto; }
+  .use-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.9rem; }
   .use-size { font-size: var(--text-sm); color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .facts { display: grid; gap: 0.35rem; margin-top: 1.25rem; font-size: 0.92rem; }
+  .facts div { display: flex; gap: 0.75rem; }
+  .facts dt { min-width: 4.5rem; color: var(--ink-faint); }
+  .facts dd { margin: 0; color: var(--ink); }
+  @media (max-width: 40rem) {
+    .use-with-cover { grid-template-columns: 1fr; }
+    .use-cover { width: min(100%, 18rem); }
+  }
+
+  .figures { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+  .figures h2 { font-size: var(--h2); margin-bottom: 1.5rem; }
+  .fig + .fig { margin-top: 2.5rem; }
+  .fig-link { display: block; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .fig-link :global(img) { display: block; width: 100%; height: auto; }
+  .fig figcaption { margin-top: 0.85rem; max-width: 48rem; font-size: 0.95rem; line-height: 1.6; color: var(--ink-soft); }
+  .fig figcaption strong { color: var(--ink); }
+  .fig-note { margin-top: 1.25rem; font-size: var(--text-sm); color: var(--ink-faint); }
+  .licence { margin-top: 3rem; }
   .links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 </style>

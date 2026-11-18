@@ -20,11 +20,14 @@ interface Props {
   coverAlt?: string;
   draft?: boolean;
   ogType?: 'website' | 'article';
+  /** Link-preview image for this page (1200 × 630). */
+  ogImage?: ImageMetadata;
+  ogImageAlt?: string;
 }
 
 const {
   title, summary, section, kicker, date, updated, status, tags = [], minutes,
-  cover, coverAlt, draft = false, ogType = 'article',
+  cover, coverAlt, draft = false, ogType = 'article', ogImage, ogImageAlt,
 } = Astro.props;
 
 const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
@@ -33,7 +36,7 @@ const correctionUrl = githubCommunityUrl
   : '/collaborate/';
 ---
 
-<BaseLayout title={title} description={summary} ogType={ogType} published={date} noindex={draft} searchable>
+<BaseLayout title={title} description={summary} ogType={ogType} published={date} noindex={draft} searchable ogImage={ogImage} ogImageAlt={ogImageAlt}>
   <article>
     <header class="page-head">
       <div class="container">
@@ -61,6 +64,7 @@ const correctionUrl = githubCommunityUrl
       <div class="prose">
         <slot />
       </div>
+      <slot name="wide" />
 
       <footer class="entry-foot" data-pagefind-ignore>
         <slot name="actions" />

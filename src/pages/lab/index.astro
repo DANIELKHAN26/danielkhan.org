@@ -2,11 +2,15 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
+import { Image } from 'astro:assets';
 import { getLab, getLibrary, isExternal, downloadInfo } from '../../lib/content';
 
 const lab = await getLab();
 const experiments = lab.filter((e) => e.data.kind === 'Experiment');
 const tools = lab.filter((e) => e.data.kind !== 'Experiment');
+// Featured releases get a panel of their own at the top of the section; the shelf lists the rest.
+const featured = tools.filter((t) => t.data.featured);
+const shelf = tools.filter((t) => !t.data.featured);
 const library = await getLibrary();
 const topics = [...new Set(library.map((l) => l.data.topic))];
 /** Colour key per topic (classes, not inline styles, so the CSP stays strict). */
@@ -15,8 +19,8 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(
 const nonCommercial = (licence: string) => /\bNC\b|non-commercial/i.test(licence);
 
 const sections = [
-  { id: 'experiments', label: 'Experiments', count: experiments.length },
   { id: 'tools', label: 'Tools', count: tools.length },
+  { id: 'experiments', label: 'Experiments', count: experiments.length },
   { id: 'library', label: 'Library', count: library.length },
 ].filter((s) => s.count > 0);
 ---
@@ -24,10 +28,10 @@ const sections = [
 <BaseLayout searchable title="Lab" description="Daniel Khan's lab: language-technology experiments for verifying news, free research tools, and a library of credited outside work.">
   <PageHeader
     title="Lab"
-    lede="Experiments I'm running, tools anyone can use, and the outside work I build on — each labelled by its real stage and properly credited."
+    lede="Software and tools anyone can use, experiments in progress, and the outside work I build on — each labelled by its real stage and properly credited."
     stats={[
-      { value: experiments.length, label: experiments.length === 1 ? 'experiment' : 'experiments' },
       { value: tools.length, label: 'free tools & templates' },
+      { value: experiments.length, label: experiments.length === 1 ? 'experiment' : 'experiments' },
       { value: library.length, label: 'credited sources' },
     ].filter((s) => s.value > 0)}
   />
@@ -41,6 +45,61 @@ const sections = [
   </nav>
 
   <div class="container lab">
+    {tools.length > 0 && (
+      <section class="block" id="tools" aria-labelledby="tools-title">
+        <div class="block-head">
+          <h2 id="tools-title">Tools &amp; templates</h2>
+          <p>Free to use and adapt. Each one shows its version and licence; no sign-up, no cookies.</p>
+        </div>
+        {featured.map((t) => (
+          <article class="release">
+            {t.data.cover && (
+              <a class="release-cover" href={`/lab/${t.id}/`} tabindex="-1" aria-hidden="true">
+                <Image src={t.data.cover} alt="" widths={[240, 360, 480]} sizes="12rem" />
+              </a>
+            )}
+            <div class="release-body">
+              <p class="release-kicker"><span class="release-flag">Featured</span><span>{t.data.kind} · v{t.data.version} · {t.data.licence}</span></p>
+              <h3 class="release-title"><a href={`/lab/${t.id}/`}>{t.data.title}{t.data.draft && ' (draft)'}</a></h3>
+              <p class="release-text">{t.data.summary}</p>
+              {t.data.requirements && <p class="release-meta">{t.data.requirements}</p>}
+              <div class="release-actions">
+                <a class="btn btn-primary btn-sm" href={`/lab/${t.id}/`}>Read about {t.data.title} <span aria-hidden="true">→</span></a>
+                {t.data.source && <a class="btn btn-ghost btn-sm" href={t.data.source} rel="noopener">{/github\.com/i.test(t.data.source) ? 'View on GitHub' : 'Source code'} <span aria-hidden="true">↗</span></a>}
+              </div>
+            </div>
+          </article>
+        ))}
+        {shelf.length > 0 && <ul class="kit">
+          {shelf.map((t) => {
+            const file = t.data.download ? downloadInfo(t.data.download) : undefined;
+            const web = !file && !!t.data.demo;
+            const code = !file && !web && !!t.data.source;
+            return (
+              <li class="kit-item">
+                <span class:list={['glyph', { 'glyph-web': web || code }]} aria-hidden="true" data-pagefind-ignore>{web ? 'WEB' : code ? 'CODE' : file?.ext}</span>
+                <div class="kit-body">
+                  <h3 class="kit-title"><a href={`/lab/${t.id}/`}>{t.data.title}{t.data.draft && ' (draft)'}</a></h3>
+                  <p class="kit-text">{t.data.summary}</p>
+                  <p class="kit-meta">{[t.data.kind, `v${t.data.version}`, t.data.licence, t.data.requirements].filter(Boolean).join(' · ')}</p>
+                </div>
+                <div class="kit-actions">
+                  {file && t.data.download && (
+                    <a class="btn btn-primary btn-sm" href={t.data.download} download={isExternal(t.data.download) ? undefined : ''}>
+                      Download {file.format}
+                    </a>
+                  )}
+                  {t.data.demo && <a class:list={['btn btn-sm', file ? 'btn-ghost' : 'btn-primary']} href={t.data.demo}>Open tool</a>}
+                  {code && <a class="btn btn-primary btn-sm" href={t.data.source} rel="noopener">Source code <span aria-hidden="true">↗</span></a>}
+                  {file?.size && <span class="kit-size">{file.size}</span>}
+                </div>
+              </li>
+            );
+          })}
+        </ul>}
+      </section>
+    )}
+
     {experiments.length > 0 && (
       <section class="block" id="experiments" aria-labelledby="experiments-title">
         <div class="block-head">
@@ -60,40 +119,6 @@ const sections = [
             </article>
           ))}
         </div>
-      </section>
-    )}
-
-    {tools.length > 0 && (
-      <section class="block" id="tools" aria-labelledby="tools-title">
-        <div class="block-head">
-          <h2 id="tools-title">Tools &amp; templates</h2>
-          <p>Free to use and adapt. Each one shows its version and licence; no sign-up, no cookies.</p>
-        </div>
-        <ul class="kit">
-          {tools.map((t) => {
-            const file = t.data.download ? downloadInfo(t.data.download) : undefined;
-            const web = !file && !!t.data.demo;
-            return (
-              <li class="kit-item">
-                <span class:list={['glyph', { 'glyph-web': web }]} aria-hidden="true" data-pagefind-ignore>{web ? 'WEB' : file?.ext}</span>
-                <div class="kit-body">
-                  <h3 class="kit-title"><a href={`/lab/${t.id}/`}>{t.data.title}{t.data.draft && ' (draft)'}</a></h3>
-                  <p class="kit-text">{t.data.summary}</p>
-                  <p class="kit-meta">{[t.data.kind, `v${t.data.version}`, t.data.licence, t.data.requirements].filter(Boolean).join(' · ')}</p>
-                </div>
-                <div class="kit-actions">
-                  {file && t.data.download && (
-                    <a class="btn btn-primary btn-sm" href={t.data.download} download={isExternal(t.data.download) ? undefined : ''}>
-                      Download {file.format}
-                    </a>
-                  )}
-                  {t.data.demo && <a class:list={['btn btn-sm', file ? 'btn-ghost' : 'btn-primary']} href={t.data.demo}>Open tool</a>}
-                  {file?.size && <span class="kit-size">{file.size}</span>}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
       </section>
     )}
 
@@ -191,6 +216,27 @@ const sections = [
     .kit-item { grid-template-columns: auto minmax(0, 1fr); }
     .kit-actions { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; min-width: 0; }
     .kit-size { text-align: left; }
+  }
+
+  /* Featured release */
+  .release {
+    display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: 1.5rem 2rem; align-items: center; margin-bottom: 1.25rem;
+    padding: 1.5rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface);
+  }
+  .release-cover { display: block; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+  .release-cover:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .release-cover :global(img) { display: block; width: 100%; height: auto; }
+  .release-kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; font-size: 0.82rem; color: var(--ink-faint); }
+  .release-flag { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--sea-wash); color: var(--sea); font-weight: 700; letter-spacing: 0.02em; }
+  .release-title { margin-top: 0.6rem; font-size: var(--h2); line-height: 1.15; }
+  .release-title a { color: var(--ink); text-decoration: none; }
+  .release-title a:hover { color: var(--sea); text-decoration: underline; text-underline-offset: 0.15em; }
+  .release-text { margin-top: 0.6rem; max-width: 40rem; color: var(--ink-soft); }
+  .release-meta { margin-top: 0.5rem; font-size: 0.85rem; color: var(--ink-faint); }
+  .release-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.1rem; }
+  @media (max-width: 40rem) {
+    .release { grid-template-columns: 1fr; padding: 1.25rem; }
+    .release-cover { width: min(100%, 13rem); }
   }
 
   /* Library */

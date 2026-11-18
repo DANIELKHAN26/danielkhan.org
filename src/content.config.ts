@@ -62,7 +62,7 @@ export const LAB_KINDS = ['Experiment', 'Tool', 'Template'] as const;
 
 const lab = defineCollection({
   loader: glob({ pattern: '**/[^_]*.md', base: './src/content/lab' }),
-  schema: z
+  schema: ({ image }) => z
     .object({
       ...common,
       kind: z.enum(LAB_KINDS),
@@ -77,6 +77,21 @@ const lab = defineCollection({
       demo: href.optional(),
       requirements: z.string().optional(),
       links: z.array(link).default([]),
+      /** Shown first in the Lab and on the home page. */
+      featured: z.boolean().default(false),
+      /** A poster or card for the entry (shown on its page and in the Lab). */
+      cover: image().optional(),
+      coverAlt: z.string().optional(),
+      /** Printable version of the cover, e.g. /downloads/my-card.pdf */
+      coverPdf: href.optional(),
+      /** Link-preview image (1200 × 630) for this page; the site default is used otherwise. */
+      ogImage: image().optional(),
+      /** Figures shown under the text, each with a caption. */
+      figures: z
+        .array(z.object({ src: image(), title: z.string().min(3), alt: z.string().min(10), caption: z.string().min(10) }))
+        .default([]),
+      /** One line of credit shown under the licence, when "Original work by Daniel Khan" is not the whole story. */
+      credit: z.string().optional(),
       /** Credit for anything adapted from someone else's work. */
       basedOn: z
         .array(z.object({ name: z.string(), url: href, author: z.string().optional(), licence: z.string() }))
@@ -88,6 +103,10 @@ const lab = defineCollection({
     })
     .refine((d) => d.kind === 'Experiment' || d.download || d.source || d.demo, {
       message: 'Tools and templates need at least one of download, source or demo, so visitors can use them.',
+    })
+    .refine((d) => !d.cover || !!d.coverAlt, {
+      message: 'Add coverAlt (a text description of the image) when you set a cover.',
+      path: ['coverAlt'],
     }),
 });
 

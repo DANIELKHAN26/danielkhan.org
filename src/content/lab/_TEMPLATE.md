@@ -15,6 +15,16 @@ tags: [Topic]
 # download: /downloads/my-file.zip           # file in public/downloads/, or an https:// release
 # source: https://github.com/you/repo        # optional
 # demo: /tools/my-tool/                      # optional
+# featured: true                            # show first in the Lab and on the home page
+# cover: ../../assets/lab/my-tool/card.png   # a poster/card image (put images in src/assets/lab/)
+# coverAlt: What the card says, in words     # required with cover
+# coverPdf: /downloads/my-card.pdf           # printable version of the cover
+# ogImage: ../../assets/lab/my-tool/og.jpg   # link preview, 1200 x 630
+# credit: One line of credit if others' models or ideas are involved
+# figures:
+#   - src: ../../assets/lab/my-tool/fig1.png
+#     alt: What the figure shows, in words
+#     caption: What a reader should take from it, and its limits
 # links:
 #   - label: Paper
 #     url: https://example.org/paper

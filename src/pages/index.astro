@@ -23,14 +23,17 @@ const work = await getWork();
 const projects = [...work.filter((w) => w.data.featured), ...work.filter((w) => !w.data.featured)].slice(0, 3);
 const seeking = work.filter((w) => w.data.collaboration?.open).length;
 
-const experiments = (await getLab()).filter((e) => e.data.kind === 'Experiment' && e.data.status === 'In progress');
+const lab = await getLab();
+const experiments = lab.filter((e) => e.data.kind === 'Experiment' && e.data.status === 'In progress');
+// The newest featured release, if any, leads the lab cell.
+const release = lab.find((e) => e.data.kind !== 'Experiment' && e.data.featured);
 const updates = await getUpdates();
 const latest = updates.find((u) => !u.data.podcast);
 const podcastLive = SITE.podcast.status === 'live';
 
 // "Updated" = the newest date anywhere in the content, so the Now panel never claims to be fresher than it is.
 const lastChange = new Date(Math.max(
-  ...[...work, ...(await getLab()), ...updates].map((e) => ('updated' in e.data && e.data.updated ? e.data.updated : e.data.date).getTime()),
+  ...[...work, ...lab, ...updates].map((e) => ('updated' in e.data && e.data.updated ? e.data.updated : e.data.date).getTime()),
 ));
 const email = SITE.contact.email;
 
@@ -77,7 +80,13 @@ const heroImage = await getImage({ src: photo, format: 'avif', widths: [...PORTR
           <span class="now-sub">Copies available on request</span>
         </a>
       )}
-      {experiments.length > 0 && (
+      {release ? (
+        <a class="now-cell" href={`/lab/${release.id}/`}>
+          <span class="now-label">New in the lab</span>
+          <span class="now-value">{release.data.title} {release.data.version} released</span>
+          <span class="now-sub">{release.data.focus ?? release.data.summary}{experiments.length > 0 && ` Plus ${experiments.length} ${experiments.length === 1 ? 'experiment' : 'experiments'} in progress.`}</span>
+        </a>
+      ) : experiments.length > 0 && (
         <a class="now-cell" href="/lab/#experiments">
           <span class="now-label">In the lab</span>
           <span class="now-value">{experiments.length === 1 ? experiments[0].data.title : `${experiments.length} experiments in progress`}</span>

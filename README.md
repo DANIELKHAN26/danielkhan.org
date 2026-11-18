@@ -45,7 +45,7 @@ npm run add -- <linkedin-or-facebook-link> --title "Post title" --summary "One l
 
 ### Add an experiment, tool or library item
 
-- **Experiment or tool:** copy `src/content/lab/_TEMPLATE.md`. Experiments need only a title, summary, status and a one-line `focus`; tools and templates also need a version, licence and a download, source or demo link. Put downloadable files in `public/downloads/`; the Lab shows their format and real size automatically, and the build stops if a listed file is missing.
+- **Experiment or tool:** copy `src/content/lab/_TEMPLATE.md`. Experiments need only a title, summary, status and a one-line `focus`; tools and templates also need a version, licence and a download, source or demo link. Put downloadable files in `public/downloads/`; the Lab shows their format and real size automatically, and the build stops if a listed file is missing. A release can also have a poster (`cover`, with a PDF as `coverPdf`), a link-preview image (`ogImage`), captioned `figures` and `featured: true` to lead the Lab and the home page — see `src/content/lab/kanm.md` for a complete example; put its images in `src/assets/lab/<name>/`.
 - **Library item (someone else's work):** add a block to `src/content/library.yaml` with the official link, authors, topic and the **exact licence** — some research resources are non-commercial only.
 
 ### Open a project for collaborators
